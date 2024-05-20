@@ -24,7 +24,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Set publishing config
+        run: pnpm config set '//registry.npmjs.org/:_authToken' "${NODE_AUTH_TOKEN}"
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+
       - name: Publish to npm
         run: pnpm recursive exec -- pnpm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}  # You need to set up a secret for your npm token
