@@ -1,0 +1,17 @@
+{
+  "name": "gabber-client-core",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^4.0.0"
+  },
+  "dependencies": {
+    "@types/jsonwebtoken": "^9.0.6",
+    "jsonwebtoken": "^9.0.2",
+    "livekit-client": "^2.1.5"
+  }
+}

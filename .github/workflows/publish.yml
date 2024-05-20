@@ -1,0 +1,25 @@
+name: Publish to npm
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: pnpm/setup-pnpm@v1
+        with:
+          node-version: 14  # Adjust Node.js version as needed
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Publish to npm
+        run: pnpm recursive exec -- pnpm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}  # You need to set up a secret for your npm token

@@ -1,0 +1,7 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/client-core" },
+    { "path": "./packages/server" }
+  ]
+}
