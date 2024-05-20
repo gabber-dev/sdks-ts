@@ -30,4 +30,6 @@ jobs:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
       - name: Publish to npm
-        run: pnpm recursive exec -- pnpm run build && pnpm publish --access public
+        run: |
+          pnpm recursive exec -- pnpm run build
+          pnpm recursive exec -- pnpm publish --access public
