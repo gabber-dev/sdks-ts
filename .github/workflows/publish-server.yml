@@ -1,4 +1,4 @@
-name: Publish Client Core
+name: Publish Server
 
 on:
   workflow_dispatch:
