@@ -1,13 +1,11 @@
-name: Publish Client Core
+name: Publish Client Core 
 
 on:
   workflow_dispatch:
 
 jobs:
   publish:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Publish workflow
-        uses: ./.github/workflows/publish.yml
-        with:
-          package: client-core
+    uses: ./.github/workflows/publish.yml
+    with:
+      package: client-core 
+    secrets: inherit

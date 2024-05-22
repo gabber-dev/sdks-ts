@@ -1,15 +1,11 @@
-name: Publish Client React 
+name: Publish Client React
 
 on:
   workflow_dispatch:
 
 jobs:
   publish:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: Publish workflow
-        uses: ./.github/workflows/publish.yml
-        with:
-          package: client-react
+    uses: ./.github/workflows/publish.yml
+    with:
+      package: client-react 
+    secrets: inherit

@@ -5,9 +5,7 @@ on:
 
 jobs:
   publish:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Publish workflow
-        uses: ./.github/workflows/publish.yml
-        with:
-          package: server
+    uses: ./.github/workflows/publish.yml
+    with:
+      package: server
+    secrets: inherit
