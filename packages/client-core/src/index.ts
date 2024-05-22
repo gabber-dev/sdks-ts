@@ -4,7 +4,10 @@ import {
   RemoteTrackPublication,
   RemoteTrack,
   RemoteAudioTrack,
-  DataPacket_Kind
+  DataPacket_Kind,
+  TrackPublication,
+  Track,
+  LocalTrackPublication
 } from "livekit-client";
 
 export namespace Gabber {
@@ -14,12 +17,14 @@ export namespace Gabber {
     private livekitRoom: Room;
     private agentParticipant: RemoteParticipant | null = null;
     private agentTrack: RemoteAudioTrack | null = null;
+    private _microphoneEnabledState: boolean;
     private messages: SessionMessage[] = [];
     private onSessionStateChanged: SessionStateChangedCallback;
     private onMessagesChanged: OnMessagesChangedCallback;
+    private onMicrophoneChanged: OnMicrophoneCallback;
     private divElement: HTMLDivElement;
 
-    constructor({ url, token, onSessionStateChanged, onMessagesChanged }: SessionParams) {
+    constructor({ url, token, onSessionStateChanged, onMessagesChanged, onMicrophoneChanged }: SessionParams) {
       this.url = url;
       this.token = token;
       this.livekitRoom = new Room();
@@ -32,16 +37,25 @@ export namespace Gabber {
       document.body.appendChild(this.divElement);
       this.onSessionStateChanged = onSessionStateChanged;
       this.onMessagesChanged = onMessagesChanged;
+      this.onMicrophoneChanged = onMicrophoneChanged;
     }
 
     async connect() {
       await this.livekitRoom.connect(this.url, this.token, {
         autoSubscribe: true,
       });
+      this.livekitRoom.localParticipant.on("trackPublished", this.localOnTrackPublished)
+      this.livekitRoom.localParticipant.on("trackUnpublished", this.localOnTrackUnpublished)
+      this.livekitRoom.localParticipant.on("trackMuted", this.localOnTrackMuted)
+      this.livekitRoom.localParticipant.on("trackUnmuted", this.localOnTrackUnMuted)
     }
 
     async disconnect() {
       await this.livekitRoom.disconnect();
+    }
+
+    async setMicrophoneEnabled(enabled: boolean) {
+      await this.livekitRoom.localParticipant.setMicrophoneEnabled(enabled)
     }
 
     destroy() {
@@ -54,11 +68,66 @@ export namespace Gabber {
       }
     }
 
+    private get microphoneEnabledState() {
+      return this._microphoneEnabledState;
+    }
+
+    private set microphoneEnabledState(value: boolean) {
+      if(this._microphoneEnabledState !== value) {
+        this._microphoneEnabledState = value;
+        this.onMicrophoneChanged(value);
+      }
+    }
+
+    private resolveMicrophoneState() {
+      if(!this.livekitRoom.localParticipant) {
+        this.setMicrophoneEnabled(false);
+      }
+      let pub: LocalTrackPublication | null = null;
+      for(const key in this.livekitRoom.localParticipant.audioTrackPublications) {
+        pub = this.livekitRoom.localParticipant.audioTrackPublications[key]
+        break
+      }
+
+      let enabled = false;
+      if(pub.audioTrack && !pub.audioTrack.isMuted) {
+        enabled = true;
+      }
+
+      this.setMicrophoneEnabled(enabled);
+    }
+
+    private localOnTrackUnMuted(publication: TrackPublication) {
+      if(publication.kind === Track.Kind.Audio) {
+        this.resolveMicrophoneState();
+      }
+    }
+
+    private localOnTrackMuted(publication: TrackPublication) {
+      if (publication.kind === Track.Kind.Audio) {
+        this.resolveMicrophoneState();
+      }
+    }
+
+    private localOnTrackPublished(publication: RemoteTrackPublication) {
+      if (publication.kind === Track.Kind.Audio) {
+        this.resolveMicrophoneState();
+      }
+    }
+
+    private localOnTrackUnpublished(publication: RemoteTrackPublication) {
+      if (publication.kind === Track.Kind.Audio) {
+        this.resolveMicrophoneState();
+      }
+    }
+
     private onRoomConnected() {
+      this.resolveMicrophoneState();
       this.onSessionStateChanged("waiting_for_agent");
     }
 
     private onRoomDisconnected() {
+      this.resolveMicrophoneState();
       this.onSessionStateChanged("not_connected");
     }
 
@@ -137,12 +206,14 @@ export namespace Gabber {
 
   type SessionStateChangedCallback = (state: SessionState) => void;
   type OnMessagesChangedCallback = (messages: SessionMessage[]) => void;
+  type OnMicrophoneCallback = (enabled: boolean) => void;
 
   type SessionParams = {
     url: string;
     token: string;
     onSessionStateChanged: SessionStateChangedCallback;
     onMessagesChanged: OnMessagesChangedCallback;
+    onMicrophoneChanged: OnMicrophoneCallback;
   };
 
   export type SessionMessage = {
