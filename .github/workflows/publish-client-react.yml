@@ -1,0 +1,13 @@
+name: Publish Client Core
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish workflow
+        uses: ./.github/workflows/publish.yml
+        with:
+          package: client-react

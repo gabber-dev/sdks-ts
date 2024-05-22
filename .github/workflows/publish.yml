@@ -2,6 +2,9 @@ name: Publish to npm
 
 on:
   workflow_dispatch:
+    inputs:
+      package:
+        required: true
 
 jobs:
   publish:
@@ -31,5 +34,6 @@ jobs:
 
       - name: Publish to npm
         run: |
-          pnpm recursive exec -- pnpm run build
-          pnpm recursive exec -- pnpm publish --access public
+          cd packages/${{inputs.package}}
+          pnpm run build
+          pnpm publish --access public
