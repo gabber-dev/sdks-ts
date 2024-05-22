@@ -62,7 +62,7 @@ export function SessionProvider({ token, url, connect, children }: Props) {
             }
             session.current.disconnect().then(() => session.current = null)
         }
-    }, [connect, onMessagesChanged, onSessionStateChanged, token, url])
+    }, [connect, onMessagesChanged, onMicrophoneChanged, onSessionStateChanged, token, url])
 
     return <SessionContext.Provider value={{
         messages,
@@ -75,5 +75,9 @@ export function SessionProvider({ token, url, connect, children }: Props) {
 }
 
 export function useSession() {
-
+    const context = React.useContext(SessionContext)
+    if(!context) {
+        throw "useSession must be used within a SessionProvider"
+    }
+    return context;
 }
