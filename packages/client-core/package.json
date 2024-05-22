@@ -1,13 +1,13 @@
 {
   "name": "gabber-client-core",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc"
   },
   "devDependencies": {
-    "typescript": "^4.0.0"
+    "typescript": "^5.0.0"
   },
   "dependencies": {
     "livekit-client": "^2.1.5"

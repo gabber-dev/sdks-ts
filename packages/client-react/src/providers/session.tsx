@@ -1,6 +1,6 @@
 import { createContext, useRef, useEffect, useCallback, useState } from 'react'
 import { Gabber } from 'gabber-client-core'
-import React = require('react')
+import React from 'react'
 
 type SessionContextData = {
     inProgressState: Gabber.InProgressState

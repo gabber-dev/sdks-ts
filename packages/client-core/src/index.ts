@@ -17,7 +17,7 @@ export namespace Gabber {
     private livekitRoom: Room;
     private agentParticipant: RemoteParticipant | null = null;
     private agentTrack: RemoteAudioTrack | null = null;
-    private _microphoneEnabledState: boolean;
+    private _microphoneEnabledState: boolean = false;
     private messages: SessionMessage[] = [];
     private onInProgressStateChanged: InProgressStateChangedCallback;
     private onMessagesChanged: OnMessagesChangedCallback;
@@ -68,10 +68,6 @@ export namespace Gabber {
       }
     }
 
-    private get microphoneEnabledState() {
-      return this._microphoneEnabledState;
-    }
-
     private set microphoneEnabledState(value: boolean) {
       if(this._microphoneEnabledState !== value) {
         this._microphoneEnabledState = value;
@@ -81,20 +77,20 @@ export namespace Gabber {
 
     private resolveMicrophoneState() {
       if(!this.livekitRoom.localParticipant) {
-        this.setMicrophoneEnabled(false);
+        this.microphoneEnabledState = false;
       }
       let pub: LocalTrackPublication | null = null;
       for(const key in this.livekitRoom.localParticipant.audioTrackPublications) {
-        pub = this.livekitRoom.localParticipant.audioTrackPublications[key]
+        pub = this.livekitRoom.localParticipant.audioTrackPublications.get(key) ?? null
         break
       }
 
       let enabled = false;
-      if(pub.audioTrack && !pub.audioTrack.isMuted) {
+      if(pub?.audioTrack && !pub?.audioTrack.isMuted) {
         enabled = true;
       }
 
-      this.setMicrophoneEnabled(enabled);
+      this.microphoneEnabledState = enabled
     }
 
     private localOnTrackUnMuted(publication: TrackPublication) {
@@ -133,7 +129,7 @@ export namespace Gabber {
 
     private onTrackSubscribed(
       track: RemoteTrack,
-      publication: RemoteTrackPublication,
+      _: RemoteTrackPublication,
       participant: RemoteParticipant
     ) {
       if (track.kind !== "audio") {
@@ -151,8 +147,8 @@ export namespace Gabber {
 
     private onTrackUnsubscribed(
       track: RemoteTrack,
-      publication: RemoteTrackPublication,
-      participant: RemoteParticipant
+      _: RemoteTrackPublication,
+      __: RemoteParticipant
     ) {
       if (track.kind !== "audio") {
         return;
@@ -173,9 +169,9 @@ export namespace Gabber {
 
     private onDataReceived(
       data: Uint8Array,
-      participant: RemoteParticipant,
-      kind: DataPacket_Kind,
-      topic: string
+      participant: RemoteParticipant | undefined,
+      _: DataPacket_Kind | undefined,
+      topic: string | undefined
     ) {
       if (participant !== this.agentParticipant) {
         return;

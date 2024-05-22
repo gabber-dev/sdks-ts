@@ -1,16 +1,21 @@
 {
+  "private": true,
   "name": "gabber-sdks-ts",
-  "version": "0.1.0",
-  "workspaces": [
-    "packages/*"
-  ],
+  "version": "0.0.0",
   "scripts": {
     "build": "pnpm -r run build",
     "test": "pnpm -r run test",
     "clean": "pnpm -r run clean"
   },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
   "devDependencies": {
-    "typescript": "^4.0.0",
-    "ts-node": "^10.0.0"
+    "typescript": "^5.0.0",
+    "ts-node": "^10.0.0",
+    "tslib": "^2.6.2"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
