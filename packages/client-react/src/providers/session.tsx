@@ -3,7 +3,7 @@ import { Gabber } from 'gabber-client-core'
 import React = require('react')
 
 type SessionContextData = {
-    sessionState: Gabber.SessionState
+    inProgressState: Gabber.InProgressState
     messages: Gabber.SessionMessage[]
     microphoneEnabled: boolean
     setMicrophoneEnabled: (enabled: boolean) => Promise<void>
@@ -20,12 +20,12 @@ type Props = {
 
 export function SessionProvider({ token, url, connect, children }: Props) {
     const session = useRef<Gabber.Session | null>(null)
-    const [sessionState, setSessionState] = useState<Gabber.SessionState>("not_connected")
+    const [inProgressState, setInProgressState] = useState<Gabber.InProgressState>("not_connected")
     const [messages, setMessages] = useState<Gabber.SessionMessage[]>([])
     const [microphoneEnabledState, setMicrophoneEnabledState] = useState(false);
 
-    const onSessionStateChanged = useCallback((sessionState: Gabber.SessionState) => { 
-        setSessionState(sessionState);
+    const onInProgressStateChanged = useCallback((sessionState: Gabber.InProgressState) => { 
+        setInProgressState(sessionState);
     }, [])
 
     const onMessagesChanged = useCallback((messages: Gabber.SessionMessage[]) => {
@@ -53,7 +53,7 @@ export function SessionProvider({ token, url, connect, children }: Props) {
             if(session.current) {
                 return
             }
-            session.current = new Gabber.Session({ url, token, onSessionStateChanged, onMessagesChanged, onMicrophoneChanged })
+            session.current = new Gabber.Session({ url, token, onInProgressStateChanged, onMessagesChanged, onMicrophoneChanged })
             session.current.connect()
         } else {
             if(!session.current) {
@@ -62,11 +62,11 @@ export function SessionProvider({ token, url, connect, children }: Props) {
             }
             session.current.disconnect().then(() => session.current = null)
         }
-    }, [connect, onMessagesChanged, onMicrophoneChanged, onSessionStateChanged, token, url])
+    }, [connect, onInProgressStateChanged, onMessagesChanged, onMicrophoneChanged, token, url])
 
     return <SessionContext.Provider value={{
         messages,
-        sessionState,
+        inProgressState,
         microphoneEnabled: microphoneEnabledState,
         setMicrophoneEnabled,
     }}>

@@ -19,12 +19,12 @@ export namespace Gabber {
     private agentTrack: RemoteAudioTrack | null = null;
     private _microphoneEnabledState: boolean;
     private messages: SessionMessage[] = [];
-    private onSessionStateChanged: SessionStateChangedCallback;
+    private onInProgressStateChanged: InProgressStateChangedCallback;
     private onMessagesChanged: OnMessagesChangedCallback;
     private onMicrophoneChanged: OnMicrophoneCallback;
     private divElement: HTMLDivElement;
 
-    constructor({ url, token, onSessionStateChanged, onMessagesChanged, onMicrophoneChanged }: SessionParams) {
+    constructor({ url, token, onInProgressStateChanged, onMessagesChanged, onMicrophoneChanged }: SessionParams) {
       this.url = url;
       this.token = token;
       this.livekitRoom = new Room();
@@ -35,7 +35,7 @@ export namespace Gabber {
       this.livekitRoom.on("dataReceived", this.onDataReceived);
       this.divElement = document.createElement("div");
       document.body.appendChild(this.divElement);
-      this.onSessionStateChanged = onSessionStateChanged;
+      this.onInProgressStateChanged = onInProgressStateChanged;
       this.onMessagesChanged = onMessagesChanged;
       this.onMicrophoneChanged = onMicrophoneChanged;
     }
@@ -123,12 +123,12 @@ export namespace Gabber {
 
     private onRoomConnected() {
       this.resolveMicrophoneState();
-      this.onSessionStateChanged("waiting_for_agent");
+      this.onInProgressStateChanged("waiting_for_agent");
     }
 
     private onRoomDisconnected() {
       this.resolveMicrophoneState();
-      this.onSessionStateChanged("not_connected");
+      this.onInProgressStateChanged("not_connected");
     }
 
     private onTrackSubscribed(
@@ -146,7 +146,7 @@ export namespace Gabber {
       this.divElement.appendChild(track.attach());
       this.agentParticipant = participant;
       this.agentTrack = track as RemoteAudioTrack;
-      this.onSessionStateChanged("connected");
+      this.onInProgressStateChanged("connected");
     }
 
     private onTrackUnsubscribed(
@@ -167,7 +167,7 @@ export namespace Gabber {
       this.agentParticipant = null;
       this.agentTrack = null;
       if (this.livekitRoom.state === "connected") {
-        this.onSessionStateChanged("waiting_for_agent");
+        this.onInProgressStateChanged("waiting_for_agent");
       }
     }
 
@@ -198,20 +198,20 @@ export namespace Gabber {
     }
   }
 
-  export type SessionState =
+  export type InProgressState =
     | "not_connected"
     | "connecting"
     | "waiting_for_agent"
     | "connected";
 
-  type SessionStateChangedCallback = (state: SessionState) => void;
+  type InProgressStateChangedCallback = (state: InProgressState) => void;
   type OnMessagesChangedCallback = (messages: SessionMessage[]) => void;
   type OnMicrophoneCallback = (enabled: boolean) => void;
 
   type SessionParams = {
     url: string;
     token: string;
-    onSessionStateChanged: SessionStateChangedCallback;
+    onInProgressStateChanged: InProgressStateChangedCallback;
     onMessagesChanged: OnMessagesChangedCallback;
     onMicrophoneChanged: OnMicrophoneCallback;
   };
