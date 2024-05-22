@@ -53,7 +53,7 @@ export function SessionProvider({ token, url, connect, children }: Props) {
             if(session.current) {
                 return
             }
-            session.current = new Gabber.Session({ url, token, onSessionStateChanged, onMessagesChanged })
+            session.current = new Gabber.Session({ url, token, onSessionStateChanged, onMessagesChanged, onMicrophoneChanged })
             session.current.connect()
         } else {
             if(!session.current) {
