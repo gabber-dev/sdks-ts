@@ -1,9 +1,10 @@
 name: Publish to npm
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       package:
+        type: string
         required: true
 
 jobs:
