@@ -35,6 +35,6 @@ jobs:
 
       - name: Publish to npm
         run: |
-          cd packages/${{inputs.package}}
           pnpm run build
+          cd packages/${{inputs.package}}
           pnpm publish --access public
