@@ -2,6 +2,7 @@
   "files": [],
   "references": [
     { "path": "./packages/client-core" },
+    { "path": "./packages/client-react" },
     { "path": "./packages/server" }
   ]
 }
