@@ -1,6 +1,6 @@
 {
   "name": "gabber-client-react",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -21,7 +21,7 @@
   },
   "typings": "dist/index.d.ts",
   "dependencies": {
-    "gabber-client-core": "^0.1.6",
+    "gabber-client-core": "^0.1.7",
     "react": "^18"
   },
   "devDependencies": {
