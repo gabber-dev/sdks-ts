@@ -34,7 +34,7 @@ importers:
   packages/client-react:
     dependencies:
       gabber-client-core:
-        specifier: ^0.1.8
+        specifier: ^0.1.9
         version: link:../client-core
       react:
         specifier: ^18

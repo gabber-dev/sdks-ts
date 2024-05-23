@@ -28,10 +28,10 @@ export namespace Gabber {
       this.url = url;
       this.token = token;
       this.livekitRoom = new Room();
-      this.livekitRoom.on("connected", this.onRoomConnected);
-      this.livekitRoom.on("disconnected", this.onRoomDisconnected);
-      this.livekitRoom.on("trackSubscribed", this.onTrackSubscribed);
-      this.livekitRoom.on("trackUnsubscribed", this.onTrackUnsubscribed);
+      this.livekitRoom.on("connected", this.onRoomConnected.bind(this));
+      this.livekitRoom.on("disconnected", this.onRoomDisconnected.bind(this));
+      this.livekitRoom.on("trackSubscribed", this.onTrackSubscribed.bind(this));
+      this.livekitRoom.on("trackUnsubscribed", this.onTrackUnsubscribed.bind(this));
       this.livekitRoom.on("dataReceived", this.onDataReceived);
       this.divElement = document.createElement("div");
       document.body.appendChild(this.divElement);
@@ -44,10 +44,10 @@ export namespace Gabber {
       await this.livekitRoom.connect(this.url, this.token, {
         autoSubscribe: true,
       });
-      this.livekitRoom.localParticipant.on("trackPublished", this.localOnTrackPublished)
-      this.livekitRoom.localParticipant.on("trackUnpublished", this.localOnTrackUnpublished)
-      this.livekitRoom.localParticipant.on("trackMuted", this.localOnTrackMuted)
-      this.livekitRoom.localParticipant.on("trackUnmuted", this.localOnTrackUnMuted)
+      this.livekitRoom.localParticipant.on("trackPublished", this.localOnTrackPublished.bind(this))
+      this.livekitRoom.localParticipant.on("trackUnpublished", this.localOnTrackUnpublished.bind(this))
+      this.livekitRoom.localParticipant.on("trackMuted", this.localOnTrackMuted.bind(this))
+      this.livekitRoom.localParticipant.on("trackUnmuted", this.localOnTrackUnMuted.bind(this))
     }
 
     async disconnect() {
