@@ -1,6 +1,6 @@
 {
   "name": "gabber-client-react",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -16,7 +16,7 @@
     "src"
   ],
   "scripts": {
-    "build": "tsc --declaration --emitDeclarationOnly",
+    "build": "tsc",
     "lint": "eslint -f unix \"src/**/*.{ts,tsx}\""
   },
   "typings": "dist/index.d.ts",
