@@ -1,0 +1,11 @@
+name: Publish Client Core 
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    uses: ./.github/workflows/publish.yml
+    with:
+      package: client-widget
+    secrets: inherit
