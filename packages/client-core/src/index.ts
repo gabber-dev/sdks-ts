@@ -79,18 +79,7 @@ export namespace Gabber {
       if(!this.livekitRoom.localParticipant) {
         this.microphoneEnabledState = false;
       }
-      let pub: LocalTrackPublication | null = null;
-      for(const key in this.livekitRoom.localParticipant.audioTrackPublications) {
-        pub = this.livekitRoom.localParticipant.audioTrackPublications.get(key) ?? null
-        break
-      }
-
-      let enabled = false;
-      if(pub?.audioTrack && !pub?.audioTrack.isMuted) {
-        enabled = true;
-      }
-
-      this.microphoneEnabledState = enabled
+      this.microphoneEnabledState = this.livekitRoom.localParticipant.isMicrophoneEnabled
     }
 
     private localOnTrackUnMuted(publication: TrackPublication) {
