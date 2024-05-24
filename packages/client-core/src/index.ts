@@ -7,7 +7,6 @@ import {
   DataPacket_Kind,
   TrackPublication,
   Track,
-  LocalTrackPublication
 } from "livekit-client";
 
 export namespace Gabber {
