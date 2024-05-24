@@ -9,6 +9,7 @@ import {
   Track,
   LocalTrackPublication,
   LocalParticipant,
+  Participant,
 } from "livekit-client";
 
 export namespace Gabber {
@@ -36,6 +37,8 @@ export namespace Gabber {
       this.livekitRoom.on("dataReceived", this.onDataReceived.bind(this));
       this.livekitRoom.on("localTrackPublished", this.onLocalTrackPublished.bind(this))
       this.livekitRoom.on("localTrackUnpublished", this.onLocalTrackUnpublished.bind(this))
+      this.livekitRoom.on("trackMuted", this.onTrackMuted.bind(this))
+      this.livekitRoom.on("trackUnmuted", this.onTrackUnmuted.bind(this))
       this.divElement = document.createElement("div");
       document.body.appendChild(this.divElement);
       this.onInProgressStateChanged = onInProgressStateChanged;
@@ -47,8 +50,6 @@ export namespace Gabber {
       await this.livekitRoom.connect(this.url, this.token, {
         autoSubscribe: true,
       });
-      this.livekitRoom.localParticipant.on("trackMuted", this.localOnTrackMuted.bind(this))
-      this.livekitRoom.localParticipant.on("trackUnmuted", this.localOnTrackUnMuted.bind(this))
     }
 
     async disconnect() {
@@ -83,15 +84,21 @@ export namespace Gabber {
       this.microphoneEnabledState = this.livekitRoom.localParticipant.isMicrophoneEnabled
     }
 
-    private localOnTrackUnMuted(publication: TrackPublication) {
-      console.log("Local track unmuted", publication)
+    private onTrackUnmuted(publication: TrackPublication, participant: Participant) {
+      console.log("Local track unmuted", publication, participant)
+      if(!participant.isLocal) {
+        return;
+      }
       if(publication.kind === Track.Kind.Audio) {
         this.resolveMicrophoneState();
       }
     }
 
-    private localOnTrackMuted(publication: TrackPublication) {
-      console.log("Local track muted", publication)
+    private onTrackMuted(publication: TrackPublication, participant: Participant) {
+      console.log("Local track muted", publication, participant)
+      if(!participant.isLocal) {
+        return;
+      }
       if (publication.kind === Track.Kind.Audio) {
         this.resolveMicrophoneState();
       }
