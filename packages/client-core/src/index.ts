@@ -83,44 +83,51 @@ export namespace Gabber {
     }
 
     private localOnTrackUnMuted(publication: TrackPublication) {
+      console.log("Local track unmuted", publication)
       if(publication.kind === Track.Kind.Audio) {
         this.resolveMicrophoneState();
       }
     }
 
     private localOnTrackMuted(publication: TrackPublication) {
+      console.log("Local track muted", publication)
       if (publication.kind === Track.Kind.Audio) {
         this.resolveMicrophoneState();
       }
     }
 
     private localOnTrackPublished(publication: RemoteTrackPublication) {
+      console.log("Local track published", publication)
       if (publication.kind === Track.Kind.Audio) {
         this.resolveMicrophoneState();
       }
     }
 
     private localOnTrackUnpublished(publication: RemoteTrackPublication) {
+      console.log("Local track unpublished", publication)
       if (publication.kind === Track.Kind.Audio) {
         this.resolveMicrophoneState();
       }
     }
 
     private onRoomConnected() {
+      console.log("Room connected")
       this.resolveMicrophoneState();
       this.onInProgressStateChanged("waiting_for_agent");
     }
 
     private onRoomDisconnected() {
+      console.log("Room disconnected")
       this.resolveMicrophoneState();
       this.onInProgressStateChanged("not_connected");
     }
 
     private onTrackSubscribed(
       track: RemoteTrack,
-      _: RemoteTrackPublication,
+      pub: RemoteTrackPublication,
       participant: RemoteParticipant
     ) {
+      console.log("Track subscribed", track, pub, participant)
       if (track.kind !== "audio") {
         return;
       }
@@ -136,9 +143,10 @@ export namespace Gabber {
 
     private onTrackUnsubscribed(
       track: RemoteTrack,
-      _: RemoteTrackPublication,
-      __: RemoteParticipant
+      pub: RemoteTrackPublication,
+      participant: RemoteParticipant
     ) {
+      console.log("Track unsubscribed", track, pub, participant)
       if (track.kind !== "audio") {
         return;
       }
@@ -162,6 +170,7 @@ export namespace Gabber {
       _: DataPacket_Kind | undefined,
       topic: string | undefined
     ) {
+      console.log("Data received", data, participant, topic)
       if (participant !== this.agentParticipant) {
         return;
       }
