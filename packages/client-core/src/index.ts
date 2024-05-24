@@ -7,6 +7,8 @@ import {
   DataPacket_Kind,
   TrackPublication,
   Track,
+  LocalTrackPublication,
+  LocalParticipant,
 } from "livekit-client";
 
 export namespace Gabber {
@@ -31,7 +33,9 @@ export namespace Gabber {
       this.livekitRoom.on("disconnected", this.onRoomDisconnected.bind(this));
       this.livekitRoom.on("trackSubscribed", this.onTrackSubscribed.bind(this));
       this.livekitRoom.on("trackUnsubscribed", this.onTrackUnsubscribed.bind(this));
-      this.livekitRoom.on("dataReceived", this.onDataReceived);
+      this.livekitRoom.on("dataReceived", this.onDataReceived.bind(this));
+      this.livekitRoom.on("localTrackPublished", this.onLocalTrackPublished.bind(this))
+      this.livekitRoom.on("localTrackUnpublished", this.onLocalTrackUnpublished.bind(this))
       this.divElement = document.createElement("div");
       document.body.appendChild(this.divElement);
       this.onInProgressStateChanged = onInProgressStateChanged;
@@ -43,8 +47,6 @@ export namespace Gabber {
       await this.livekitRoom.connect(this.url, this.token, {
         autoSubscribe: true,
       });
-      this.livekitRoom.localParticipant.on("trackPublished", this.localOnTrackPublished.bind(this))
-      this.livekitRoom.localParticipant.on("trackUnpublished", this.localOnTrackUnpublished.bind(this))
       this.livekitRoom.localParticipant.on("trackMuted", this.localOnTrackMuted.bind(this))
       this.livekitRoom.localParticipant.on("trackUnmuted", this.localOnTrackUnMuted.bind(this))
     }
@@ -95,15 +97,15 @@ export namespace Gabber {
       }
     }
 
-    private localOnTrackPublished(publication: RemoteTrackPublication) {
-      console.log("Local track published", publication)
+    private onLocalTrackPublished(publication: LocalTrackPublication, participant: LocalParticipant) {
+      console.log("Local track published", publication, participant)
       if (publication.kind === Track.Kind.Audio) {
         this.resolveMicrophoneState();
       }
     }
 
-    private localOnTrackUnpublished(publication: RemoteTrackPublication) {
-      console.log("Local track unpublished", publication)
+    private onLocalTrackUnpublished(publication: LocalTrackPublication, participant: LocalParticipant) {
+      console.log("Local track unpublished", publication, participant)
       if (publication.kind === Track.Kind.Audio) {
         this.resolveMicrophoneState();
       }
