@@ -1,4 +1,4 @@
-name: Publish Client Core 
+name: Publish Client Widget 
 
 on:
   workflow_dispatch:
