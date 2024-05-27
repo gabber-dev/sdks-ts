@@ -1,15 +1,26 @@
 <html>
-    <head>
-        <script src="../dist/index.js"></script>
-    </head>
 
-    <body>
-        <div id="gabber">
+<head>
+    <script src="../dist/index.js"></script>
+    <style>
+        .gabber {
+            width: 500px;
+            height: 500px;
+        }
+    </style>
+</head>
 
-        </div>
-    </body>
 
-    <script>
-        Gabber.Widget.attach("gabber")
-    </script>
+
+<body>
+    <div class="gabber" id="gabber">
+
+    </div>
+</body>
+
+<script>
+    var w = Gabber.Widget.create({ elementID: "gabber" })
+    w.connect({ url: "test", token: "123" })
+</script>
+
 </html>

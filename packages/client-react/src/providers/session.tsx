@@ -3,11 +3,12 @@ import { Gabber } from 'gabber-client-core'
 import React from 'react'
 
 type SessionContextData = {
-    inProgressState: Gabber.InProgressState
-    messages: Gabber.SessionMessage[]
-    microphoneEnabled: boolean
-    setMicrophoneEnabled: (enabled: boolean) => Promise<void>
-}
+  inProgressState: Gabber.InProgressState;
+  messages: Gabber.SessionMessage[];
+  microphoneEnabled: boolean;
+  setMicrophoneEnabled: (enabled: boolean) => Promise<void>;
+  sendChatMessage: (p: Gabber.SendChatMessageParams) => Promise<void>;
+};
 
 const SessionContext = createContext<SessionContextData | undefined>(undefined)
 
@@ -40,6 +41,17 @@ export function SessionProvider({ token, url, connect, children }: Props) {
         await session.current.setMicrophoneEnabled(enabled);
     }, [])
 
+    const sendChatMessage = useCallback(
+      async (p: Gabber.SendChatMessageParams) => {
+        if(!session.current) {
+            console.error("Trying to send chat message when there is no session")
+            return
+        }
+        await session.current.sendChatMessage(p);
+      },
+      []
+    );
+
     const onMicrophoneChanged = useCallback(async (enabled: boolean) => {
         setMicrophoneEnabledState(enabled);
     }, [])
@@ -64,14 +76,19 @@ export function SessionProvider({ token, url, connect, children }: Props) {
         }
     }, [connect, onInProgressStateChanged, onMessagesChanged, onMicrophoneChanged, token, url])
 
-    return <SessionContext.Provider value={{
-        messages,
-        inProgressState,
-        microphoneEnabled: microphoneEnabledState,
-        setMicrophoneEnabled,
-    }}>
-        { children }
-    </SessionContext.Provider>
+    return (
+      <SessionContext.Provider
+        value={{
+          messages,
+          inProgressState,
+          microphoneEnabled: microphoneEnabledState,
+          sendChatMessage,
+          setMicrophoneEnabled,
+        }}
+      >
+        {children}
+      </SessionContext.Provider>
+    );
 }
 
 export function useSession() {

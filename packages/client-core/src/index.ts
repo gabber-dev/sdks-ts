@@ -26,19 +26,34 @@ export namespace Gabber {
     private onMicrophoneChanged: OnMicrophoneCallback;
     private divElement: HTMLDivElement;
 
-    constructor({ url, token, onInProgressStateChanged, onMessagesChanged, onMicrophoneChanged }: SessionParams) {
+    constructor({
+      url,
+      token,
+      onInProgressStateChanged,
+      onMessagesChanged,
+      onMicrophoneChanged,
+    }: SessionParams) {
       this.url = url;
       this.token = token;
       this.livekitRoom = new Room();
       this.livekitRoom.on("connected", this.onRoomConnected.bind(this));
       this.livekitRoom.on("disconnected", this.onRoomDisconnected.bind(this));
       this.livekitRoom.on("trackSubscribed", this.onTrackSubscribed.bind(this));
-      this.livekitRoom.on("trackUnsubscribed", this.onTrackUnsubscribed.bind(this));
+      this.livekitRoom.on(
+        "trackUnsubscribed",
+        this.onTrackUnsubscribed.bind(this)
+      );
       this.livekitRoom.on("dataReceived", this.onDataReceived.bind(this));
-      this.livekitRoom.on("localTrackPublished", this.onLocalTrackPublished.bind(this))
-      this.livekitRoom.on("localTrackUnpublished", this.onLocalTrackUnpublished.bind(this))
-      this.livekitRoom.on("trackMuted", this.onTrackMuted.bind(this))
-      this.livekitRoom.on("trackUnmuted", this.onTrackUnmuted.bind(this))
+      this.livekitRoom.on(
+        "localTrackPublished",
+        this.onLocalTrackPublished.bind(this)
+      );
+      this.livekitRoom.on(
+        "localTrackUnpublished",
+        this.onLocalTrackUnpublished.bind(this)
+      );
+      this.livekitRoom.on("trackMuted", this.onTrackMuted.bind(this));
+      this.livekitRoom.on("trackUnmuted", this.onTrackUnmuted.bind(this));
       this.divElement = document.createElement("div");
       document.body.appendChild(this.divElement);
       this.onInProgressStateChanged = onInProgressStateChanged;
@@ -57,7 +72,15 @@ export namespace Gabber {
     }
 
     async setMicrophoneEnabled(enabled: boolean) {
-      await this.livekitRoom.localParticipant.setMicrophoneEnabled(enabled)
+      await this.livekitRoom.localParticipant.setMicrophoneEnabled(enabled);
+    }
+
+    async sendChatMessage({ text }: SendChatMessageParams) {
+      const te = new TextEncoder();
+      const encoded = te.encode(JSON.stringify({text}))
+      await this.livekitRoom.localParticipant.publishData(encoded, {
+        topic: "chat_input",
+      });
     }
 
     destroy() {
@@ -71,32 +94,26 @@ export namespace Gabber {
     }
 
     private set microphoneEnabledState(value: boolean) {
-      if(this._microphoneEnabledState !== value) {
+      if (this._microphoneEnabledState !== value) {
         this._microphoneEnabledState = value;
         this.onMicrophoneChanged(value);
       }
     }
 
     private resolveMicrophoneState() {
-      if(!this.livekitRoom.localParticipant) {
+      if (!this.livekitRoom.localParticipant) {
         this.microphoneEnabledState = false;
       }
-      this.microphoneEnabledState = this.livekitRoom.localParticipant.isMicrophoneEnabled
+      this.microphoneEnabledState =
+        this.livekitRoom.localParticipant.isMicrophoneEnabled;
     }
 
-    private onTrackUnmuted(publication: TrackPublication, participant: Participant) {
-      console.log("Local track unmuted", publication, participant)
-      if(!participant.isLocal) {
-        return;
-      }
-      if(publication.kind === Track.Kind.Audio) {
-        this.resolveMicrophoneState();
-      }
-    }
-
-    private onTrackMuted(publication: TrackPublication, participant: Participant) {
-      console.log("Local track muted", publication, participant)
-      if(!participant.isLocal) {
+    private onTrackUnmuted(
+      publication: TrackPublication,
+      participant: Participant
+    ) {
+      console.log("Local track unmuted", publication, participant);
+      if (!participant.isLocal) {
         return;
       }
       if (publication.kind === Track.Kind.Audio) {
@@ -104,28 +121,47 @@ export namespace Gabber {
       }
     }
 
-    private onLocalTrackPublished(publication: LocalTrackPublication, participant: LocalParticipant) {
-      console.log("Local track published", publication, participant)
+    private onTrackMuted(
+      publication: TrackPublication,
+      participant: Participant
+    ) {
+      console.log("Local track muted", publication, participant);
+      if (!participant.isLocal) {
+        return;
+      }
       if (publication.kind === Track.Kind.Audio) {
         this.resolveMicrophoneState();
       }
     }
 
-    private onLocalTrackUnpublished(publication: LocalTrackPublication, participant: LocalParticipant) {
-      console.log("Local track unpublished", publication, participant)
+    private onLocalTrackPublished(
+      publication: LocalTrackPublication,
+      participant: LocalParticipant
+    ) {
+      console.log("Local track published", publication, participant);
+      if (publication.kind === Track.Kind.Audio) {
+        this.resolveMicrophoneState();
+      }
+    }
+
+    private onLocalTrackUnpublished(
+      publication: LocalTrackPublication,
+      participant: LocalParticipant
+    ) {
+      console.log("Local track unpublished", publication, participant);
       if (publication.kind === Track.Kind.Audio) {
         this.resolveMicrophoneState();
       }
     }
 
     private onRoomConnected() {
-      console.log("Room connected")
+      console.log("Room connected");
       this.resolveMicrophoneState();
       this.onInProgressStateChanged("waiting_for_agent");
     }
 
     private onRoomDisconnected() {
-      console.log("Room disconnected")
+      console.log("Room disconnected");
       this.resolveMicrophoneState();
       this.onInProgressStateChanged("not_connected");
     }
@@ -135,7 +171,7 @@ export namespace Gabber {
       pub: RemoteTrackPublication,
       participant: RemoteParticipant
     ) {
-      console.log("Track subscribed", track, pub, participant)
+      console.log("Track subscribed", track, pub, participant);
       if (track.kind !== "audio") {
         return;
       }
@@ -154,7 +190,7 @@ export namespace Gabber {
       pub: RemoteTrackPublication,
       participant: RemoteParticipant
     ) {
-      console.log("Track unsubscribed", track, pub, participant)
+      console.log("Track unsubscribed", track, pub, participant);
       if (track.kind !== "audio") {
         return;
       }
@@ -178,7 +214,7 @@ export namespace Gabber {
       _: DataPacket_Kind | undefined,
       topic: string | undefined
     ) {
-      console.log("Data received", data, participant, topic)
+      console.log("Data received", data, participant, topic);
       if (participant !== this.agentParticipant) {
         return;
       }
@@ -186,7 +222,7 @@ export namespace Gabber {
       if (topic === "message") {
         const messageJson = new TextDecoder().decode(data);
         const message = JSON.parse(messageJson) as SessionMessage;
-        for(let i = 0; i < this.messages.length; i++) {
+        for (let i = 0; i < this.messages.length; i++) {
           if (this.messages[i].id === message.id) {
             this.messages[i] = message;
             this.onMessagesChanged(this.messages);
@@ -216,6 +252,10 @@ export namespace Gabber {
     onInProgressStateChanged: InProgressStateChangedCallback;
     onMessagesChanged: OnMessagesChangedCallback;
     onMicrophoneChanged: OnMicrophoneCallback;
+  };
+
+  export type SendChatMessageParams = {
+    text: string;
   };
 
   export type SessionMessage = {
