@@ -13,7 +13,10 @@ import {
 } from "livekit-client";
 
 export namespace Gabber {
-  export class Session {
+  export class SessionEngine {
+    private _session: Session;
+    private _persona: Persona;
+    private _scenario: Scenario;
     private url: string;
     private token: string;
     private livekitRoom: Room;
@@ -27,14 +30,19 @@ export namespace Gabber {
     private divElement: HTMLDivElement;
 
     constructor({
-      url,
-      token,
+      connectionDetails,
+      session,
+      scenario,
+      persona,
       onInProgressStateChanged,
       onMessagesChanged,
       onMicrophoneChanged,
-    }: SessionParams) {
-      this.url = url;
-      this.token = token;
+    }: SessionEngineParams) {
+      this._session = session;
+      this._persona = persona;
+      this._scenario = scenario;
+      this.url = connectionDetails.url;
+      this.token = connectionDetails.token;
       this.livekitRoom = new Room();
       this.livekitRoom.on("connected", this.onRoomConnected.bind(this));
       this.livekitRoom.on("disconnected", this.onRoomDisconnected.bind(this));
@@ -77,7 +85,7 @@ export namespace Gabber {
 
     async sendChatMessage({ text }: SendChatMessageParams) {
       const te = new TextEncoder();
-      const encoded = te.encode(JSON.stringify({text}))
+      const encoded = te.encode(JSON.stringify({ text }));
       await this.livekitRoom.localParticipant.publishData(encoded, {
         topic: "chat_input",
       });
@@ -91,6 +99,18 @@ export namespace Gabber {
       } catch (e) {
         console.error("Error destroying session", e);
       }
+    }
+
+    public get persona() {
+      return this._persona;
+    }
+
+    public get session() {
+      return this._session;
+    }
+
+    public get scenario() {
+      return this._scenario;
     }
 
     private set microphoneEnabledState(value: boolean) {
@@ -246,9 +266,31 @@ export namespace Gabber {
   type OnMessagesChangedCallback = (messages: SessionMessage[]) => void;
   type OnMicrophoneCallback = (enabled: boolean) => void;
 
-  type SessionParams = {
+  export type ConnectionDetails = {
     url: string;
     token: string;
+  }
+
+  export type Session = {
+    id: string;
+    state: ""
+  }
+
+  export type Persona = {
+    id: string;
+    name: string;
+    image_url: string | null;
+  }
+
+  export type Scenario = {
+    id: string;
+  }
+
+  export type SessionEngineParams = {
+    session: Session;
+    persona: Persona;
+    scenario: Scenario;
+    connectionDetails: ConnectionDetails;
     onInProgressStateChanged: InProgressStateChangedCallback;
     onMessagesChanged: OnMessagesChangedCallback;
     onMicrophoneChanged: OnMicrophoneCallback;

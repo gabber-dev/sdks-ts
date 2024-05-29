@@ -13,82 +13,132 @@ type SessionContextData = {
 const SessionContext = createContext<SessionContextData | undefined>(undefined)
 
 type Props = {
-    url: string | undefined 
-    token: string | undefined
-    connect: boolean
-    children: React.ReactNode
-}
+  connectionDetails: Gabber.ConnectionDetails;
+  session: Gabber.Session;
+  persona: Gabber.Persona;
+  scenario: Gabber.Scenario;
+  connect: boolean;
+  children: React.ReactNode;
+};
 
-export function SessionProvider({ token, url, connect, children }: Props) {
-    const session = useRef<Gabber.Session | null>(null)
-    const [inProgressState, setInProgressState] = useState<Gabber.InProgressState>("not_connected")
-    const [messages, setMessages] = useState<Gabber.SessionMessage[]>([])
-    const [microphoneEnabledState, setMicrophoneEnabledState] = useState(false);
+export function SessionProvider({
+  connectionDetails,
+  persona,
+  session,
+  scenario,
+  connect,
+  children,
+}: Props) {
 
-    const onInProgressStateChanged = useCallback((sessionState: Gabber.InProgressState) => { 
-        setInProgressState(sessionState);
-    }, [])
+  const [inProgressState, setInProgressState] =
+    useState<Gabber.InProgressState>("not_connected");
+  const [messages, setMessages] = useState<Gabber.SessionMessage[]>([]);
+  const [microphoneEnabledState, setMicrophoneEnabledState] = useState(false);
 
-    const onMessagesChanged = useCallback((messages: Gabber.SessionMessage[]) => {
-        setMessages([...messages])
-    }, [])
+  const onInProgressStateChanged = useCallback(
+    (sessionState: Gabber.InProgressState) => {
+      setInProgressState(sessionState);
+    },
+    []
+  );
 
-    const setMicrophoneEnabled = useCallback(async (enabled: boolean) => {
-        if(!session.current) {
-            console.error("Trying to set microphone when there is no session")
-            return
-        }
-        await session.current.setMicrophoneEnabled(enabled);
-    }, [])
+  const onMessagesChanged = useCallback((messages: Gabber.SessionMessage[]) => {
+    setMessages([...messages]);
+  }, []);
 
-    const sendChatMessage = useCallback(
-      async (p: Gabber.SendChatMessageParams) => {
-        if(!session.current) {
-            console.error("Trying to send chat message when there is no session")
-            return
-        }
-        await session.current.sendChatMessage(p);
-      },
-      []
-    );
+  const onMicrophoneChanged = useCallback(async (enabled: boolean) => {
+    setMicrophoneEnabledState(enabled);
+  }, []);
 
-    const onMicrophoneChanged = useCallback(async (enabled: boolean) => {
-        setMicrophoneEnabledState(enabled);
-    }, [])
+  const sessionEngine = useRef<Gabber.SessionEngine>(
+    new Gabber.SessionEngine({
+      connectionDetails,
+      persona,
+      session,
+      scenario,
+      onInProgressStateChanged,
+      onMessagesChanged,
+      onMicrophoneChanged,
+    })
+  );
 
-    useEffect(() => {
-        if(connect) {
-            if(!token || !url) {
-                console.error("Trying to connect without a token or url")
-                return
-            }
-            if(session.current) {
-                return
-            }
-            session.current = new Gabber.Session({ url, token, onInProgressStateChanged, onMessagesChanged, onMicrophoneChanged })
-            session.current.connect()
-        } else {
-            if(!session.current) {
-                console.error("Trying to disconnect from no session")
-                return
-            }
-            session.current.disconnect().then(() => session.current = null)
-        }
-    }, [connect, onInProgressStateChanged, onMessagesChanged, onMicrophoneChanged, token, url])
+  useEffect(() => {
+    if(session.id === sessionEngine.current.session.id) {
+      return;
+    }
 
-    return (
-      <SessionContext.Provider
-        value={{
-          messages,
-          inProgressState,
-          microphoneEnabled: microphoneEnabledState,
-          sendChatMessage,
-          setMicrophoneEnabled,
-        }}
-      >
-        {children}
-      </SessionContext.Provider>
-    );
+    console.error("Using a new session id, this isn't supported yet");
+  }, [session.id])
+
+  const setMicrophoneEnabled = useCallback(async (enabled: boolean) => {
+    if (!sessionEngine.current) {
+      console.error("Trying to set microphone when there is no session");
+      return;
+    }
+    await sessionEngine.current.setMicrophoneEnabled(enabled);
+  }, []);
+
+  const sendChatMessage = useCallback(
+    async (p: Gabber.SendChatMessageParams) => {
+      if (!sessionEngine.current) {
+        console.error("Trying to send chat message when there is no session");
+        return;
+      }
+      await sessionEngine.current.sendChatMessage(p);
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (connect) {
+      if (!connectionDetails) {
+        console.error("Trying to connect without a token or url");
+        return;
+      }
+      if (sessionEngine.current) {
+        return;
+      }
+      sessionEngine.current = new Gabber.SessionEngine({
+        connectionDetails,
+        session,
+        persona,
+        scenario,
+        onInProgressStateChanged,
+        onMessagesChanged,
+        onMicrophoneChanged,
+      });
+      sessionEngine.current.connect();
+    } else {
+      if (!sessionEngine.current) {
+        console.error("Trying to disconnect from no session");
+        return;
+      }
+      sessionEngine.current.disconnect();
+    }
+  }, [
+    connect,
+    session,
+    persona,
+    scenario,
+    connectionDetails,
+    onInProgressStateChanged,
+    onMessagesChanged,
+    onMicrophoneChanged,
+  ]);
+
+  return (
+    <SessionContext.Provider
+      value={{
+        messages,
+        inProgressState,
+        microphoneEnabled: microphoneEnabledState,
+        sendChatMessage,
+        setMicrophoneEnabled,
+      }}
+    >
+      {children}
+    </SessionContext.Provider>
+  );
 }
 
 export function useSession() {
