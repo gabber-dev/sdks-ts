@@ -13,6 +13,7 @@ module.exports = {
     terser(),
     node_resolve(),
     common_resolve(),
+    replace({ "use client": "" }),
     replace({
       preventAssignment: true,
       "process.env.NODE_ENV": JSON.stringify("production"),

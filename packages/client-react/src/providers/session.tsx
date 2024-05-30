@@ -14,18 +14,12 @@ const SessionContext = createContext<SessionContextData | undefined>(undefined)
 
 type Props = {
   connectionDetails: Gabber.ConnectionDetails;
-  session: Gabber.Session;
-  persona: Gabber.Persona;
-  scenario: Gabber.Scenario;
   connect: boolean;
   children: React.ReactNode;
 };
 
 export function SessionProvider({
   connectionDetails,
-  persona,
-  session,
-  scenario,
   connect,
   children,
 }: Props) {
@@ -53,22 +47,11 @@ export function SessionProvider({
   const sessionEngine = useRef<Gabber.SessionEngine>(
     new Gabber.SessionEngine({
       connectionDetails,
-      persona,
-      session,
-      scenario,
       onInProgressStateChanged,
       onMessagesChanged,
       onMicrophoneChanged,
     })
   );
-
-  useEffect(() => {
-    if(session.id === sessionEngine.current.session.id) {
-      return;
-    }
-
-    console.error("Using a new session id, this isn't supported yet");
-  }, [session.id])
 
   const setMicrophoneEnabled = useCallback(async (enabled: boolean) => {
     if (!sessionEngine.current) {
@@ -95,31 +78,11 @@ export function SessionProvider({
         console.error("Trying to connect without a token or url");
         return;
       }
-      if (sessionEngine.current) {
-        return;
-      }
-      sessionEngine.current = new Gabber.SessionEngine({
-        connectionDetails,
-        session,
-        persona,
-        scenario,
-        onInProgressStateChanged,
-        onMessagesChanged,
-        onMicrophoneChanged,
-      });
+      console.log("session engine connecting")
       sessionEngine.current.connect();
-    } else {
-      if (!sessionEngine.current) {
-        console.error("Trying to disconnect from no session");
-        return;
-      }
-      sessionEngine.current.disconnect();
     }
   }, [
     connect,
-    session,
-    persona,
-    scenario,
     connectionDetails,
     onInProgressStateChanged,
     onMessagesChanged,

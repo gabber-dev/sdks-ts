@@ -2,12 +2,9 @@ import React from 'react'
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import { Root } from './components/Root';
-import { Gabber } from 'gabber-client-core';
 
 export class Widget {
-  private connectHandler: (() => void) | null = null;
-
-  static create({ elementID, session, persona, scenario, connectionDetails }: CreateParams) {
+  static create({ elementID, connectionDetails, settings }: CreateParams) {
     const w = new Widget();
     const el = document.getElementById(elementID);
     if (!el) {
@@ -18,39 +15,28 @@ export class Widget {
     root.render(
       <React.StrictMode>
         <Root
-          widget={w}
           connectionDetails={connectionDetails}
-          session={session}
-          persona={persona}
-          scenario={scenario}
+          settings={settings}
         />
       </React.StrictMode>
     );
     return w;
   }
-
-  registerConnectHandler(h: () => void) {
-    this.connectHandler = h;
-  }
-
-  unregisterConnectHandler(h: () => void) {
-    if (this.connectHandler === h) {
-      this.connectHandler = null;
-    }
-  }
-
-  connect() {
-    // Hack to let the connect handler register
-    // from the react component
-    setTimeout(() => {
-      if (this.connectHandler) {
-        this.connectHandler();
-      }
-    }, 10);
-  }
 }
 
-export type CreateParams = { elementID: string } & Pick<
-  Gabber.SessionEngineParams,
-  "session" | "persona" | "scenario" | "connectionDetails"
->;
+export type CreateParams = { elementID: string } & {
+  connectionDetails: { url: string; token: string };
+} & { settings?: Settings };
+
+export type Settings = {
+  autoConnect?: boolean;
+  personaImage?: string;
+  primaryColor?: string;
+  primaryColorContent?: string;
+  secondaryColor?: string;
+  secondaryColorContent?: string;
+  baseColor?: string;
+  baseColorPlusOne?: string;
+  baseColorPlusTwo?: string;
+  baseColorContent?: string;
+}

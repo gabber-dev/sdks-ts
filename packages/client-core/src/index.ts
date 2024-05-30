@@ -14,9 +14,6 @@ import {
 
 export namespace Gabber {
   export class SessionEngine {
-    private _session: Session;
-    private _persona: Persona;
-    private _scenario: Scenario;
     private url: string;
     private token: string;
     private livekitRoom: Room;
@@ -31,16 +28,10 @@ export namespace Gabber {
 
     constructor({
       connectionDetails,
-      session,
-      scenario,
-      persona,
       onInProgressStateChanged,
       onMessagesChanged,
       onMicrophoneChanged,
     }: SessionEngineParams) {
-      this._session = session;
-      this._persona = persona;
-      this._scenario = scenario;
       this.url = connectionDetails.url;
       this.token = connectionDetails.token;
       this.livekitRoom = new Room();
@@ -99,18 +90,6 @@ export namespace Gabber {
       } catch (e) {
         console.error("Error destroying session", e);
       }
-    }
-
-    public get persona() {
-      return this._persona;
-    }
-
-    public get session() {
-      return this._session;
-    }
-
-    public get scenario() {
-      return this._scenario;
     }
 
     private set microphoneEnabledState(value: boolean) {
@@ -271,25 +250,7 @@ export namespace Gabber {
     token: string;
   }
 
-  export type Session = {
-    id: string;
-    state: ""
-  }
-
-  export type Persona = {
-    id: string;
-    name: string;
-    image_url: string | null;
-  }
-
-  export type Scenario = {
-    id: string;
-  }
-
   export type SessionEngineParams = {
-    session: Session;
-    persona: Persona;
-    scenario: Scenario;
     connectionDetails: ConnectionDetails;
     onInProgressStateChanged: InProgressStateChangedCallback;
     onMessagesChanged: OnMessagesChangedCallback;
