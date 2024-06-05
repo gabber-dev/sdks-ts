@@ -41,7 +41,7 @@ export const AgentVisualizer = ({ color, gap }: Props) => {
         }
         thinkingIndex.current += thinkingDirection.current;
         setHeights(
-          agentVolumesRef.current.map((h, idx) => {
+          agentVolumesRef.current.map((_, idx) => {
             if (idx === thinkingIndex.current) {
               return 0.4;
             }
