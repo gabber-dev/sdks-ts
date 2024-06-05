@@ -1,29 +1,15 @@
 import React from "react";
-import { MicrophoneToggle } from "./MicrophoneToggle";
-import { ChatInput } from "./ChatInput";
 import { ContentView } from "./ContentView";
-import { Settings } from "..";
+import { Input } from "./Input";
 
-type Props = {
-  settings?: Settings;
-  connect: () => void;
-};
-
-export function MainView({ settings, connect }: Props) {
+export function MainView() {
   return (
-    <div className="w-full h-full flex flex-col bg-red-400">
-      <div className="grow bg-blue-400">
-        <ContentView connect={connect} settings={settings} />
+    <div className="relative w-full h-full bg-red-400">
+      <div className="absolute left-0 right-0 bottom-0 top-0">
+        <ContentView />
       </div>
-      <div className="h-[50px] bg-green-400">
-        <div className="flex h-full w-full">
-          <div className="h-full aspect-square">
-            <MicrophoneToggle />
-          </div>
-          <div className="h-full grow">
-            <ChatInput />
-          </div>
-        </div>
+      <div className="absolute left-0 right-0 bottom-0 h-[120px] m-2 z-10">
+        <Input heightPixels={120} />
       </div>
     </div>
   );

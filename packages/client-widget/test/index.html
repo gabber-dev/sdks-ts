@@ -11,18 +11,50 @@
     </style>
 </head>
 
-
-
 <body>
     <div class="gabber" id="gabber">
-
     </div>
 </body>
+
 <script>
-    var w = Gabber.Widget.create({
-        elementID: "gabber", connectionDetails: { url: "url", token: "token" }, settings: {
-            autoConnect: false 
-        }
+    var api_key = "71e05660-41f8-405f-a232-f4239eb742c0"
+    var persona = "d579bf4a-23fd-4065-945a-4241b8184b76"
+    var scenario = "efa4471e-7272-491d-b09b-2103918a4c6c"
+    var endpoint = "https://app.gabber.dev/api/v1/session/start"
+    var body = {
+        persona: persona,
+        scenario: scenario
+    }
+    fetch(endpoint, {
+        method: "POST", 
+        headers: {
+            "x-api-key": api_key,
+            "Content-Type": "application/json"
+        }, 
+        body: JSON.stringify(body)
+    }).then(res => {
+        return res.json()
+    }).then(res => {
+        return res.body;
+    }).then(({connection_details, persona, scenario}) => {
+        console.log("Connection details", connection_details, persona, scenario)
+        Gabber.Widget.create({
+            elementID: "gabber",
+            connectionDetails: connection_details,
+            settings: {
+                autoConnect: false,
+                connectText: "connect",
+                personaImage: persona.image_url,
+                primaryColor: "#ff0000",
+                primaryColorContent: "#ffffff",
+                secondaryColor: "#00ff00",
+                secondaryColorContent: "#ffffff",
+                baseColor: "#000000",
+                baseColorPlusOne: "#1c1c1c",
+                baseColorPlusTwo: "#373636",
+                baseColorContent: "#ffffff",
+            }
+        })
     })
 </script>
 

@@ -4,6 +4,9 @@ import { SessionProvider } from "gabber-client-react";
 import React from "react";
 import { MainView } from "./MainView";
 import { Gabber } from "gabber-client-core";
+import { SettingsProvider } from "./SettingsProvider";
+
+const DEFAULT_SETTINGS: Settings = {};
 
 type Props = {
   connectionDetails: Gabber.ConnectionDetails;
@@ -15,14 +18,19 @@ export function Root({ connectionDetails, settings }: Props) {
     Boolean(settings?.autoConnect)
   );
 
+  console.log("shold conect", shouldConnect)
+
   return (
     <SessionProvider
       connectionDetails={connectionDetails}
       connect={shouldConnect}
     >
-      <>
-        <MainView connect={() => setShouldConnect(true)} settings={settings} />
-      </>
+      <SettingsProvider
+        connect={() => setShouldConnect(true)}
+        settings={settings || DEFAULT_SETTINGS}
+      >
+        <MainView />
+      </SettingsProvider>
     </SessionProvider>
   );
 }

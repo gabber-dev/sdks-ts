@@ -30,6 +30,7 @@ export type CreateParams = { elementID: string } & {
 
 export type Settings = {
   autoConnect?: boolean;
+  connectText?: string;
   personaImage?: string;
   primaryColor?: string;
   primaryColorContent?: string;

@@ -10,7 +10,9 @@ import {
   LocalTrackPublication,
   LocalParticipant,
   Participant,
+  LocalAudioTrack,
 } from "livekit-client";
+import { TrackVolumeVisualizer } from "./TrackVolumeVisualizer";
 
 export namespace Gabber {
   export class SessionEngine {
@@ -21,9 +23,14 @@ export namespace Gabber {
     private agentTrack: RemoteAudioTrack | null = null;
     private _microphoneEnabledState: boolean = false;
     private messages: SessionMessage[] = [];
+    private agentVolumeVisualizer: TrackVolumeVisualizer;
+    private userVolumeVisualizer: TrackVolumeVisualizer;
     private onInProgressStateChanged: InProgressStateChangedCallback;
     private onMessagesChanged: OnMessagesChangedCallback;
     private onMicrophoneChanged: OnMicrophoneCallback;
+    private onAgentVolumeChanged: OnVolumeCallback;
+    private onUserVolumeChanged: OnVolumeCallback;
+    private onAgentStateChanged: OnAgentStateChanged;
     private divElement: HTMLDivElement;
 
     constructor({
@@ -31,6 +38,9 @@ export namespace Gabber {
       onInProgressStateChanged,
       onMessagesChanged,
       onMicrophoneChanged,
+      onAgentVolumeChanged,
+      onUserVolumeChanged,
+      onAgentStateChanged,
     }: SessionEngineParams) {
       this.url = connectionDetails.url;
       this.token = connectionDetails.token;
@@ -44,6 +54,10 @@ export namespace Gabber {
       );
       this.livekitRoom.on("dataReceived", this.onDataReceived.bind(this));
       this.livekitRoom.on(
+        "participantMetadataChanged",
+        this.onParticipantMetadataChanged.bind(this)
+      );
+      this.livekitRoom.on(
         "localTrackPublished",
         this.onLocalTrackPublished.bind(this)
       );
@@ -53,11 +67,25 @@ export namespace Gabber {
       );
       this.livekitRoom.on("trackMuted", this.onTrackMuted.bind(this));
       this.livekitRoom.on("trackUnmuted", this.onTrackUnmuted.bind(this));
+
       this.divElement = document.createElement("div");
       document.body.appendChild(this.divElement);
       this.onInProgressStateChanged = onInProgressStateChanged;
       this.onMessagesChanged = onMessagesChanged;
       this.onMicrophoneChanged = onMicrophoneChanged;
+      this.onAgentVolumeChanged = onAgentVolumeChanged;
+      this.onUserVolumeChanged = onUserVolumeChanged;
+      this.onAgentStateChanged = onAgentStateChanged;
+
+      this.agentVolumeVisualizer = new TrackVolumeVisualizer({
+        onTick: this.onAgentVolumeChanged.bind(this),
+        bands: 10,
+      });
+
+      this.userVolumeVisualizer = new TrackVolumeVisualizer({
+        onTick: this.onUserVolumeChanged.bind(this),
+        bands: 10,
+      });
     }
 
     async connect() {
@@ -139,6 +167,9 @@ export namespace Gabber {
     ) {
       console.log("Local track published", publication, participant);
       if (publication.kind === Track.Kind.Audio) {
+        this.userVolumeVisualizer.setTrack(
+          publication.audioTrack as LocalAudioTrack
+        );
         this.resolveMicrophoneState();
       }
     }
@@ -181,6 +212,7 @@ export namespace Gabber {
       this.divElement.appendChild(track.attach());
       this.agentParticipant = participant;
       this.agentTrack = track as RemoteAudioTrack;
+      this.agentVolumeVisualizer.setTrack(track as RemoteAudioTrack);
       this.onInProgressStateChanged("connected");
     }
 
@@ -233,6 +265,26 @@ export namespace Gabber {
         this.onMessagesChanged(this.messages);
       }
     }
+
+    private onParticipantMetadataChanged(
+      metadata: string | undefined,
+      participant: RemoteParticipant | LocalParticipant
+    ) {
+      if (!metadata || !participant.isAgent) {
+        return;
+      }
+      try {
+        const md = JSON.parse(metadata);
+        const { agent_state } = md;
+        if(agent_state != "speaking" && agent_state != "listening" && agent_state != "thinking") {
+          console.error("Unrecognized agent_state", agent_state);
+          return;
+        }
+        this.onAgentStateChanged(agent_state);
+      } catch (e) {
+        console.error("Error on participant metadata cb", e);
+      }
+    }
   }
 
   export type InProgressState =
@@ -241,9 +293,13 @@ export namespace Gabber {
     | "waiting_for_agent"
     | "connected";
 
+  export type AgentState = "listening" | "thinking" | "speaking";
+
   type InProgressStateChangedCallback = (state: InProgressState) => void;
   type OnMessagesChangedCallback = (messages: SessionMessage[]) => void;
   type OnMicrophoneCallback = (enabled: boolean) => void;
+  type OnVolumeCallback = (values: number[], volume: number) => void;
+  type OnAgentStateChanged = (state: AgentState) => void;
 
   export type ConnectionDetails = {
     url: string;
@@ -255,6 +311,9 @@ export namespace Gabber {
     onInProgressStateChanged: InProgressStateChangedCallback;
     onMessagesChanged: OnMessagesChangedCallback;
     onMicrophoneChanged: OnMicrophoneCallback;
+    onAgentStateChanged: OnAgentStateChanged;
+    onAgentVolumeChanged: OnVolumeCallback;
+    onUserVolumeChanged: OnVolumeCallback;
   };
 
   export type SendChatMessageParams = {
