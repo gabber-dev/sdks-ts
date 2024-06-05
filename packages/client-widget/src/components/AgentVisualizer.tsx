@@ -24,9 +24,7 @@ export const AgentVisualizer = ({ color, gap }: Props) => {
       return;
     }
 
-    if(agentStateRef.current === "listening" || agentStateRef.current === "speaking") {
-      setHeights(agentVolumeBands)
-    } else if(agentStateRef.current === "thinking") {
+    if(agentStateRef.current === "thinking") {
       if (thinkingIndex.current >= agentVolumesRef.current.length) {
         thinkingIndex.current = agentVolumesRef.current.length - 1;
       }
@@ -51,6 +49,8 @@ export const AgentVisualizer = ({ color, gap }: Props) => {
           })
         );
       }
+    } else {
+      setHeights(agentVolumesRef.current)
     }
   })
 
