@@ -245,14 +245,14 @@ export namespace Gabber {
       _: DataPacket_Kind | undefined,
       topic: string | undefined
     ) {
-      console.log("Data received", data, participant, topic);
       if (participant !== this.agentParticipant) {
         return;
       }
 
+      const decoded = new TextDecoder().decode(data)
+      console.log("Data received", decoded, participant, topic);
       if (topic === "message") {
-        const messageJson = new TextDecoder().decode(data);
-        const message = JSON.parse(messageJson) as SessionMessage;
+        const message = JSON.parse(decoded) as SessionMessage;
         for (let i = 0; i < this.messages.length; i++) {
           if (this.messages[i].id === message.id) {
             this.messages[i] = message;
