@@ -11,8 +11,6 @@ module.exports = {
   plugins: [
     typescript({ tsconfig: "./tsconfig.json" }),
     terser(),
-    node_resolve(),
-    common_resolve(),
     replace({ "use client": "" }),
     replace({
       preventAssignment: true,
