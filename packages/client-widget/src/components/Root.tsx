@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Settings } from "..";
 import { SessionProvider } from "gabber-client-react";
 import React from "react";
 import { MainView } from "./MainView";
 import { Gabber } from "gabber-client-core";
 import { SettingsProvider } from "./SettingsProvider";
+import { BottomBarView } from "./BottomBarView";
 
-const DEFAULT_SETTINGS: Settings = {};
+const DEFAULT_SETTINGS: Settings = {
+  layout: "full"
+};
 
 type Props = {
   connectionDetails: Gabber.ConnectionDetails;
@@ -18,7 +21,14 @@ export function Root({ connectionDetails, settings }: Props) {
     Boolean(settings?.autoConnect)
   );
 
-  console.log("shold conect", shouldConnect)
+  const component = useMemo(() => {
+    if(settings?.layout === "full") {
+      return <MainView />
+    } else if(settings?.layout === "bottom_bar") {
+      return <BottomBarView />
+    }
+    return <MainView />;
+  }, [])
 
   return (
     <SessionProvider
@@ -29,7 +39,7 @@ export function Root({ connectionDetails, settings }: Props) {
         connect={() => setShouldConnect(true)}
         settings={settings || DEFAULT_SETTINGS}
       >
-        <MainView />
+        {component}
       </SettingsProvider>
     </SessionProvider>
   );

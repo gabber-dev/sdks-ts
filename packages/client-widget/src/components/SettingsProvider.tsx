@@ -1,9 +1,11 @@
-import { createContext } from "react";
+import { createContext, useMemo } from "react";
 import React from "react";
 import { Settings } from "..";
+import { useSession } from "gabber-client-react";
 
 type SettingsContextData = {
   settings: Settings;
+  needsManualConnect: boolean;
   connect: () => void;
 };
 
@@ -18,9 +20,19 @@ type Props = {
 };
 
 export function SettingsProvider({ settings, connect, children }: Props) {
+  const { inProgressState } = useSession();
+
+  const needsManualConnect = useMemo(() => {
+    if (inProgressState === "not_connected" && !Boolean(settings.autoConnect)) {
+      return true;
+    }
+    return false;
+  }, [inProgressState])
+
   return (
     <SettingsContext.Provider
       value={{
+        needsManualConnect,
         settings,
         connect,
       }}

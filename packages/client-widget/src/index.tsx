@@ -30,6 +30,7 @@ export type CreateParams = { elementID: string } & {
 
 export type Settings = {
   autoConnect?: boolean;
+  layout?: "full" | "bottom_bar";
   connectText?: string;
   personaImage?: string;
   primaryColor?: string;
@@ -40,4 +41,4 @@ export type Settings = {
   baseColorPlusOne?: string;
   baseColorPlusTwo?: string;
   baseColorContent?: string;
-}
+};

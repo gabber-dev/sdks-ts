@@ -321,8 +321,9 @@ export namespace Gabber {
   };
 
   export type SessionMessage = {
-    id: string;
+    id: number;
     agent: boolean;
+    final: boolean;
     created_at: Date;
     speaking_ended_at: Date;
     deleted_at?: Date;

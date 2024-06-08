@@ -1,11 +1,15 @@
 import { useSession } from "gabber-client-react";
-import React from "react";
+import React, { useEffect } from "react";
 import { useSettings } from "./SettingsProvider";
 import { AgentVisualizer } from "./AgentVisualizer";
 
 export function ContentView() {
-  const { inProgressState } = useSession();
+  const { inProgressState, messages } = useSession();
   const { settings } = useSettings();
+
+  useEffect(() => {
+    console.log(messages);
+  }, [messages])
 
   return (
     <div className="relative w-full h-full flex flex-col items-center justify-center">
