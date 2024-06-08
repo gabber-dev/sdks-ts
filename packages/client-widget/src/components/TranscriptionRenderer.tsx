@@ -1,5 +1,5 @@
 import { useSession } from "gabber-client-react"
-import React, { useRef } from "react";
+import React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useSettings } from "./SettingsProvider";
 
@@ -8,7 +8,6 @@ export function TranscriptionRenderer() {
     const {settings} = useSettings(); 
     const [workingText, setWorkingText] = useState("");
     const [final, setFinal] = useState(false);
-    const workingId = useRef(-1)
 
     const lastUserMessage = useMemo(() => {
         for(let i = messages.length - 1; i >= 0; i--) {
