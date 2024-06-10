@@ -1,4 +1,4 @@
-import { createContext, useRef, useEffect, useState } from 'react'
+import { createContext, useRef, useEffect, useState, useMemo } from 'react'
 import { Gabber } from 'gabber-client-core'
 import React from 'react'
 
@@ -11,6 +11,7 @@ type SessionContextData = {
   userVolumeBands: number[];
   userVolume: number;
   agentState: Gabber.AgentState;
+  transcription: {text: string, final: boolean}
   setMicrophoneEnabled: (enabled: boolean) => Promise<void>;
   sendChatMessage: (p: Gabber.SendChatMessageParams) => Promise<void>;
 };
@@ -39,6 +40,23 @@ export function SessionProvider({
   const [userVolume, setUserVolume] = useState<number>(0);
   const [agentState, setAgentState] = useState<Gabber.AgentState>("listening");
   const createOnce = useRef(false);
+  const [transcription, setTranscription] = useState({
+    text: "",
+    final: false,
+  });
+
+  const lastUserMessage = useMemo(() => {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (!messages[i].agent) {
+        return messages[i];
+      }
+    }
+    return null;
+  }, [messages]);
+
+  useEffect(() => {
+    setTranscription({ final: false, text: lastUserMessage?.text || "" });
+  }, [lastUserMessage]);
 
   const onInProgressStateChanged = useRef(
     (sessionState: Gabber.InProgressState) => {
@@ -129,6 +147,7 @@ export function SessionProvider({
         userVolumeBands,
         userVolume,
         agentState,
+        transcription,
         sendChatMessage: sendChatMessage.current,
         setMicrophoneEnabled: setMicrophoneEnabled.current,
       }}
