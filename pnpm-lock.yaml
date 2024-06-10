@@ -34,8 +34,8 @@ importers:
   packages/client-react:
     dependencies:
       gabber-client-core:
-        specifier: ^0.3.1
-        version: 0.3.3
+        specifier: ^0.4.0
+        version: link:../client-core
       react:
         specifier: ^18
         version: 18.3.1
@@ -65,8 +65,8 @@ importers:
         specifier: ^11.11.5
         version: 11.11.5(@emotion/react@11.11.4)(@types/react@18.3.3)(react@18.3.1)
       gabber-client-react:
-        specifier: ^0.3.0
-        version: 0.3.1
+        specifier: ^0.4.0
+        version: link:../client-react
       livekit-client:
         specifier: ^2.1.5
         version: 2.1.5
@@ -1769,19 +1769,6 @@ packages:
 
   /function-bind@1.1.2:
     resolution: {integrity: sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==}
-
-  /gabber-client-core@0.3.3:
-    resolution: {integrity: sha512-sXdzmbS75RrUOPumdfqiYL1cKNMdUksgF1FtvZs3eEyM1ot7pEyCX265F6XuJLnEULK9OlLUDNB4/v8VJKOvoQ==}
-    dependencies:
-      livekit-client: 2.1.5
-    dev: false
-
-  /gabber-client-react@0.3.1:
-    resolution: {integrity: sha512-IxCZWvuS5l6f3AZcaDtskHh07iNfzkPf3Xpd0pFYBtyhpwJ6zm62u5DoWIl6Sm3WzJqfdjSA9Sn4FhO75TJENg==}
-    dependencies:
-      gabber-client-core: 0.3.3
-      react: 18.3.1
-    dev: false
 
   /generic-names@4.0.0:
     resolution: {integrity: sha512-ySFolZQfw9FoDb3ed9d80Cm9f0+r7qj+HJkWjeD9RBfpxEVTlVhol+gvaQB/78WbwYfbnNh8nWHHBSlg072y6A==}

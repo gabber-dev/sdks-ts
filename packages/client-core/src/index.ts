@@ -89,6 +89,11 @@ export namespace Gabber {
     }
 
     async connect() {
+      try {
+        await this.livekitRoom.startAudio()
+      } catch(e) {
+        console.error("Error starting audio", e);
+      }
       await this.livekitRoom.connect(this.url, this.token, {
         autoSubscribe: true,
       });
