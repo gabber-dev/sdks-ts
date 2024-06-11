@@ -278,15 +278,14 @@ export namespace Gabber {
     }
 
     private onParticipantMetadataChanged(
-      metadata: string | undefined,
+      _: string | undefined,
       participant: RemoteParticipant | LocalParticipant
     ) {
-      if (!metadata || !participant.isAgent) {
+      if (!participant.metadata || !participant.isAgent) {
         return;
       }
-      console.log("Metadata changed", metadata)
       try {
-        const md = JSON.parse(metadata);
+        const md = JSON.parse(participant.metadata);
         const { agent_state } = md;
         if (
           agent_state != "speaking" &&
