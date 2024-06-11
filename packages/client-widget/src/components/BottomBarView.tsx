@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSettings } from "./SettingsProvider";
 import { useSession } from "gabber-client-react";
 import { MicrophoneOn } from "./icons/MicrophoneOn";
@@ -8,6 +8,7 @@ import { ConnectButton } from "./ConnectButton";
 import { MicrophoneOff } from "./icons/MicrophoneOff";
 import { AgentVisualizer } from "./AgentVisualizer";
 import { TranscriptionRenderer } from "./TranscriptionRenderer";
+import toast from "react-hot-toast";
 
 export function BottomBarView() {
   const [value, setValue] = useState("");
@@ -16,6 +17,7 @@ export function BottomBarView() {
     microphoneEnabled,
     setMicrophoneEnabled,
     userVolumeBands,
+    lastError
   } = useSession();
 
   const { settings, needsManualConnect } = useSettings();
@@ -36,6 +38,13 @@ export function BottomBarView() {
     setMicrophoneEnabled(!microphoneEnabled);
   }, [microphoneEnabled]);
 
+  useEffect(() => {
+    console.error(lastError)
+    if(lastError) {
+        toast.error(lastError);
+    }
+  }, [lastError])
+
   if (needsManualConnect) {
     return (
       <div
@@ -49,15 +58,15 @@ export function BottomBarView() {
 
   return (
     <div
-      className="relative w-full h-full flex gap-2 overflow-hidden"
+      className="relative w-full h-full flex items-center gap-2 overflow-hidden"
       style={{
         backgroundColor: settings.baseColor,
       }}
     >
-      <div className="relative h-full aspect-square flex flex-col">
+      <div className="relative h-full ml-2 flex flex-col">
         <div className="grow" />
-        <button className="h-2/3 w-full" onClick={micClicked}>
-          <div className="w-full p-2">{micComponent}</div>
+        <button className="h-1/2 w-full" onClick={micClicked}>
+          <div className="w-full h-full p-2">{micComponent}</div>
         </button>
         <div className="grow">
           <BarAudioVisualizer
@@ -89,7 +98,7 @@ export function BottomBarView() {
               <>
                 <input
                   className="grow h-full bg-transparent outline-none"
-                  placeholder="Say something..."
+                  placeholder="Start conversation..."
                   value={value}
                   onChange={(e) => {
                     setValue(e.target.value);

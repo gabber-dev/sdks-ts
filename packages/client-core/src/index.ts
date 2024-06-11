@@ -31,6 +31,7 @@ export namespace Gabber {
     private onAgentVolumeChanged: OnVolumeCallback;
     private onUserVolumeChanged: OnVolumeCallback;
     private onAgentStateChanged: OnAgentStateChanged;
+    private onAgentError: OnAgentErrorCallback;
     private divElement: HTMLDivElement;
 
     constructor({
@@ -41,6 +42,7 @@ export namespace Gabber {
       onAgentVolumeChanged,
       onUserVolumeChanged,
       onAgentStateChanged,
+      onAgentError,
     }: SessionEngineParams) {
       this.url = connectionDetails.url;
       this.token = connectionDetails.token;
@@ -76,6 +78,7 @@ export namespace Gabber {
       this.onAgentVolumeChanged = onAgentVolumeChanged;
       this.onUserVolumeChanged = onUserVolumeChanged;
       this.onAgentStateChanged = onAgentStateChanged;
+      this.onAgentError = onAgentError;
 
       this.agentVolumeVisualizer = new TrackVolumeVisualizer({
         onTick: this.onAgentVolumeChanged.bind(this),
@@ -90,8 +93,8 @@ export namespace Gabber {
 
     async connect() {
       try {
-        await this.livekitRoom.startAudio()
-      } catch(e) {
+        await this.livekitRoom.startAudio();
+      } catch (e) {
         console.error("Error starting audio", e);
       }
       await this.livekitRoom.connect(this.url, this.token, {
@@ -254,7 +257,7 @@ export namespace Gabber {
         return;
       }
 
-      const decoded = new TextDecoder().decode(data)
+      const decoded = new TextDecoder().decode(data);
       console.log("Data received", decoded, participant, topic);
       if (topic === "message") {
         const message = JSON.parse(decoded) as SessionMessage;
@@ -268,6 +271,9 @@ export namespace Gabber {
 
         this.messages.push(message);
         this.onMessagesChanged(this.messages);
+      } else if(topic === "error") {
+        const payload = JSON.parse(decoded);
+        this.onAgentError(payload.message);
       }
     }
 
@@ -278,10 +284,16 @@ export namespace Gabber {
       if (!metadata || !participant.isAgent) {
         return;
       }
+      console.log("Metadata changed", metadata)
       try {
         const md = JSON.parse(metadata);
         const { agent_state } = md;
-        if(agent_state != "speaking" && agent_state != "listening" && agent_state != "thinking") {
+        if (
+          agent_state != "speaking" &&
+          agent_state != "listening" &&
+          agent_state != "thinking" &&
+          agent_state != "warmup"
+        ) {
           console.error("Unrecognized agent_state", agent_state);
           return;
         }
@@ -305,6 +317,7 @@ export namespace Gabber {
   type OnMicrophoneCallback = (enabled: boolean) => void;
   type OnVolumeCallback = (values: number[], volume: number) => void;
   type OnAgentStateChanged = (state: AgentState) => void;
+  type OnAgentErrorCallback = (msg: string) => void;
 
   export type ConnectionDetails = {
     url: string;
@@ -319,6 +332,7 @@ export namespace Gabber {
     onAgentStateChanged: OnAgentStateChanged;
     onAgentVolumeChanged: OnVolumeCallback;
     onUserVolumeChanged: OnVolumeCallback;
+    onAgentError: OnAgentErrorCallback;
   };
 
   export type SendChatMessageParams = {

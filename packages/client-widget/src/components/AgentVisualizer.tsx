@@ -8,7 +8,7 @@ type Props = {
 };
 
 export const AgentVisualizer = ({ color, gap }: Props) => {
-  const { agentVolumeBands, inProgressState } = useSession();
+  const { agentVolumeBands, inProgressState, agentState } = useSession();
   const [heights, setHeights] = useState<number[]>([])
 
   const agentVolumesRef = useRef<number[]>(agentVolumeBands)
@@ -53,6 +53,10 @@ export const AgentVisualizer = ({ color, gap }: Props) => {
       setHeights(agentVolumesRef.current)
     }
   })
+
+  useEffect(() => {
+    agentStateRef.current = agentState;
+  }, [agentState])
 
   useEffect(() => {
     agentVolumesRef.current = agentVolumeBands;

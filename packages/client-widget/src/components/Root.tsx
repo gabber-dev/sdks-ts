@@ -6,6 +6,7 @@ import { MainView } from "./MainView";
 import { Gabber } from "gabber-client-core";
 import { SettingsProvider } from "./SettingsProvider";
 import { BottomBarView } from "./BottomBarView";
+import { Toaster } from "react-hot-toast";
 
 const DEFAULT_SETTINGS: Settings = {
   layout: "full"
@@ -35,6 +36,7 @@ export function Root({ connectionDetails, settings }: Props) {
       connectionDetails={connectionDetails}
       connect={shouldConnect}
     >
+      <Toaster />
       <SettingsProvider
         connect={() => setShouldConnect(true)}
         settings={settings || DEFAULT_SETTINGS}

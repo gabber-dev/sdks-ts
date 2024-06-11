@@ -5,6 +5,7 @@ import React from 'react'
 type SessionContextData = {
   inProgressState: Gabber.InProgressState;
   messages: Gabber.SessionMessage[];
+  lastError: string | null;
   microphoneEnabled: boolean;
   agentVolumeBands: number[];
   agentVolume: number;
@@ -39,6 +40,7 @@ export function SessionProvider({
   const [userVolumeBands, setUserVolumeBands] = useState<number[]>([]);
   const [userVolume, setUserVolume] = useState<number>(0);
   const [agentState, setAgentState] = useState<Gabber.AgentState>("listening");
+  const [lastError, setLastError] = useState<string | null>(null);
   const createOnce = useRef(false);
   const [transcription, setTranscription] = useState({
     text: "",
@@ -86,6 +88,10 @@ export function SessionProvider({
     setAgentState(as);
   })
 
+  const onAgentError = useRef((msg: string) => {
+    setLastError(msg)
+  })
+
   const sessionEngine = useRef(
     (() => {
       // React will always return the first instantiation
@@ -96,6 +102,7 @@ export function SessionProvider({
       createOnce.current = true;
       return new Gabber.SessionEngine({
         connectionDetails,
+        onAgentError: onAgentError.current,
         onAgentStateChanged: onAgentStateChanged.current,
         onUserVolumeChanged: onUserVolumeChanged.current,
         onAgentVolumeChanged: onAgentVolumeChanged.current,
@@ -148,6 +155,7 @@ export function SessionProvider({
         userVolume,
         agentState,
         transcription,
+        lastError,
         sendChatMessage: sendChatMessage.current,
         setMicrophoneEnabled: setMicrophoneEnabled.current,
       }}
