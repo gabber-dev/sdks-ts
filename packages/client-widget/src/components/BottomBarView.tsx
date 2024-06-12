@@ -63,7 +63,7 @@ export function BottomBarView() {
         backgroundColor: settings.baseColor,
       }}
     >
-      <div className="relative h-full ml-2 flex flex-col">
+      <div className="relative h-full ml-2 flex flex-col justify-center">
         <div className="grow" />
         <button className="h-1/2 w-full" onClick={micClicked}>
           <div className="w-full h-full p-2">{micComponent}</div>
@@ -127,15 +127,10 @@ export function BottomBarView() {
       </div>
       <div className="h-full aspect-square flex flex-col items-center justify-center">
         <div className="grow" />
-        <div className="h-2/3 aspect-square rounded-full overflow-hidden">
-          <img
-            className="w-full h-full object-cover"
-            src={settings.personaImage}
-          />
-        </div>
-        <div className="grow w-full">
+        <div className="grow w-full mr-2">
           <AgentVisualizer gap={2} color={settings.secondaryColor || "green"} />
         </div>
+        <div className="grow" />
       </div>
     </div>
   );
