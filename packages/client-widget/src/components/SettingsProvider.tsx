@@ -1,4 +1,4 @@
-import { createContext, useMemo } from "react";
+import { createContext, useEffect, useMemo } from "react";
 import React from "react";
 import { Settings } from "..";
 import { useSession } from "gabber-client-react";
@@ -28,6 +28,12 @@ export function SettingsProvider({ settings, connect, children }: Props) {
     }
     return false;
   }, [inProgressState])
+
+  useEffect(() => {
+    if(inProgressState === "not_connected" && Boolean(settings.autoConnect)) {
+      connect();
+    }
+  }, [inProgressState, settings?.autoConnect])
 
   return (
     <SettingsContext.Provider
