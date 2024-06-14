@@ -5,6 +5,7 @@ import { Root } from './components/Root';
 
 export class Widget {
   static create({ elementID, connectionDetails, settings }: CreateParams) {
+    console.log("Creating widget:", { elementID, connectionDetails, settings });
     const w = new Widget();
     const el = document.getElementById(elementID);
     if (!el) {

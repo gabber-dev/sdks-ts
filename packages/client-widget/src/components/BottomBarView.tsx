@@ -48,7 +48,7 @@ export function BottomBarView() {
   if (needsManualConnect) {
     return (
       <div
-        className="h-full w-full flex items-center justify-center"
+        className="h-full w-full max-h-[80px] flex items-center justify-center"
         style={{ backgroundColor: settings.baseColor }}
       >
         <ConnectButton />
@@ -58,7 +58,7 @@ export function BottomBarView() {
 
   return (
     <div
-      className="relative w-full h-full flex items-center gap-2 overflow-hidden"
+      className="relative w-full h-full max-h-[80px] flex items-center gap-2 overflow-hidden"
       style={{
         backgroundColor: settings.baseColor,
       }}

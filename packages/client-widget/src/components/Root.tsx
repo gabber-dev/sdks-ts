@@ -28,7 +28,7 @@ export function Root({ connectionDetails, settings }: Props) {
     } else if(settings?.layout === "bottom_bar") {
       return <BottomBarView />
     }
-    return <MainView />;
+    return <BottomBarView />;
   }, [])
 
   return (
