@@ -32,6 +32,7 @@ export namespace Gabber {
     private onUserVolumeChanged: OnVolumeCallback;
     private onAgentStateChanged: OnAgentStateChanged;
     private onAgentError: OnAgentErrorCallback;
+    private onCanPlayAudioChanged: OnCanPlayAudioChanged;
     private divElement: HTMLDivElement;
 
     constructor({
@@ -43,6 +44,7 @@ export namespace Gabber {
       onUserVolumeChanged,
       onAgentStateChanged,
       onAgentError,
+      onCanPlayAudioChanged,
     }: SessionEngineParams) {
       this.url = connectionDetails.url;
       this.token = connectionDetails.token;
@@ -69,6 +71,10 @@ export namespace Gabber {
       );
       this.livekitRoom.on("trackMuted", this.onTrackMuted.bind(this));
       this.livekitRoom.on("trackUnmuted", this.onTrackUnmuted.bind(this));
+      this.livekitRoom.on(
+        "audioPlaybackChanged",
+        this.onAudioPlaybackChangaed.bind(this)
+      );
 
       this.divElement = document.createElement("div");
       document.body.appendChild(this.divElement);
@@ -79,6 +85,7 @@ export namespace Gabber {
       this.onUserVolumeChanged = onUserVolumeChanged;
       this.onAgentStateChanged = onAgentStateChanged;
       this.onAgentError = onAgentError;
+      this.onCanPlayAudioChanged = onCanPlayAudioChanged;
 
       this.agentVolumeVisualizer = new TrackVolumeVisualizer({
         onTick: this.onAgentVolumeChanged.bind(this),
@@ -92,18 +99,22 @@ export namespace Gabber {
     }
 
     async connect() {
-      try {
-        await this.livekitRoom.startAudio();
-      } catch (e) {
-        console.error("Error starting audio", e);
-      }
       await this.livekitRoom.connect(this.url, this.token, {
         autoSubscribe: true,
       });
+      this.onCanPlayAudioChanged(this.livekitRoom.canPlaybackAudio);
     }
 
     async disconnect() {
       await this.livekitRoom.disconnect();
+    }
+
+    async startAudio() {
+      try {
+        await this.livekitRoom.startAudio();
+      } catch(e) {
+        console.error("Error starting audio")
+      }
     }
 
     async setMicrophoneEnabled(enabled: boolean) {
@@ -190,6 +201,10 @@ export namespace Gabber {
       if (publication.kind === Track.Kind.Audio) {
         this.resolveMicrophoneState();
       }
+    }
+
+    private onAudioPlaybackChangaed(_: boolean) {
+      this.onCanPlayAudioChanged(this.livekitRoom.canPlaybackAudio)
     }
 
     private onRoomConnected() {
@@ -317,6 +332,7 @@ export namespace Gabber {
   type OnVolumeCallback = (values: number[], volume: number) => void;
   type OnAgentStateChanged = (state: AgentState) => void;
   type OnAgentErrorCallback = (msg: string) => void;
+  type OnCanPlayAudioChanged = (allowed: boolean) => void;
 
   export type ConnectionDetails = {
     url: string;
@@ -332,6 +348,7 @@ export namespace Gabber {
     onAgentVolumeChanged: OnVolumeCallback;
     onUserVolumeChanged: OnVolumeCallback;
     onAgentError: OnAgentErrorCallback;
+    onCanPlayAudioChanged: OnCanPlayAudioChanged;
   };
 
   export type SendChatMessageParams = {

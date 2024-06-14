@@ -12,9 +12,11 @@ type SessionContextData = {
   userVolumeBands: number[];
   userVolume: number;
   agentState: Gabber.AgentState;
-  transcription: {text: string, final: boolean}
+  transcription: { text: string; final: boolean };
+  canPlayAudio: boolean;
   setMicrophoneEnabled: (enabled: boolean) => Promise<void>;
   sendChatMessage: (p: Gabber.SendChatMessageParams) => Promise<void>;
+  startAudio: () => Promise<void>;
 };
 
 const SessionContext = createContext<SessionContextData | undefined>(undefined)
@@ -41,6 +43,7 @@ export function SessionProvider({
   const [userVolume, setUserVolume] = useState<number>(0);
   const [agentState, setAgentState] = useState<Gabber.AgentState>("listening");
   const [lastError, setLastError] = useState<string | null>(null);
+  const [canPlayAudio, setCanPlayAudio] = useState(true);
   const createOnce = useRef(false);
   const [transcription, setTranscription] = useState({
     text: "",
@@ -92,6 +95,11 @@ export function SessionProvider({
     setLastError(msg)
   })
 
+  const onCanPlayAudio = useRef((allowed: boolean) => {
+    setCanPlayAudio(allowed);
+  })
+
+
   const sessionEngine = useRef(
     (() => {
       // React will always return the first instantiation
@@ -109,6 +117,7 @@ export function SessionProvider({
         onInProgressStateChanged: onInProgressStateChanged.current,
         onMessagesChanged: onMessagesChanged.current,
         onMicrophoneChanged: onMicrophoneChanged.current,
+        onCanPlayAudioChanged: onCanPlayAudio.current,
       });
     })()
   );
@@ -128,6 +137,10 @@ export function SessionProvider({
     }
     await sessionEngine.current.sendChatMessage(p);
   });
+
+  const startAudio = useRef(async () => {
+    await sessionEngine.current.startAudio();
+  })
 
   useEffect(() => {
     if (connect) {
@@ -156,8 +169,10 @@ export function SessionProvider({
         agentState,
         transcription,
         lastError,
+        canPlayAudio,
         sendChatMessage: sendChatMessage.current,
         setMicrophoneEnabled: setMicrophoneEnabled.current,
+        startAudio: startAudio.current,
       }}
     >
       {children}

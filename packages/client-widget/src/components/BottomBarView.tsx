@@ -9,6 +9,7 @@ import { MicrophoneOff } from "./icons/MicrophoneOff";
 import { AgentVisualizer } from "./AgentVisualizer";
 import { TranscriptionRenderer } from "./TranscriptionRenderer";
 import toast from "react-hot-toast";
+import { HoverButton } from "./HoverButton";
 
 export function BottomBarView() {
   const [value, setValue] = useState("");
@@ -16,8 +17,10 @@ export function BottomBarView() {
     sendChatMessage,
     microphoneEnabled,
     setMicrophoneEnabled,
+    startAudio,
     userVolumeBands,
-    lastError
+    lastError,
+    canPlayAudio
   } = useSession();
 
   const { settings, needsManualConnect } = useSettings();
@@ -63,6 +66,22 @@ export function BottomBarView() {
         backgroundColor: settings.baseColor,
       }}
     >
+      {canPlayAudio ? null : (
+        <div className="absolute top-0 left-0 bottom-0 right-0 bg-red-500 flex flex-col items-center justify-center" style={{
+          backgroundColor: settings.baseColorPlusTwo,
+          zIndex: 9000
+        }}>
+          <div style={{ color: settings.baseColorContent }}>
+            Audio playback requires you to interact with this page.
+          </div>
+          <HoverButton
+            text="Start Audio Playback"
+            onClick={() => {
+              startAudio();
+            }}
+          />
+        </div>
+      )}
       <div className="relative h-full ml-2 flex flex-col justify-center">
         <div className="grow" />
         <button className="h-1/2 w-full" onClick={micClicked}>
