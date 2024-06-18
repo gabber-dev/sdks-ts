@@ -42,8 +42,8 @@ export type Settings = {
   baseColorPlusOne?: string;
   baseColorPlusTwo?: string;
   baseColorContent?: string;
-  audioPlaybackText?: {
-    description?: string
+  audioPlaybackFailed?: {
+    descriptionText?: string
     buttonText?: string
   }
 };

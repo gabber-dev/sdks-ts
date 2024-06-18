@@ -75,12 +75,12 @@ export function BottomBarView() {
           }}
         >
           <div style={{ color: settings.baseColorContent }}>
-            {settings.audioPlaybackText?.description ||
+            {settings.audioPlaybackFailed?.descriptionText ||
               "Audio playback requires you to interact with this page."}
           </div>
           <HoverButton
             text={
-              settings.audioPlaybackText?.buttonText || "Start Audio Playback"
+              settings.audioPlaybackFailed?.buttonText || "Start Audio Playback"
             }
             onClick={() => {
               startAudio();
