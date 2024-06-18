@@ -67,15 +67,21 @@ export function BottomBarView() {
       }}
     >
       {canPlayAudio ? null : (
-        <div className="absolute top-0 left-0 bottom-0 right-0 bg-red-500 flex flex-col items-center justify-center" style={{
-          backgroundColor: settings.baseColorPlusTwo,
-          zIndex: 9000
-        }}>
+        <div
+          className="absolute top-0 left-0 bottom-0 right-0 bg-red-500 flex flex-col items-center justify-center"
+          style={{
+            backgroundColor: settings.baseColorPlusTwo,
+            zIndex: 9000,
+          }}
+        >
           <div style={{ color: settings.baseColorContent }}>
-            Audio playback requires you to interact with this page.
+            {settings.audioPlaybackText?.description ||
+              "Audio playback requires you to interact with this page."}
           </div>
           <HoverButton
-            text="Start Audio Playback"
+            text={
+              settings.audioPlaybackText?.buttonText || "Start Audio Playback"
+            }
             onClick={() => {
               startAudio();
             }}
