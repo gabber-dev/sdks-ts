@@ -1,12 +1,14 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client';
+import { Gabber } from "gabber-client-core";
 import './index.css';
 import { Root } from './components/Root';
+import { InternalWidget } from './InternalWidget';
 
-export class Widget {
-  static create({ elementID, connectionDetails, settings }: CreateParams) {
+export class Widget extends InternalWidget {
+  static create({ elementID, connectionDetails, settings, onStateChanged }: CreateParams) {
     console.log("Creating widget:", { elementID, connectionDetails, settings });
-    const w = new Widget();
+    const w = new Widget({ onStateChanged });
     const el = document.getElementById(elementID);
     if (!el) {
       console.error("Can't find the element with id", elementID);
@@ -16,6 +18,7 @@ export class Widget {
     root.render(
       <React.StrictMode>
         <Root
+          widget={w}
           connectionDetails={connectionDetails}
           settings={settings}
         />
@@ -25,9 +28,12 @@ export class Widget {
   }
 }
 
-export type CreateParams = { elementID: string } & {
+export type CreateParams = {
+  elementID: string;
   connectionDetails: { url: string; token: string };
-} & { settings?: Settings };
+  settings?: Settings;
+  onStateChanged?: (state: Gabber.AgentState) => void;
+};
 
 export type Settings = {
   autoConnect?: boolean;

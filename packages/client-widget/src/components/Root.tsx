@@ -7,6 +7,7 @@ import { Gabber } from "gabber-client-core";
 import { SettingsProvider } from "./SettingsProvider";
 import { BottomBarView } from "./BottomBarView";
 import { Toaster } from "react-hot-toast";
+import { InternalWidget } from "../InternalWidget";
 
 const DEFAULT_SETTINGS: Settings = {
   layout: "full"
@@ -15,9 +16,10 @@ const DEFAULT_SETTINGS: Settings = {
 type Props = {
   connectionDetails: Gabber.ConnectionDetails;
   settings?: Settings;
+  widget: InternalWidget;
 };
 
-export function Root({ connectionDetails, settings }: Props) {
+export function Root({ connectionDetails, settings, widget }: Props) {
   const [shouldConnect, setShouldConnect] = useState(
     Boolean(settings?.autoConnect)
   );
@@ -40,6 +42,7 @@ export function Root({ connectionDetails, settings }: Props) {
       <SettingsProvider
         connect={() => setShouldConnect(true)}
         settings={settings || DEFAULT_SETTINGS}
+        widget={widget}
       >
         {component}
       </SettingsProvider>

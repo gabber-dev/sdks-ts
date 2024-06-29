@@ -324,7 +324,7 @@ export namespace Gabber {
     | "waiting_for_agent"
     | "connected";
 
-  export type AgentState = "listening" | "thinking" | "speaking";
+  export type AgentState = "warmup" | "listening" | "thinking" | "speaking" | "timed_out";
 
   type InProgressStateChangedCallback = (state: InProgressState) => void;
   type OnMessagesChangedCallback = (messages: SessionMessage[]) => void;

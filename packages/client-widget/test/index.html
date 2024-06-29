@@ -41,6 +41,7 @@
         Gabber.Widget.create({
             elementID: "gabber",
             connectionDetails: connection_details,
+            onStateChanged: (state) => { console.log("NEIL state", state) },
             settings: {
                 layout: "bottom_bar",
                 autoConnect: true,

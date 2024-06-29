@@ -1,10 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { ContentView } from "./ContentView";
 import { Input } from "./Input";
 import { useSettings } from "./SettingsProvider";
+import { useSession } from "gabber-client-react";
 
 export function MainView() {
-  const { settings } = useSettings();
+  const { settings, widget } = useSettings();
+  const { agentState } = useSession();
+
+  useEffect(() => {
+    console.log("NEIL", agentState)
+    widget.setState(agentState);
+  }, [agentState])
+
   return (
     <div
       className="relative w-full h-full"

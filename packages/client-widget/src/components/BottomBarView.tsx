@@ -20,10 +20,17 @@ export function BottomBarView() {
     startAudio,
     userVolumeBands,
     lastError,
-    canPlayAudio
+    canPlayAudio,
+    agentState,
   } = useSession();
 
-  const { settings, needsManualConnect } = useSettings();
+  const { settings, needsManualConnect, widget } = useSettings();
+
+  useEffect(() => {
+    console.log("NEIL", agentState)
+    widget.setState(agentState);
+  }, [agentState])
+
   const micComponent = useMemo(() => {
     const style = {
       width: "90%",
@@ -42,7 +49,6 @@ export function BottomBarView() {
   }, [microphoneEnabled]);
 
   useEffect(() => {
-    console.error(lastError)
     if(lastError) {
         toast.error(lastError);
     }
