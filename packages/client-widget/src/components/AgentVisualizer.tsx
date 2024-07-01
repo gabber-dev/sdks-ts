@@ -8,19 +8,19 @@ type Props = {
 };
 
 export const AgentVisualizer = ({ color, gap }: Props) => {
-  const { agentVolumeBands, inProgressState, agentState } = useSession();
+  const { agentVolumeBands, connectionState, agentState } = useSession();
   const [heights, setHeights] = useState<number[]>([])
 
   const agentVolumesRef = useRef<number[]>(agentVolumeBands)
-  const inProgressStateRef = useRef<Gabber.InProgressState>("not_connected")
+  const connectionStateRef = useRef<Gabber.ConnectionState>("not_connected")
   const agentStateRef = useRef<Gabber.AgentState>("listening")
   const thinkingIndex = useRef<number>(0)
   const thinkingLastTick = useRef<number>(0)
   const thinkingDirection = useRef(1)
 
   useAnimationFrame((dt: number) => {
-    if(inProgressStateRef.current !== "connected") {
-      setHeights([])
+    if (connectionStateRef.current !== "connected") {
+      setHeights([]);
       return;
     }
 
@@ -60,8 +60,8 @@ export const AgentVisualizer = ({ color, gap }: Props) => {
 
   useEffect(() => {
     agentVolumesRef.current = agentVolumeBands;
-    inProgressStateRef.current = inProgressState;
-  }, [agentVolumeBands, inProgressState]);
+    connectionStateRef.current = connectionState;
+  }, [agentVolumeBands, connectionState]);
 
   return (
     <div className={`flex flex-row items-center w-full h-full`} style={{ gap }}>

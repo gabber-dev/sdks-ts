@@ -22,13 +22,19 @@ export function BottomBarView() {
     lastError,
     canPlayAudio,
     agentState,
+    connectionState
   } = useSession();
 
   const { settings, needsManualConnect, widget } = useSettings();
 
+  // Sync widget with react. TODO, this should be in it's own provider
   useEffect(() => {
-    console.log("NEIL", agentState)
-    widget.setState(agentState);
+    widget.connectionState = connectionState;
+  }, [connectionState])
+
+  // Sync widget with react. TODO, this should be in it's own provider
+  useEffect(() => {
+    widget.agentState = agentState;
   }, [agentState])
 
   const micComponent = useMemo(() => {
@@ -53,6 +59,17 @@ export function BottomBarView() {
         toast.error(lastError);
     }
   }, [lastError])
+
+  if (connectionState === "not_connected") {
+    return (
+      <div
+        className="relative w-full h-full max-h-[80px] flex items-center gap-2 overflow-hidden"
+        style={{
+          backgroundColor: settings.baseColor,
+        }}
+      ></div>
+    );
+  }
 
   if (needsManualConnect) {
     return (

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Settings } from "..";
 import { SessionProvider } from "gabber-client-react";
 import React from "react";
@@ -24,6 +24,16 @@ export function Root({ connectionDetails, settings, widget }: Props) {
     Boolean(settings?.autoConnect)
   );
 
+  const [forceDisconnect, setForceDisconnect] = useState(false)
+
+  const disconnectHandler = useRef(() => {
+    setForceDisconnect(true)
+  })
+
+  useEffect(() => {
+    widget.registerDisconnectHandler(disconnectHandler.current);
+  }, [])
+
   const component = useMemo(() => {
     if(settings?.layout === "full") {
       return <MainView />
@@ -36,7 +46,7 @@ export function Root({ connectionDetails, settings, widget }: Props) {
   return (
     <SessionProvider
       connectionDetails={connectionDetails}
-      connect={shouldConnect}
+      connect={shouldConnect && !forceDisconnect}
     >
       <Toaster />
       <SettingsProvider

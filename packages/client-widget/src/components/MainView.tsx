@@ -9,8 +9,7 @@ export function MainView() {
   const { agentState } = useSession();
 
   useEffect(() => {
-    console.log("NEIL", agentState)
-    widget.setState(agentState);
+    widget.agentState = agentState;
   }, [agentState])
 
   return (

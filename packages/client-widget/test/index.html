@@ -38,10 +38,11 @@
         return res.body;
     }).then(({connection_details, persona, scenario}) => {
         console.log("Connection details", connection_details, persona, scenario)
-        Gabber.Widget.create({
+        window.neil = Gabber.Widget.create({
             elementID: "gabber",
             connectionDetails: connection_details,
-            onStateChanged: (state) => { console.log("NEIL state", state) },
+            onAgentStateChanged: (state) => { console.log("NEIL agent state", state) },
+            onConnectionStateChanged: (state) => { console.log("NEIL connection state", state) },
             settings: {
                 layout: "bottom_bar",
                 autoConnect: true,

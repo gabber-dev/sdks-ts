@@ -17,7 +17,7 @@ export function Input({heightPixels}: Props) {
     sendChatMessage,
     microphoneEnabled,
     setMicrophoneEnabled,
-    inProgressState,
+    connectionState,
     userVolumeBands
   } = useSession();
   const [connectHovered, setConnectHovered] = useState(false);
@@ -72,9 +72,9 @@ export function Input({heightPixels}: Props) {
     setMicrophoneEnabled(!microphoneEnabled);
   }, [mode, microphoneEnabled]);
 
-  if (inProgressState !== "connected" && !Boolean(settings.autoConnect)) {
+  if (connectionState !== "connected" && !Boolean(settings.autoConnect)) {
     const text =
-      inProgressState === "not_connected" ? settings.connectText || "" : "";
+      connectionState === "not_connected" ? settings.connectText || "" : "";
     return (
       <div className="h-full w-full flex items-center justify-center">
         <button

@@ -1,24 +1,51 @@
 import { Gabber } from "gabber-client-core";
 
 type Params = {
-    onStateChanged?: (state: Gabber.AgentState) => void
-}
+  onAgentStateChanged?: (state: Gabber.AgentState) => void;
+  onConnectionStateChanged?: (state: Gabber.ConnectionState) => void;
+};
 
 export class InternalWidget {
-  private onStateChanged?: (state: Gabber.AgentState) => void;
-  private prevState: Gabber.AgentState | undefined = undefined
+  private onAgentStateChanged?: (state: Gabber.AgentState) => void;
+  private onConnectionStateChanged?: (state: Gabber.ConnectionState) => void;
 
-  public setState(state: Gabber.AgentState) {
-    if(state === this.prevState) {
-        return;
+  private _agentState: Gabber.AgentState = "warmup";
+  private _connectionState: Gabber.ConnectionState = "not_connected";
+  private _disconnectHandler: () => void = () => null;
+
+  public set agentState(state: Gabber.AgentState) {
+    if (state === this._agentState) {
+      return;
     }
-    if (this.onStateChanged) {
-      this.onStateChanged(state);
+    if (this.onAgentStateChanged) {
+      this.onAgentStateChanged(state);
     }
-    this.prevState = state;
+    this._agentState = state;
   }
 
-  public constructor({ onStateChanged }: Params) {
-    this.onStateChanged = onStateChanged;
+  public set connectionState(state: Gabber.ConnectionState) {
+    if (state === this._connectionState) {
+      return;
+    }
+    if (this.onConnectionStateChanged) {
+      this.onConnectionStateChanged(state);
+    }
+    this._connectionState = state;
+  }
+
+  public registerDisconnectHandler(h: () => void) {
+    this._disconnectHandler = h;
+  }
+
+  public disconnect() {
+    this._disconnectHandler();
+  }
+
+  public constructor({
+    onConnectionStateChanged,
+    onAgentStateChanged,
+  }: Params) {
+    this.onAgentStateChanged = onAgentStateChanged;
+    this.onConnectionStateChanged = onConnectionStateChanged;
   }
 }

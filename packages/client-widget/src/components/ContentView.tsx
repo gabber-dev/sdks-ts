@@ -4,7 +4,7 @@ import { useSettings } from "./SettingsProvider";
 import { AgentVisualizer } from "./AgentVisualizer";
 
 export function ContentView() {
-  const { inProgressState, messages } = useSession();
+  const { connectionState, messages } = useSession();
   const { settings } = useSettings();
 
   useEffect(() => {
@@ -14,7 +14,7 @@ export function ContentView() {
   return (
     <div className="relative w-full h-full flex flex-col items-center justify-center">
       <div className="absolute top-[8px] right-[8px] h-[50px] w-[100px] z-[20]">
-        {inProgressState === "not_connected" ? null : (
+        {connectionState === "not_connected" ? null : (
           <div className="relative rounded-md w-full h-full">
             <div
               className="absolute top-0 bottom-0 rounded-md left-0 right-0"

@@ -25,7 +25,7 @@ export namespace Gabber {
     private messages: SessionMessage[] = [];
     private agentVolumeVisualizer: TrackVolumeVisualizer;
     private userVolumeVisualizer: TrackVolumeVisualizer;
-    private onInProgressStateChanged: InProgressStateChangedCallback;
+    private onConnectionStateChanged: ConnectionStateChangedCallback;
     private onMessagesChanged: OnMessagesChangedCallback;
     private onMicrophoneChanged: OnMicrophoneCallback;
     private onAgentVolumeChanged: OnVolumeCallback;
@@ -37,7 +37,7 @@ export namespace Gabber {
 
     constructor({
       connectionDetails,
-      onInProgressStateChanged,
+      onConnectionStateChanged: onConnectionStateChanged,
       onMessagesChanged,
       onMicrophoneChanged,
       onAgentVolumeChanged,
@@ -78,7 +78,7 @@ export namespace Gabber {
 
       this.divElement = document.createElement("div");
       document.body.appendChild(this.divElement);
-      this.onInProgressStateChanged = onInProgressStateChanged;
+      this.onConnectionStateChanged = onConnectionStateChanged;
       this.onMessagesChanged = onMessagesChanged;
       this.onMicrophoneChanged = onMicrophoneChanged;
       this.onAgentVolumeChanged = onAgentVolumeChanged;
@@ -210,13 +210,13 @@ export namespace Gabber {
     private onRoomConnected() {
       console.log("Room connected");
       this.resolveMicrophoneState();
-      this.onInProgressStateChanged("waiting_for_agent");
+      this.onConnectionStateChanged("waiting_for_agent");
     }
 
     private onRoomDisconnected() {
       console.log("Room disconnected");
       this.resolveMicrophoneState();
-      this.onInProgressStateChanged("not_connected");
+      this.onConnectionStateChanged("not_connected");
     }
 
     private onTrackSubscribed(
@@ -236,7 +236,7 @@ export namespace Gabber {
       this.agentParticipant = participant;
       this.agentTrack = track as RemoteAudioTrack;
       this.agentVolumeVisualizer.setTrack(track as RemoteAudioTrack);
-      this.onInProgressStateChanged("connected");
+      this.onConnectionStateChanged("connected");
     }
 
     private onTrackUnsubscribed(
@@ -258,7 +258,7 @@ export namespace Gabber {
       this.agentParticipant = null;
       this.agentTrack = null;
       if (this.livekitRoom.state === "connected") {
-        this.onInProgressStateChanged("waiting_for_agent");
+        this.onConnectionStateChanged("waiting_for_agent");
       }
     }
 
@@ -318,7 +318,7 @@ export namespace Gabber {
     }
   }
 
-  export type InProgressState =
+  export type ConnectionState =
     | "not_connected"
     | "connecting"
     | "waiting_for_agent"
@@ -326,7 +326,7 @@ export namespace Gabber {
 
   export type AgentState = "warmup" | "listening" | "thinking" | "speaking" | "timed_out";
 
-  type InProgressStateChangedCallback = (state: InProgressState) => void;
+  type ConnectionStateChangedCallback = (state: ConnectionState) => void;
   type OnMessagesChangedCallback = (messages: SessionMessage[]) => void;
   type OnMicrophoneCallback = (enabled: boolean) => void;
   type OnVolumeCallback = (values: number[], volume: number) => void;
@@ -341,7 +341,7 @@ export namespace Gabber {
 
   export type SessionEngineParams = {
     connectionDetails: ConnectionDetails;
-    onInProgressStateChanged: InProgressStateChangedCallback;
+    onConnectionStateChanged: ConnectionStateChangedCallback;
     onMessagesChanged: OnMessagesChangedCallback;
     onMicrophoneChanged: OnMicrophoneCallback;
     onAgentStateChanged: OnAgentStateChanged;

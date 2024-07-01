@@ -6,9 +6,15 @@ import { Root } from './components/Root';
 import { InternalWidget } from './InternalWidget';
 
 export class Widget extends InternalWidget {
-  static create({ elementID, connectionDetails, settings, onStateChanged }: CreateParams) {
+  static create({
+    elementID,
+    connectionDetails,
+    settings,
+    onAgentStateChanged,
+    onConnectionStateChanged,
+  }: CreateParams) {
     console.log("Creating widget:", { elementID, connectionDetails, settings });
-    const w = new Widget({ onStateChanged });
+    const w = new Widget({ onAgentStateChanged, onConnectionStateChanged });
     const el = document.getElementById(elementID);
     if (!el) {
       console.error("Can't find the element with id", elementID);
@@ -26,13 +32,34 @@ export class Widget extends InternalWidget {
     );
     return w;
   }
+
+  public get agentState() {
+    return super.agentState;
+  }
+
+  public get connectionState() {
+    return super.connectionState
+  }
+
+  public set agentState(value: Gabber.AgentState) {
+    super.agentState = value;
+  }
+
+  public set connectionState(value: Gabber.ConnectionState) {
+    super.connectionState = value;
+  }
+
+  public disconnect() {
+    super.disconnect();
+  }
 }
 
 export type CreateParams = {
   elementID: string;
   connectionDetails: { url: string; token: string };
   settings?: Settings;
-  onStateChanged?: (state: Gabber.AgentState) => void;
+  onAgentStateChanged?: (state: Gabber.AgentState) => void;
+  onConnectionStateChanged?: (state: Gabber.ConnectionState) => void;
 };
 
 export type Settings = {

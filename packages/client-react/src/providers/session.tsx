@@ -3,7 +3,7 @@ import { Gabber } from 'gabber-client-core'
 import React from 'react'
 
 type SessionContextData = {
-  inProgressState: Gabber.InProgressState;
+  connectionState: Gabber.ConnectionState;
   messages: Gabber.SessionMessage[];
   lastError: string | null;
   microphoneEnabled: boolean;
@@ -33,8 +33,8 @@ export function SessionProvider({
   children,
 }: Props) {
 
-  const [inProgressState, setInProgressState] =
-    useState<Gabber.InProgressState>("not_connected");
+  const [connectionState, setConnectionState] =
+    useState<Gabber.ConnectionState>("not_connected");
   const [messages, setMessages] = useState<Gabber.SessionMessage[]>([]);
   const [microphoneEnabledState, setMicrophoneEnabledState] = useState(false);
   const [agentVolumeBands, setAgentVolumeBands] = useState<number[]>([]);
@@ -63,9 +63,9 @@ export function SessionProvider({
     setTranscription({ final: false, text: lastUserMessage?.text || "" });
   }, [lastUserMessage]);
 
-  const onInProgressStateChanged = useRef(
-    (sessionState: Gabber.InProgressState) => {
-      setInProgressState(sessionState);
+  const onConnectionStateChanged = useRef(
+    (sessionState: Gabber.ConnectionState) => {
+      setConnectionState(sessionState);
     }
   );
 
@@ -114,7 +114,7 @@ export function SessionProvider({
         onAgentStateChanged: onAgentStateChanged.current,
         onUserVolumeChanged: onUserVolumeChanged.current,
         onAgentVolumeChanged: onAgentVolumeChanged.current,
-        onInProgressStateChanged: onInProgressStateChanged.current,
+        onConnectionStateChanged: onConnectionStateChanged.current,
         onMessagesChanged: onMessagesChanged.current,
         onMicrophoneChanged: onMicrophoneChanged.current,
         onCanPlayAudioChanged: onCanPlayAudio.current,
@@ -144,7 +144,7 @@ export function SessionProvider({
 
   useEffect(() => {
     if (connect) {
-      if (inProgressState !== "not_connected") {
+      if (connectionState !== "not_connected") {
         return;
       }
       if (!connectionDetails) {
@@ -153,14 +153,19 @@ export function SessionProvider({
       }
       console.log("session engine connecting");
       sessionEngine.current.connect();
+    } else {
+      if(connectionState === "not_connected") {
+        return
+      }
+      sessionEngine.current.disconnect();
     }
-  }, [connect, connectionDetails, inProgressState]);
+  }, [connect, connectionDetails, connectionState]);
 
   return (
     <SessionContext.Provider
       value={{
         messages,
-        inProgressState,
+        connectionState: connectionState,
         microphoneEnabled: microphoneEnabledState,
         agentVolumeBands,
         agentVolume,

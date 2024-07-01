@@ -1,10 +1,11 @@
 import { createContext, useEffect, useMemo } from "react";
 import React from "react";
-import { Settings, Widget } from "..";
+import { Settings } from "..";
 import { useSession } from "gabber-client-react";
+import { InternalWidget } from "../InternalWidget";
 
 type SettingsContextData = {
-  widget: Widget;
+  widget: InternalWidget;
   settings: Settings;
   needsManualConnect: boolean;
   connect: () => void;
@@ -15,7 +16,7 @@ const SettingsContext = createContext<SettingsContextData | undefined>(
 );
 
 type Props = {
-  widget: Widget;
+  widget: InternalWidget;
   settings: Settings;
   connect: () => void;
   children: React.ReactNode;
@@ -27,20 +28,20 @@ export function SettingsProvider({
   children,
   widget,
 }: Props) {
-  const { inProgressState } = useSession();
+  const { connectionState } = useSession();
 
   const needsManualConnect = useMemo(() => {
-    if (inProgressState === "not_connected" && !Boolean(settings.autoConnect)) {
+    if (connectionState === "not_connected" && !Boolean(settings.autoConnect)) {
       return true;
     }
     return false;
-  }, [inProgressState]);
+  }, [connectionState]);
 
   useEffect(() => {
-    if (inProgressState === "not_connected" && Boolean(settings.autoConnect)) {
+    if (connectionState === "not_connected" && Boolean(settings.autoConnect)) {
       connect();
     }
-  }, [inProgressState, settings?.autoConnect]);
+  }, [connectionState, settings?.autoConnect]);
 
   return (
     <SettingsContext.Provider
