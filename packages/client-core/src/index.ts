@@ -31,8 +31,11 @@ export namespace Gabber {
     private onAgentVolumeChanged: OnVolumeCallback;
     private onUserVolumeChanged: OnVolumeCallback;
     private onAgentStateChanged: OnAgentStateChanged;
+    private onRemainingSecondsChanged: OnRemainingSecondsChanged;
     private onAgentError: OnAgentErrorCallback;
     private onCanPlayAudioChanged: OnCanPlayAudioChanged;
+    private _agentState: AgentState = "warmup";
+    private _remainingSeconds: number | null = null;
     private divElement: HTMLDivElement;
 
     constructor({
@@ -43,6 +46,7 @@ export namespace Gabber {
       onAgentVolumeChanged,
       onUserVolumeChanged,
       onAgentStateChanged,
+      onRemainingSecondsChanged: onRemainingSecondsChanged,
       onAgentError,
       onCanPlayAudioChanged,
     }: SessionEngineParams) {
@@ -84,6 +88,7 @@ export namespace Gabber {
       this.onAgentVolumeChanged = onAgentVolumeChanged;
       this.onUserVolumeChanged = onUserVolumeChanged;
       this.onAgentStateChanged = onAgentStateChanged;
+      this.onRemainingSecondsChanged = onRemainingSecondsChanged;
       this.onAgentError = onAgentError;
       this.onCanPlayAudioChanged = onCanPlayAudioChanged;
 
@@ -112,8 +117,8 @@ export namespace Gabber {
     async startAudio() {
       try {
         await this.livekitRoom.startAudio();
-      } catch(e) {
-        console.error("Error starting audio")
+      } catch (e) {
+        console.error("Error starting audio");
       }
     }
 
@@ -127,6 +132,23 @@ export namespace Gabber {
       await this.livekitRoom.localParticipant.publishData(encoded, {
         topic: "chat_input",
       });
+    }
+
+    private set agentState(value: AgentState) {
+      if (value == this._agentState) {
+        return;
+      }
+      this._agentState = value;
+      this.onAgentStateChanged(value);
+    }
+
+    private set remainingSeconds(value: number) {
+      if(value === this._remainingSeconds) {
+        return;
+      }
+
+      this._remainingSeconds = value;
+      this.onRemainingSecondsChanged(value);
     }
 
     destroy() {
@@ -204,7 +226,7 @@ export namespace Gabber {
     }
 
     private onAudioPlaybackChangaed(_: boolean) {
-      this.onCanPlayAudioChanged(this.livekitRoom.canPlaybackAudio)
+      this.onCanPlayAudioChanged(this.livekitRoom.canPlaybackAudio);
     }
 
     private onRoomConnected() {
@@ -286,7 +308,7 @@ export namespace Gabber {
 
         this.messages.push(message);
         this.onMessagesChanged(this.messages);
-      } else if(topic === "error") {
+      } else if (topic === "error") {
         const payload = JSON.parse(decoded);
         this.onAgentError(payload.message);
       }
@@ -306,12 +328,16 @@ export namespace Gabber {
           agent_state != "speaking" &&
           agent_state != "listening" &&
           agent_state != "thinking" &&
-          agent_state != "warmup"
+          agent_state != "warmup" &&
+          agent_state != "time_limit_exceeded"
         ) {
           console.error("Unrecognized agent_state", agent_state);
           return;
         }
-        this.onAgentStateChanged(agent_state);
+        this.agentState = agent_state;
+        if(md.remaining_seconds) {
+          this.remainingSeconds = md.remaining_seconds;
+        }
       } catch (e) {
         console.error("Error on participant metadata cb", e);
       }
@@ -324,13 +350,14 @@ export namespace Gabber {
     | "waiting_for_agent"
     | "connected";
 
-  export type AgentState = "warmup" | "listening" | "thinking" | "speaking" | "timed_out";
+  export type AgentState = "warmup" | "listening" | "thinking" | "speaking" | "time_limit_exceeded";
 
   type ConnectionStateChangedCallback = (state: ConnectionState) => void;
   type OnMessagesChangedCallback = (messages: SessionMessage[]) => void;
   type OnMicrophoneCallback = (enabled: boolean) => void;
   type OnVolumeCallback = (values: number[], volume: number) => void;
   type OnAgentStateChanged = (state: AgentState) => void;
+  type OnRemainingSecondsChanged = (seconds: number) => void;
   type OnAgentErrorCallback = (msg: string) => void;
   type OnCanPlayAudioChanged = (allowed: boolean) => void;
 
@@ -345,6 +372,7 @@ export namespace Gabber {
     onMessagesChanged: OnMessagesChangedCallback;
     onMicrophoneChanged: OnMicrophoneCallback;
     onAgentStateChanged: OnAgentStateChanged;
+    onRemainingSecondsChanged: OnRemainingSecondsChanged;
     onAgentVolumeChanged: OnVolumeCallback;
     onUserVolumeChanged: OnVolumeCallback;
     onAgentError: OnAgentErrorCallback;
