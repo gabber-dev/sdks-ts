@@ -323,6 +323,9 @@ export namespace Gabber {
       }
       try {
         const md = JSON.parse(participant.metadata);
+        if(md.remaining_seconds) {
+          this.remainingSeconds = md.remaining_seconds;
+        }
         const { agent_state } = md;
         if (
           agent_state != "speaking" &&
@@ -335,9 +338,6 @@ export namespace Gabber {
           return;
         }
         this.agentState = agent_state;
-        if(md.remaining_seconds) {
-          this.remainingSeconds = md.remaining_seconds;
-        }
       } catch (e) {
         console.error("Error on participant metadata cb", e);
       }

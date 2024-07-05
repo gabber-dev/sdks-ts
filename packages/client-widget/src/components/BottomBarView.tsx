@@ -21,21 +21,10 @@ export function BottomBarView() {
     userVolumeBands,
     lastError,
     canPlayAudio,
-    agentState,
     connectionState
   } = useSession();
 
-  const { settings, needsManualConnect, widget } = useSettings();
-
-  // Sync widget with react. TODO, this should be in it's own provider
-  useEffect(() => {
-    widget.connectionState = connectionState;
-  }, [connectionState])
-
-  // Sync widget with react. TODO, this should be in it's own provider
-  useEffect(() => {
-    widget.agentState = agentState;
-  }, [agentState])
+  const { settings, needsManualConnect } = useSettings();
 
   const micComponent = useMemo(() => {
     const style = {

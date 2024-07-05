@@ -11,10 +11,15 @@ export class Widget extends InternalWidget {
     connectionDetails,
     settings,
     onAgentStateChanged,
+    onRemainingSecondsChanged,
     onConnectionStateChanged,
   }: CreateParams) {
     console.log("Creating widget:", { elementID, connectionDetails, settings });
-    const w = new Widget({ onAgentStateChanged, onConnectionStateChanged });
+    const w = new Widget({
+      onAgentStateChanged,
+      onConnectionStateChanged,
+      onRemainingSecondsChanged,
+    });
     const el = document.getElementById(elementID);
     if (!el) {
       console.error("Can't find the element with id", elementID);
@@ -59,6 +64,7 @@ export type CreateParams = {
   connectionDetails: { url: string; token: string };
   settings?: Settings;
   onAgentStateChanged?: (state: Gabber.AgentState) => void;
+  onRemainingSecondsChanged?: (seconds: number | null) => void;
   onConnectionStateChanged?: (state: Gabber.ConnectionState) => void;
 };
 

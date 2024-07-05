@@ -23,7 +23,8 @@
     var endpoint = "https://app.gabber.dev/api/v1/session/start"
     var body = {
         persona: persona,
-        scenario: scenario
+        scenario: scenario,
+        time_limit_s: 10,
     }
     fetch(endpoint, {
         method: "POST", 
@@ -43,6 +44,7 @@
             connectionDetails: connection_details,
             onAgentStateChanged: (state) => { console.log("NEIL agent state", state) },
             onConnectionStateChanged: (state) => { console.log("NEIL connection state", state) },
+            onRemainingSecondsChanged: (seconds) => { console.log("NEIL remaining seconds", seconds) },
             settings: {
                 layout: "bottom_bar",
                 autoConnect: true,

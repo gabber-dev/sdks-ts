@@ -12,6 +12,7 @@ type SessionContextData = {
   userVolumeBands: number[];
   userVolume: number;
   agentState: Gabber.AgentState;
+  remainingSeconds: number | null;
   transcription: { text: string; final: boolean };
   canPlayAudio: boolean;
   setMicrophoneEnabled: (enabled: boolean) => Promise<void>;
@@ -42,6 +43,7 @@ export function SessionProvider({
   const [userVolumeBands, setUserVolumeBands] = useState<number[]>([]);
   const [userVolume, setUserVolume] = useState<number>(0);
   const [agentState, setAgentState] = useState<Gabber.AgentState>("listening");
+  const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
   const [lastError, setLastError] = useState<string | null>(null);
   const [canPlayAudio, setCanPlayAudio] = useState(true);
   const createOnce = useRef(false);
@@ -91,6 +93,10 @@ export function SessionProvider({
     setAgentState(as);
   })
 
+  const onRemainingSecondsChanged = useRef((seconds: number | null) => {
+    setRemainingSeconds(seconds);
+  });
+
   const onAgentError = useRef((msg: string) => {
     setLastError(msg)
   })
@@ -112,6 +118,7 @@ export function SessionProvider({
         connectionDetails,
         onAgentError: onAgentError.current,
         onAgentStateChanged: onAgentStateChanged.current,
+        onRemainingSecondsChanged: onRemainingSecondsChanged.current,
         onUserVolumeChanged: onUserVolumeChanged.current,
         onAgentVolumeChanged: onAgentVolumeChanged.current,
         onConnectionStateChanged: onConnectionStateChanged.current,
@@ -172,6 +179,7 @@ export function SessionProvider({
         userVolumeBands,
         userVolume,
         agentState,
+        remainingSeconds,
         transcription,
         lastError,
         canPlayAudio,

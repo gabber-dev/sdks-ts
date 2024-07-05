@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Settings } from "..";
-import { SessionProvider } from "gabber-client-react";
+import { SessionProvider, useSession } from "gabber-client-react";
 import React from "react";
 import { MainView } from "./MainView";
 import { Gabber } from "gabber-client-core";
-import { SettingsProvider } from "./SettingsProvider";
+import { SettingsProvider, useSettings } from "./SettingsProvider";
 import { BottomBarView } from "./BottomBarView";
 import { Toaster } from "react-hot-toast";
 import { InternalWidget } from "../InternalWidget";
@@ -54,8 +54,33 @@ export function Root({ connectionDetails, settings, widget }: Props) {
         settings={settings || DEFAULT_SETTINGS}
         widget={widget}
       >
+        <CallbackSync />
         {component}
       </SettingsProvider>
     </SessionProvider>
   );
+}
+
+function CallbackSync() {
+  const {
+    agentState,
+    remainingSeconds,
+    connectionState
+  } = useSession();
+
+  const { widget } = useSettings();
+
+  useEffect(() => {
+    widget.connectionState = connectionState;
+  }, [connectionState, widget])
+
+  useEffect(() => {
+    widget.agentState = agentState;
+  }, [agentState, widget])
+
+  useEffect(() => {
+    widget.remainingSeconds = remainingSeconds
+  }, [remainingSeconds, widget])
+  
+  return null;
 }
