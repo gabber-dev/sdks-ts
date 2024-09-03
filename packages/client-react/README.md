@@ -64,7 +64,6 @@ export const MyComponent = () => {
     return (<div>your component stuff</div>)
 }
 ```
-
 ### Integrating Gabber Sessions
 
 ### Overview
@@ -440,6 +439,11 @@ jsonCopy code
 
 ```
 
+### Usage and Integration Notes:
+
+- When you receive a POST request to your webhook, it indicates that the user is still connected. The agent will continue to send these requests as long as it is alive, even if the user temporarily disconnects due to internet issues.
+- You can use the information from both the timeline API and the webhook to accurately calculate and deduct credits based on user activity and periods of silence.
+- Future updates to the webhook might include additional information beyond the 30-second interval updates.
 ### Usage and Integration Notes:
 
 - When you receive a POST request to your webhook, it indicates that the user is still connected. The agent will continue to send these requests as long as it is alive, even if the user temporarily disconnects due to internet issues.
