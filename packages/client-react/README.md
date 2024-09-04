@@ -92,7 +92,7 @@ Integrate Gabber sessions into your backend to start and manage user sessions. T
     - Make an HTTP POST request to Gabber's API to start a session:
         
         ```
-        POST <https://app.gabber.dev/api/v1/session/start>
+        POST https://app.gabber.dev/api/v1/session/start
         Headers:
           Content-Type: application/json
           x-api-key: <your gabber dev service key>
@@ -123,7 +123,7 @@ Integrate Gabber sessions into your backend to start and manage user sessions. T
 
 **Backend Endpoint:**
 
-```jsx
+```js
 const express = require('express');
 const axios = require('axios');
 const app = express();
@@ -131,7 +131,7 @@ app.use(express.json());
 
 app.post('/api/start_session', async (req, res) => {
   try {
-    const response = await axios.post('<https://app.gabber.dev/api/v1/session/start>', {
+    const response = await axios.post('https://app.gabber.dev/api/v1/session/start', {
       persona: req.body.persona,
       scenario: req.body.scenario
     }, {
@@ -156,7 +156,7 @@ app.listen(3000, () => console.log('Server running on port 3000'));
 ```html
 <html>
 <head>
-  <script src="<https://unpkg.com/gabber-client-widget/dist/index.js>"></script>
+  <script src="https://unpkg.com/gabber-client-widget/dist/index.js"></script>
   <style>
     .gabber { width: 500px; height: 500px; }
   </style>
@@ -202,7 +202,7 @@ This guide covers the integration and customization of the Gabber widget into yo
     - Add the Gabber widget script to your HTML:
         
         ```html
-        <script src="<https://unpkg.com/gabber-client-widget/dist/index.js>"></script>
+        <script src="https://unpkg.com/gabber-client-widget/dist/index.js"></script>
         
         ```
         
@@ -295,7 +295,7 @@ This guide covers the integration and customization of the Gabber widget into yo
 ```html
 <html>
 <head>
-  <script src="<https://unpkg.com/gabber-client-widget/dist/index.js>"></script>
+  <script src="https://unpkg.com/gabber-client-widget/dist/index.js"></script>
   <style>
     .gabber { width: 500px; height: 500px; }
   </style>
