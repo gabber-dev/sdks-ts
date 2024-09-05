@@ -89,24 +89,21 @@ app.listen(3000, () => console.log('Server running on port 3000'));
 
 **Endpoint:**
 
-```bash
-bashCopy code
+```
 GET https://app.gabber.dev/api/v1/session/<session_id>/timeline
 
 ```
 
 **Headers:**
 
-```arduino
-arduinoCopy code
+```
 -H "x-api-key: <your api key>"
 
 ```
 
 **Response:**
 
-```json
-jsonCopy code
+```
 {
   "status": 200,
   "body": {
@@ -174,8 +171,7 @@ This API returns a timeline of the session, indicating periods of user interacti
 
 **Endpoint:**
 
-```bash
-bashCopy code
+```
 POST https://app.gabber.dev/api/v1/session/start
 
 ```
@@ -192,8 +188,7 @@ If the `webhook` parameter is specified in the request body, the agent will make
 
 **Webhook POST Request Body:**
 
-```json
-jsonCopy code
+```
 {
   "session_id": "<session_id>"
 }
