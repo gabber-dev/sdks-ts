@@ -10,7 +10,7 @@ This guide covers the integration and customization of the Gabber widget into yo
 1. **Include the Gabber Widget Script**
     - Add the Gabber widget script to your HTML:
         
-        ```html
+        ```
         <script src="https://unpkg.com/gabber-client-widget/dist/index.js"></script>
         
         ```
@@ -18,7 +18,7 @@ This guide covers the integration and customization of the Gabber widget into yo
 2. **Create a Container for the Widget**
     - Create a div element where the widget will be attached:
         
-        ```html
+        ```
         <div id="gabber-div"></div>
         
         ```
@@ -26,7 +26,7 @@ This guide covers the integration and customization of the Gabber widget into yo
 3. **Initialize the Widget**
     - Initialize the widget using the connection details provided by your backend:
         
-        ```html
+        ```
         <script>
           Gabber.Widget.create({
             elementID: 'gabber-div',
@@ -59,7 +59,7 @@ This guide covers the integration and customization of the Gabber widget into yo
 1. **Color Settings**
     - Customize the widget's colors to match your website's theme:
         
-        ```json
+        ```
         {
           "primaryColor": "#ff0000",
           "primaryColorContent": "#ffffff",
@@ -76,7 +76,7 @@ This guide covers the integration and customization of the Gabber widget into yo
 2. **Layout Settings**
     - Choose the layout of the widget:
         
-        ```json
+        ```
         {
           "layout": "bottom_bar"
         }
@@ -86,7 +86,7 @@ This guide covers the integration and customization of the Gabber widget into yo
 3. **Audio Playback Settings**
     - Customize the text for the audio playback failure UI:
         
-        ```json
+        ```
         {
           "audioPlaybackFailed": {
             "descriptionText": "Audio playback requires a user gesture.",
@@ -101,7 +101,7 @@ This guide covers the integration and customization of the Gabber widget into yo
 
 **HTML Example:**
 
-```html
+```
 <html>
 <head>
   <script src="https://unpkg.com/gabber-client-widget/dist/index.js"></script>
