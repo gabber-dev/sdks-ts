@@ -40,7 +40,7 @@ Integrate Gabber sessions into your backend to start and manage user sessions. T
         
     - The response will include the session details and connection information:
         
-        ```json
+        ```
         {
           "session": { "id": "string" },
           "persona": "string",
@@ -52,38 +52,6 @@ Integrate Gabber sessions into your backend to start and manage user sessions. T
         
 6. **Front-End Integration**
     - Use the connection details from your backend to connect to a Gabber session using the client SDK.
-
-### Example Code
-
-**Backend Endpoint:**
-
-```js
-const express = require('express');
-const axios = require('axios');
-const app = express();
-app.use(express.json());
-
-app.post('/api/start_session', async (req, res) => {
-  try {
-    const response = await axios.post('https://app.gabber.dev/api/v1/session/start', {
-      persona: req.body.persona,
-      scenario: req.body.scenario
-    }, {
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': 'your_gabber_service_key'
-      }
-    });
-
-    res.json(response.data.connection_details);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.listen(3000, () => console.log('Server running on port 3000'));
-
-```
 
 ### 1. Session Timeline API
 
