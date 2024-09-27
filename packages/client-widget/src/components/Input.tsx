@@ -17,11 +17,9 @@ export function Input({heightPixels}: Props) {
     sendChatMessage,
     microphoneEnabled,
     setMicrophoneEnabled,
-    connectionState,
     userVolumeBands
   } = useSession();
-  const [connectHovered, setConnectHovered] = useState(false);
-  const { settings, connect } = useSettings();
+  const { settings } = useSettings();
   const [mode, setMode] = useState<"chat" | "voice">("chat");
   const { mic, chat, visualizer } = useMemo(() => {
     const halfHeight = Math.floor(heightPixels / 2);
@@ -72,39 +70,6 @@ export function Input({heightPixels}: Props) {
     setMicrophoneEnabled(!microphoneEnabled);
   }, [mode, microphoneEnabled]);
 
-  if (connectionState !== "connected" && !Boolean(settings.autoConnect)) {
-    const text =
-      connectionState === "not_connected" ? settings.connectText || "" : "";
-    return (
-      <div className="h-full w-full flex items-center justify-center">
-        <button
-          onMouseEnter={() => {
-            setConnectHovered(true);
-          }}
-          onMouseLeave={() => {
-            setConnectHovered(false);
-          }}
-          onClick={() => {
-            connect();
-          }}
-          className="w-1/3 h-1/2 rounded-lg"
-          style={{
-            backgroundColor: connectHovered
-              ? settings.baseColorPlusOne
-              : settings.baseColor,
-            color: settings.baseColorContent,
-            borderColor: settings.primaryColor,
-            borderWidth: "2px",
-            borderStyle: "solid",
-            boxShadow: `0px 0px 20px 1px ${settings.primaryColor}`,
-          }}
-        >
-          {text}
-        </button>
-      </div>
-    );
-  }
-
   return (
     <div className="relative h-full w-full">
       <div className="absolute transition-all" style={visualizer}>
@@ -129,7 +94,7 @@ export function Input({heightPixels}: Props) {
           <div className="h-full w-full p-2">{micComponent}</div>
         </button>
       </div>
-      <div className="absolute transition-all rounded-full" style={chat}>
+      <div className="absolute transition-all rounded-md" style={chat}>
         {mode === "chat" ? (
           <form
             className="h-full w-full flex justify-center items-center p-2"

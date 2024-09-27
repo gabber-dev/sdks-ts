@@ -37,10 +37,10 @@ export class InternalWidget {
   }
 
   public set remainingSeconds(seconds: number | null) {
-    if(seconds === this._remainingSeconds) {
+    if (seconds === this._remainingSeconds) {
       return;
     }
-    if(this.onRemainingSecondsChanged) {
+    if (this.onRemainingSecondsChanged) {
       this.onRemainingSecondsChanged(seconds);
     }
     this._remainingSeconds = seconds;
@@ -58,7 +58,6 @@ export class InternalWidget {
     onConnectionStateChanged,
     onAgentStateChanged,
     onRemainingSecondsChanged,
-
   }: Params) {
     this.onAgentStateChanged = onAgentStateChanged;
     this.onConnectionStateChanged = onConnectionStateChanged;

@@ -1,61 +1,56 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Settings } from "..";
+import { useCallback, useEffect, useState } from "react";
+import { ConversationalWidgetSettings } from "..";
 import { SessionProvider, useSession } from "gabber-client-react";
 import React from "react";
 import { MainView } from "./MainView";
 import { Gabber } from "gabber-client-core";
 import { SettingsProvider, useSettings } from "./SettingsProvider";
-import { BottomBarView } from "./BottomBarView";
 import { Toaster } from "react-hot-toast";
 import { InternalWidget } from "../InternalWidget";
+import { ConnectionView } from "./ConnectionView";
 
-const DEFAULT_SETTINGS: Settings = {
-  layout: "full"
-};
+const DEFAULT_SETTINGS: ConversationalWidgetSettings = {};
 
 type Props = {
-  connectionDetails: Gabber.ConnectionDetails;
-  settings?: Settings;
+  onConnectionRequested: () => Promise<Gabber.ConnectionDetails>;
+  settings?: ConversationalWidgetSettings;
   widget: InternalWidget;
 };
 
-export function Root({ connectionDetails, settings, widget }: Props) {
-  const [shouldConnect, setShouldConnect] = useState(
-    Boolean(settings?.autoConnect)
-  );
+export function Root({ onConnectionRequested, settings, widget }: Props) {
+  const [loadingConnectionDetails, setLoadingConnectionDetails] =
+    useState(false);
+  const [connectionDetails, setConnectionDetails] = useState<Gabber.ConnectionDetails | null>(null);
 
-  const [forceDisconnect, setForceDisconnect] = useState(false)
+  const onConnectPressed = useCallback(async () => {
+    setLoadingConnectionDetails(true);
+    const details = await onConnectionRequested();
+    console.log("NEIL Connection details", details);
+    setConnectionDetails(details);
+    setLoadingConnectionDetails(false);
+  }, []);
 
-  const disconnectHandler = useRef(() => {
-    setForceDisconnect(true)
-  })
+  if(!connectionDetails) {
+    return (
+      <SettingsProvider settings={settings || DEFAULT_SETTINGS} widget={widget}>
+        <ConnectionView onConnectPressed={onConnectPressed} />
+      </SettingsProvider>
+    );
+  }
 
-  useEffect(() => {
-    widget.registerDisconnectHandler(disconnectHandler.current);
-  }, [])
-
-  const component = useMemo(() => {
-    if(settings?.layout === "full") {
-      return <MainView />
-    } else if(settings?.layout === "bottom_bar") {
-      return <BottomBarView />
-    }
-    return <BottomBarView />;
-  }, [])
+  if(loadingConnectionDetails) {
+    return null;
+  }
 
   return (
     <SessionProvider
+      connect={Boolean(connectionDetails)}
       connectionDetails={connectionDetails}
-      connect={shouldConnect && !forceDisconnect}
     >
       <Toaster />
-      <SettingsProvider
-        connect={() => setShouldConnect(true)}
-        settings={settings || DEFAULT_SETTINGS}
-        widget={widget}
-      >
+      <SettingsProvider settings={settings || DEFAULT_SETTINGS} widget={widget}>
         <CallbackSync />
-        {component}
+        <MainView />
       </SettingsProvider>
     </SessionProvider>
   );

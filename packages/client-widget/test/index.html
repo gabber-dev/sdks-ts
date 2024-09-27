@@ -5,8 +5,8 @@
     <!-- <script src="https://unpkg.com/gabber-client-widget/dist/index.js"></script> -->
     <style>
         .gabber {
-            width: 500px;
-            height: 100px;
+            width: 100vw;
+            height: 100vh;
         }
     </style>
 </head>
@@ -17,53 +17,54 @@
 </body>
 
 <script>
-    var api_key = "71e05660-41f8-405f-a232-f4239eb742c0"
-    var persona = "d579bf4a-23fd-4065-945a-4241b8184b76"
-    var scenario = "efa4471e-7272-491d-b09b-2103918a4c6c"
-    var endpoint = "https://app.gabber.dev/api/v1/session/start"
-    var body = {
-        persona: persona,
-        scenario: scenario,
-        time_limit_s: 10,
-    }
-    fetch(endpoint, {
-        method: "POST", 
-        headers: {
-            "x-api-key": api_key,
-            "Content-Type": "application/json"
-        }, 
-        body: JSON.stringify(body)
-    }).then(res => {
-        return res.json()
-    }).then(res => {
-        return res.body;
-    }).then(({connection_details, persona, scenario}) => {
-        console.log("Connection details", connection_details, persona, scenario)
-        window.neil = Gabber.Widget.create({
-            elementID: "gabber",
-            connectionDetails: connection_details,
-            onAgentStateChanged: (state) => { console.log("NEIL agent state", state) },
-            onConnectionStateChanged: (state) => { console.log("NEIL connection state", state) },
-            onRemainingSecondsChanged: (seconds) => { console.log("NEIL remaining seconds", seconds) },
-            settings: {
-                layout: "bottom_bar",
-                autoConnect: true,
-                connectText: "connect",
-                personaImage: persona.image_url,
-                primaryColor: "#ff0000",
-                primaryColorContent: "#ffffff",
-                secondaryColor: "#00ff00",
-                secondaryColorContent: "#ffffff",
-                baseColor: "#000000",
-                baseColorPlusOne: "#1c1c1c",
-                baseColorPlusTwo: "#373636",
-                baseColorContent: "#ffffff",
-                audioPlaybackFailed:  {
-                    descriptionText: "AP Failed",
-                    buttonText: "Start"
-                }
-            }
+    function onConnectionRequested() {
+        var api_key = "71e05660-41f8-405f-a232-f4239eb742c0"
+        var persona = "d579bf4a-23fd-4065-945a-4241b8184b76"
+        var scenario = "efa4471e-7272-491d-b09b-2103918a4c6c"
+        var endpoint = "https://app.gabber.dev/api/v1/session/start"
+        var body = {
+            persona: persona,
+            scenario: scenario,
+            time_limit_s: 10,
+        }
+        return fetch(endpoint, {
+            method: "POST",
+            headers: {
+                "x-api-key": api_key,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(body)
+        }).then(res => {
+            return res.json()
+        }).then(res => {
+            return res.body;
+        }).then(({ connection_details, persona, scenario }) => {
+            console.log("Connection details", connection_details, persona, scenario)
+            return connection_details;
         })
+    }
+    console.log("NEIL", Gabber)
+    window.neil = Gabber.ConversationalWidget.create({
+        elementID: "gabber",
+        onConnectionRequested: onConnectionRequested,
+        onAgentStateChanged: (state) => { console.log("NEIL agent state", state) },
+        onConnectionStateChanged: (state) => { console.log("NEIL connection state", state) },
+        onRemainingSecondsChanged: (seconds) => { console.log("NEIL remaining seconds", seconds) },
+        settings: {
+            connectText: "connect",
+            primaryColor: "#ff0000",
+            primaryColorContent: "#ffffff",
+            secondaryColor: "#00ff00",
+            secondaryColorContent: "#ffffff",
+            baseColor: "#000000",
+            baseColorPlusOne: "#1c1c1c",
+            baseColorPlusTwo: "#373636",
+            baseColorContent: "#ffffff",
+            audioPlaybackFailed: {
+                descriptionText: "AP Failed",
+                buttonText: "Start"
+            }
+        }
     })
 </script>
 

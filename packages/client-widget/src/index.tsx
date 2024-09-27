@@ -5,17 +5,16 @@ import './index.css';
 import { Root } from './components/Root';
 import { InternalWidget } from './InternalWidget';
 
-export class Widget extends InternalWidget {
+export class ConversationalWidget extends InternalWidget {
   static create({
     elementID,
-    connectionDetails,
     settings,
+    onConnectionRequested,
     onAgentStateChanged,
     onRemainingSecondsChanged,
     onConnectionStateChanged,
   }: CreateParams) {
-    console.log("Creating widget:", { elementID, connectionDetails, settings });
-    const w = new Widget({
+    const w = new ConversationalWidget({
       onAgentStateChanged,
       onConnectionStateChanged,
       onRemainingSecondsChanged,
@@ -30,8 +29,8 @@ export class Widget extends InternalWidget {
       <React.StrictMode>
         <Root
           widget={w}
-          connectionDetails={connectionDetails}
           settings={settings}
+          onConnectionRequested={onConnectionRequested}
         />
       </React.StrictMode>
     );
@@ -61,17 +60,16 @@ export class Widget extends InternalWidget {
 
 export type CreateParams = {
   elementID: string;
-  connectionDetails: { url: string; token: string };
-  settings?: Settings;
+  settings?: ConversationalWidgetSettings;
+  onConnectionRequested: () => Promise<Gabber.ConnectionDetails>;
   onAgentStateChanged?: (state: Gabber.AgentState) => void;
   onRemainingSecondsChanged?: (seconds: number | null) => void;
   onConnectionStateChanged?: (state: Gabber.ConnectionState) => void;
 };
 
-export type Settings = {
-  autoConnect?: boolean;
-  layout?: "full" | "bottom_bar";
+export type ConversationalWidgetSettings = {
   connectText?: string;
+  personaName?: string;
   personaImage?: string;
   primaryColor?: string;
   primaryColorContent?: string;

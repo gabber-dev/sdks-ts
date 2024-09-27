@@ -4,19 +4,20 @@ import React, { useEffect, useRef, useState } from "react";
 
 type Props = {
   color: string;
+  shadowColor: string;
   gap: number;
 };
 
-export const AgentVisualizer = ({ color, gap }: Props) => {
+export const AgentVisualizer = ({ color, shadowColor, gap }: Props) => {
   const { agentVolumeBands, connectionState, agentState } = useSession();
-  const [heights, setHeights] = useState<number[]>([])
+  const [heights, setHeights] = useState<number[]>([]);
 
-  const agentVolumesRef = useRef<number[]>(agentVolumeBands)
-  const connectionStateRef = useRef<Gabber.ConnectionState>("not_connected")
-  const agentStateRef = useRef<Gabber.AgentState>("listening")
-  const thinkingIndex = useRef<number>(0)
-  const thinkingLastTick = useRef<number>(0)
-  const thinkingDirection = useRef(1)
+  const agentVolumesRef = useRef<number[]>(agentVolumeBands);
+  const connectionStateRef = useRef<Gabber.ConnectionState>("not_connected");
+  const agentStateRef = useRef<Gabber.AgentState>("listening");
+  const thinkingIndex = useRef<number>(0);
+  const thinkingLastTick = useRef<number>(0);
+  const thinkingDirection = useRef(1);
 
   useAnimationFrame((dt: number) => {
     if (connectionStateRef.current !== "connected") {
@@ -24,7 +25,7 @@ export const AgentVisualizer = ({ color, gap }: Props) => {
       return;
     }
 
-    if(agentStateRef.current === "thinking") {
+    if (agentStateRef.current === "thinking") {
       if (thinkingIndex.current >= agentVolumesRef.current.length) {
         thinkingIndex.current = agentVolumesRef.current.length - 1;
       }
@@ -50,13 +51,13 @@ export const AgentVisualizer = ({ color, gap }: Props) => {
         );
       }
     } else {
-      setHeights(agentVolumesRef.current)
+      setHeights(agentVolumesRef.current);
     }
-  })
+  });
 
   useEffect(() => {
     agentStateRef.current = agentState;
-  }, [agentState])
+  }, [agentState]);
 
   useEffect(() => {
     agentVolumesRef.current = agentVolumeBands;
@@ -74,7 +75,7 @@ export const AgentVisualizer = ({ color, gap }: Props) => {
               height: `calc(5% + ${frequency} * 80%)`,
               transform: "",
               backgroundColor: color,
-              boxShadow: `0px 0px 20px 1px ${color}`,
+              boxShadow: `5px 5px 0px 0px ${shadowColor}`,
             }}
           ></div>
         );
