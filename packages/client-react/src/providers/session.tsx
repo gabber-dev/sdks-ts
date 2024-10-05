@@ -23,14 +23,12 @@ type SessionContextData = {
 const SessionContext = createContext<SessionContextData | undefined>(undefined)
 
 type Props = {
-  connectionDetails: Gabber.ConnectionDetails;
-  connect: boolean;
+  connectionOpts: Gabber.ConnectOptions | null;
   children: React.ReactNode;
 };
 
 export function SessionProvider({
-  connectionDetails,
-  connect,
+  connectionOpts,
   children,
 }: Props) {
 
@@ -115,7 +113,6 @@ export function SessionProvider({
       }
       createOnce.current = true;
       return new Gabber.SessionEngine({
-        connectionDetails,
         onAgentError: onAgentError.current,
         onAgentStateChanged: onAgentStateChanged.current,
         onRemainingSecondsChanged: onRemainingSecondsChanged.current,
@@ -150,23 +147,18 @@ export function SessionProvider({
   })
 
   useEffect(() => {
-    if (connect) {
+    if (connectionOpts) {
       if (connectionState !== "not_connected") {
         return;
       }
-      if (!connectionDetails) {
-        console.error("Trying to connect without a token or url");
-        return;
-      }
-      console.log("session engine connecting");
-      sessionEngine.current.connect();
+      sessionEngine.current.connect(connectionOpts);
     } else {
-      if(connectionState === "not_connected") {
-        return
+      if (connectionState === "not_connected") {
+        return;
       }
       sessionEngine.current.disconnect();
     }
-  }, [connect, connectionDetails, connectionState]);
+  }, [connectionOpts, connectionState]);
 
   return (
     <SessionContext.Provider

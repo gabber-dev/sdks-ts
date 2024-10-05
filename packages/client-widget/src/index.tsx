@@ -9,7 +9,7 @@ export class ConversationalWidget extends InternalWidget {
   static create({
     elementID,
     settings,
-    onConnectionRequested,
+    tokenGenerator,
     onAgentStateChanged,
     onRemainingSecondsChanged,
     onConnectionStateChanged,
@@ -30,7 +30,7 @@ export class ConversationalWidget extends InternalWidget {
         <Root
           widget={w}
           settings={settings}
-          onConnectionRequested={onConnectionRequested}
+          tokenGenerator={tokenGenerator}
         />
       </React.StrictMode>
     );
@@ -42,7 +42,7 @@ export class ConversationalWidget extends InternalWidget {
   }
 
   public get connectionState() {
-    return super.connectionState
+    return super.connectionState;
   }
 
   public set agentState(value: Gabber.AgentState) {
@@ -61,7 +61,7 @@ export class ConversationalWidget extends InternalWidget {
 export type CreateParams = {
   elementID: string;
   settings?: ConversationalWidgetSettings;
-  onConnectionRequested: () => Promise<Gabber.ConnectionDetails>;
+  tokenGenerator: () => Promise<string>;
   onAgentStateChanged?: (state: Gabber.AgentState) => void;
   onRemainingSecondsChanged?: (seconds: number | null) => void;
   onConnectionStateChanged?: (state: Gabber.ConnectionState) => void;

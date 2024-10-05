@@ -17,15 +17,17 @@
 </body>
 
 <script>
-    function onConnectionRequested() {
+    function tokenGenerator() {
         var api_key = "71e05660-41f8-405f-a232-f4239eb742c0"
-        var persona = "d579bf4a-23fd-4065-945a-4241b8184b76"
-        var scenario = "efa4471e-7272-491d-b09b-2103918a4c6c"
-        var endpoint = "https://app.gabber.dev/api/v1/session/start"
+        var endpoint = "https://app.gabber.dev/api/v1/usage/token"
         var body = {
-            persona: persona,
-            scenario: scenario,
-            time_limit_s: 10,
+            limits: [
+                {
+                    type: "conversational_seconds",
+                    value: 10
+                }
+            ],
+
         }
         return fetch(endpoint, {
             method: "POST",
@@ -37,16 +39,15 @@
         }).then(res => {
             return res.json()
         }).then(res => {
-            return res.body;
-        }).then(({ connection_details, persona, scenario }) => {
-            console.log("Connection details", connection_details, persona, scenario)
-            return connection_details;
-        })
+            console.log("Got token", res)
+            const token = res.token;
+            return token;
+        });
     }
     console.log("NEIL", Gabber)
     window.neil = Gabber.ConversationalWidget.create({
         elementID: "gabber",
-        onConnectionRequested: onConnectionRequested,
+        tokenGenerator,
         onAgentStateChanged: (state) => { console.log("NEIL agent state", state) },
         onConnectionStateChanged: (state) => { console.log("NEIL connection state", state) },
         onRemainingSecondsChanged: (seconds) => { console.log("NEIL remaining seconds", seconds) },

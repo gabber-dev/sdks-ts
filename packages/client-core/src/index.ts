@@ -13,11 +13,16 @@ import {
   LocalAudioTrack,
 } from "livekit-client";
 import { TrackVolumeVisualizer } from "./TrackVolumeVisualizer";
+import {
+  ApiV1SessionStartPostRequest,
+  ApiV1SessionStartPost200ResponsePersona,
+  ApiV1SessionStartPost200ResponseScenario,
+  Configuration,
+  DefaultApi,
+} from "./generated";
 
 export namespace Gabber {
   export class SessionEngine {
-    private url: string;
-    private token: string;
     private livekitRoom: Room;
     private agentParticipant: RemoteParticipant | null = null;
     private agentTrack: RemoteAudioTrack | null = null;
@@ -39,7 +44,6 @@ export namespace Gabber {
     private divElement: HTMLDivElement;
 
     constructor({
-      connectionDetails,
       onConnectionStateChanged: onConnectionStateChanged,
       onMessagesChanged,
       onMicrophoneChanged,
@@ -50,8 +54,6 @@ export namespace Gabber {
       onAgentError,
       onCanPlayAudioChanged,
     }: SessionEngineParams) {
-      this.url = connectionDetails.url;
-      this.token = connectionDetails.token;
       this.livekitRoom = new Room();
       this.livekitRoom.on("connected", this.onRoomConnected.bind(this));
       this.livekitRoom.on("disconnected", this.onRoomDisconnected.bind(this));
@@ -103,10 +105,29 @@ export namespace Gabber {
       });
     }
 
-    async connect() {
-      await this.livekitRoom.connect(this.url, this.token, {
-        autoSubscribe: true,
-      });
+    async connect(opts: ConnectOptions) {
+      let connectionDetails: ConnectionDetails | null = null;
+      if('connectionDetails' in opts) {
+        connectionDetails = opts.connectionDetails;
+      } else if('token' in opts && 'sessionConnectOptions' in opts) {
+        const config = new Configuration({ accessToken: opts.token });
+        const api = new DefaultApi(config);
+        const res = await api.apiV1SessionStartPost(opts.sessionConnectOptions);
+        connectionDetails = {
+          url: res.data.connection_details.url!,
+          token: res.data.connection_details.token!,
+        };
+      }
+      if (!connectionDetails) {
+        throw new Error("No connection details provided");
+      }
+      await this.livekitRoom.connect(
+        connectionDetails.url,
+        connectionDetails.token,
+        {
+          autoSubscribe: true,
+        }
+      );
       this.onCanPlayAudioChanged(this.livekitRoom.canPlaybackAudio);
     }
 
@@ -143,7 +164,7 @@ export namespace Gabber {
     }
 
     private set remainingSeconds(value: number) {
-      if(value === this._remainingSeconds) {
+      if (value === this._remainingSeconds) {
         return;
       }
 
@@ -323,7 +344,7 @@ export namespace Gabber {
       }
       try {
         const md = JSON.parse(participant.metadata);
-        if(md.remaining_seconds) {
+        if (md.remaining_seconds) {
           this.remainingSeconds = md.remaining_seconds;
         }
         const { agent_state } = md;
@@ -350,7 +371,12 @@ export namespace Gabber {
     | "waiting_for_agent"
     | "connected";
 
-  export type AgentState = "warmup" | "listening" | "thinking" | "speaking" | "time_limit_exceeded";
+  export type AgentState =
+    | "warmup"
+    | "listening"
+    | "thinking"
+    | "speaking"
+    | "time_limit_exceeded";
 
   type ConnectionStateChangedCallback = (state: ConnectionState) => void;
   type OnMessagesChangedCallback = (messages: SessionMessage[]) => void;
@@ -364,10 +390,9 @@ export namespace Gabber {
   export type ConnectionDetails = {
     url: string;
     token: string;
-  }
+  };
 
   export type SessionEngineParams = {
-    connectionDetails: ConnectionDetails;
     onConnectionStateChanged: ConnectionStateChangedCallback;
     onMessagesChanged: OnMessagesChangedCallback;
     onMicrophoneChanged: OnMicrophoneCallback;
@@ -393,4 +418,65 @@ export namespace Gabber {
     session: string;
     text: string;
   };
+
+  export type SessionConnectOptions = ApiV1SessionStartPostRequest;
+  export type ConnectOptions =
+    | { connectionDetails: ConnectionDetails }
+    | {
+        token: string;
+        sessionConnectOptions: SessionConnectOptions;
+      };
+
+  export class Api {
+    private api: DefaultApi;
+
+    constructor(token: string) {
+      const config = new Configuration({ accessToken: token });
+      this.api = new DefaultApi(config);
+    }
+
+    async getPersonas() {
+      const response = await this.api.apiV1PersonaListGet();
+      const data = response.data;
+      const values = data.values as Persona[];
+      return {
+        values,
+        next_page: data.next_page,
+        total_count: data.total_count,
+      };
+    }
+
+    async getScenarios() {
+      const response = await this.api.apiV1ScenarioListGet();
+      const data = response.data;
+      const values = data.values as Scenario[];
+      return {
+        values,
+        next_page: data.next_page,
+        total_count: data.total_count,
+      };
+    }
+
+    async getVoices() {
+      const response = await this.api.apiV1VoiceListGet();
+      const data = response.data;
+      const values = data.values;
+      const voices: Voice[] = values.map((v) => {
+        return {
+          id: v.id,
+          name: v.name,
+          language: v.language,
+        };
+      });
+      return {
+        values: voices,
+        next_page: data.next_page,
+        total_count: data.total_count,
+      };
+    }
+  }
+
+  export type Persona = ApiV1SessionStartPost200ResponsePersona;
+  export type Scenario = ApiV1SessionStartPost200ResponseScenario;
+  export type Voice = { id: string; name: string; language: string };
 }

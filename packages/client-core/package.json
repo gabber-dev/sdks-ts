@@ -9,14 +9,18 @@
   ],
   "scripts": {
     "build": "tsup",
-    "lint": "eslint -f unix \"src/**/*.{ts,tsx}\""
+    "lint": "eslint -f unix \"src/**/*.{ts,tsx}\"",
+    "generate": "rm -rf src/generated/* && openapi-generator-cli generate -i https://app.gabber.dev/openapi.yaml -g typescript-axios -o src/generated"
   },
   "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.13.12",
     "tsup": "^8.0.2",
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "livekit-client": "^2.1.5"
+    "axios": "^1.7.7",
+    "livekit-client": "^2.1.5",
+    "whatwg-fetch": "^3.6.20"
   },
   "publishConfig": {
     "access": "public"

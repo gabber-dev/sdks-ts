@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ConversationalWidgetSettings } from "..";
 import { SessionProvider, useSession } from "gabber-client-react";
 import React from "react";
@@ -12,41 +12,44 @@ import { ConnectionView } from "./ConnectionView";
 const DEFAULT_SETTINGS: ConversationalWidgetSettings = {};
 
 type Props = {
-  onConnectionRequested: () => Promise<Gabber.ConnectionDetails>;
+  tokenGenerator: () => Promise<string>;
   settings?: ConversationalWidgetSettings;
   widget: InternalWidget;
 };
 
-export function Root({ onConnectionRequested, settings, widget }: Props) {
-  const [loadingConnectionDetails, setLoadingConnectionDetails] =
-    useState(false);
-  const [connectionDetails, setConnectionDetails] = useState<Gabber.ConnectionDetails | null>(null);
+export function Root({ tokenGenerator, settings, widget }: Props) {
+  const [connectionOpts, setConnectionOpts] = useState<Gabber.ConnectOptions | null>(null);
 
-  const onConnectPressed = useCallback(async () => {
-    setLoadingConnectionDetails(true);
-    const details = await onConnectionRequested();
-    console.log("NEIL Connection details", details);
-    setConnectionDetails(details);
-    setLoadingConnectionDetails(false);
-  }, []);
-
-  if(!connectionDetails) {
+  if (!connectionOpts) {
     return (
       <SettingsProvider settings={settings || DEFAULT_SETTINGS} widget={widget}>
-        <ConnectionView onConnectPressed={onConnectPressed} />
+        <ConnectionView
+          tokenGenerator={tokenGenerator}
+          onConnectPressed={async (info) => {
+            const token = await tokenGenerator();
+            const opts: Gabber.ConnectOptions = {
+              token,
+              sessionConnectOptions: {
+                history: [
+                  {
+                    role: "system",
+                    content: info.prompt,
+                    import_id: null as any,
+                  },
+                ],
+                voice_override: info.voice,
+              },
+            };
+            setConnectionOpts(opts);
+          }}
+        />
+        ;
       </SettingsProvider>
     );
   }
 
-  if(loadingConnectionDetails) {
-    return null;
-  }
-
   return (
-    <SessionProvider
-      connect={Boolean(connectionDetails)}
-      connectionDetails={connectionDetails}
-    >
+    <SessionProvider connectionOpts={connectionOpts}>
       <Toaster />
       <SettingsProvider settings={settings || DEFAULT_SETTINGS} widget={widget}>
         <CallbackSync />

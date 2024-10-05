@@ -6,7 +6,7 @@ type Props = {
 
 export function ScenarioInput({}: Props) {
   const [value, setValue] = useState("");
-  const { agentState, connectionState } = useSession();
+  const { connectionState } = useSession();
   if(connectionState !== "not_connected") {
     return null
   }
