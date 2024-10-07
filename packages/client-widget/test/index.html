@@ -45,12 +45,28 @@
         });
     }
     console.log("NEIL", Gabber)
-    window.neil = Gabber.ConversationalWidget.create({
+    // window.neil = Gabber.ConversationalWidget.create({
+    //     elementID: "gabber",
+    //     tokenGenerator,
+    //     settings: {
+    //         connectText: "connect",
+    //         primaryColor: "#ff0000",
+    //         primaryColorContent: "#ffffff",
+    //         secondaryColor: "#00ff00",
+    //         secondaryColorContent: "#ffffff",
+    //         baseColor: "#000000",
+    //         baseColorPlusOne: "#1c1c1c",
+    //         baseColorPlusTwo: "#373636",
+    //         baseColorContent: "#ffffff",
+    //         audioPlaybackFailed: {
+    //             descriptionText: "AP Failed",
+    //             buttonText: "Start"
+    //         }
+    //     }
+    // })
+    window.neil = Gabber.VoiceGenerationWidget.create({
         elementID: "gabber",
         tokenGenerator,
-        onAgentStateChanged: (state) => { console.log("NEIL agent state", state) },
-        onConnectionStateChanged: (state) => { console.log("NEIL connection state", state) },
-        onRemainingSecondsChanged: (seconds) => { console.log("NEIL remaining seconds", seconds) },
         settings: {
             connectText: "connect",
             primaryColor: "#ff0000",

@@ -1,16 +1,13 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Input } from "./Input";
 import { useSettings } from "./SettingsProvider";
-import { useSession } from "gabber-client-react";
 import { AgentVisualizer } from "./AgentVisualizer";
+import { useSession } from "gabber-client-react";
 
 export function MainView() {
-  const { settings, widget } = useSettings();
-  const { agentState, connectionState } = useSession();
+  const { settings } = useSettings();
+  const { connectionState } = useSession();
 
-  useEffect(() => {
-    widget.agentState = agentState;
-  }, [agentState])
 
   return (
     <div

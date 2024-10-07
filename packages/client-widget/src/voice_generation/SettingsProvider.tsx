@@ -1,9 +1,7 @@
 import React, { createContext } from "react";
-import { InternalWidget } from "../InternalWidget";
-import { ConversationalWidgetSettings } from "..";
+import { ConversationalWidgetSettings } from "../ConversationalWidget";
 
 type SettingsContextData = {
-  widget: InternalWidget;
   settings: ConversationalWidgetSettings;
 };
 
@@ -12,17 +10,15 @@ const SettingsContext = createContext<SettingsContextData | undefined>(
 );
 
 type Props = {
-  widget: InternalWidget;
   settings: ConversationalWidgetSettings;
   children: React.ReactNode;
 };
 
-export function SettingsProvider({ settings, children, widget }: Props) {
+export function SettingsProvider({ settings, children }: Props) {
   return (
     <SettingsContext.Provider
       value={{
         settings,
-        widget,
       }}
     >
       {children}

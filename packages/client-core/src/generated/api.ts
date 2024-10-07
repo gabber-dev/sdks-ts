@@ -770,6 +770,25 @@ export interface ApiV1VoiceClonePost200Response {
 /**
  * 
  * @export
+ * @interface ApiV1VoiceGeneratePostRequest
+ */
+export interface ApiV1VoiceGeneratePostRequest {
+    /**
+     * Text to synthesize into voice
+     * @type {string}
+     * @memberof ApiV1VoiceGeneratePostRequest
+     */
+    'text': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ApiV1VoiceGeneratePostRequest
+     */
+    'voice_id': string;
+}
+/**
+ * 
+ * @export
  * @interface ApiV1VoiceListGet200Response
  */
 export interface ApiV1VoiceListGet200Response {
@@ -1344,6 +1363,49 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * Creates a new cloned voice based on the input audio file
+         * @summary Clone a voice
+         * @param {ApiV1VoiceGeneratePostRequest} apiV1VoiceGeneratePostRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1VoiceGeneratePost: async (apiV1VoiceGeneratePostRequest: ApiV1VoiceGeneratePostRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'apiV1VoiceGeneratePostRequest' is not null or undefined
+            assertParamExists('apiV1VoiceGeneratePost', 'apiV1VoiceGeneratePostRequest', apiV1VoiceGeneratePostRequest)
+            const localVarPath = `/api/v1/voice/generate`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication ApiKeyAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "x-api-key", configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(apiV1VoiceGeneratePostRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary Get a list of voices
          * @param {*} [options] Override http request option.
@@ -1547,6 +1609,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Creates a new cloned voice based on the input audio file
+         * @summary Clone a voice
+         * @param {ApiV1VoiceGeneratePostRequest} apiV1VoiceGeneratePostRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1VoiceGeneratePost(apiV1VoiceGeneratePostRequest: ApiV1VoiceGeneratePostRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<File>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1VoiceGeneratePost(apiV1VoiceGeneratePostRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.apiV1VoiceGeneratePost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary Get a list of voices
          * @param {*} [options] Override http request option.
@@ -1687,6 +1762,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         apiV1VoiceClonePost(name: string, language: string, file: File, options?: RawAxiosRequestConfig): AxiosPromise<ApiV1VoiceClonePost200Response> {
             return localVarFp.apiV1VoiceClonePost(name, language, file, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Creates a new cloned voice based on the input audio file
+         * @summary Clone a voice
+         * @param {ApiV1VoiceGeneratePostRequest} apiV1VoiceGeneratePostRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1VoiceGeneratePost(apiV1VoiceGeneratePostRequest: ApiV1VoiceGeneratePostRequest, options?: RawAxiosRequestConfig): AxiosPromise<File> {
+            return localVarFp.apiV1VoiceGeneratePost(apiV1VoiceGeneratePostRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1849,6 +1934,18 @@ export class DefaultApi extends BaseAPI {
      */
     public apiV1VoiceClonePost(name: string, language: string, file: File, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).apiV1VoiceClonePost(name, language, file, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Creates a new cloned voice based on the input audio file
+     * @summary Clone a voice
+     * @param {ApiV1VoiceGeneratePostRequest} apiV1VoiceGeneratePostRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public apiV1VoiceGeneratePost(apiV1VoiceGeneratePostRequest: ApiV1VoiceGeneratePostRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).apiV1VoiceGeneratePost(apiV1VoiceGeneratePostRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -1,11 +1,11 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { useSession } from "gabber-client-react";
 import { useSettings } from "./SettingsProvider";
-import { MicrophoneOff } from "./icons/MicrophoneOff";
-import { MicrophoneOn } from "./icons/MicrophoneOn";
-import { Chat } from "./icons/Chat";
+import { MicrophoneOff } from "../components/icons/MicrophoneOff";
+import { MicrophoneOn } from "../components/icons/MicrophoneOn";
+import { Chat } from "../components/icons/Chat";
 import { BarAudioVisualizer } from "./BarAudioVisualizer";
-import { Send } from "./icons/Send";
+import { Send } from "../components/icons/Send";
 
 type Props = {
     heightPixels: number

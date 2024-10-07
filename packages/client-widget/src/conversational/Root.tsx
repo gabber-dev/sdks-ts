@@ -1,24 +1,27 @@
-import { useEffect, useRef, useState } from "react";
-import { ConversationalWidgetSettings } from "..";
-import { SessionProvider, useSession } from "gabber-client-react";
+import { useState } from "react";
+import { SessionProvider } from "gabber-client-react";
 import React from "react";
 import { MainView } from "./MainView";
 import { Gabber } from "gabber-client-core";
-import { SettingsProvider, useSettings } from "./SettingsProvider";
+import { SettingsProvider } from "./SettingsProvider";
 import { Toaster } from "react-hot-toast";
-import { InternalWidget } from "../InternalWidget";
 import { ConnectionView } from "./ConnectionView";
+import {
+  ConversationalWidgetSettings,
+  InternalConversationalWidget,
+} from "../ConversationalWidget";
 
 const DEFAULT_SETTINGS: ConversationalWidgetSettings = {};
 
 type Props = {
   tokenGenerator: () => Promise<string>;
   settings?: ConversationalWidgetSettings;
-  widget: InternalWidget;
+  widget: InternalConversationalWidget;
 };
 
 export function Root({ tokenGenerator, settings, widget }: Props) {
-  const [connectionOpts, setConnectionOpts] = useState<Gabber.ConnectOptions | null>(null);
+  const [connectionOpts, setConnectionOpts] =
+    useState<Gabber.ConnectOptions | null>(null);
 
   if (!connectionOpts) {
     return (
@@ -52,33 +55,8 @@ export function Root({ tokenGenerator, settings, widget }: Props) {
     <SessionProvider connectionOpts={connectionOpts}>
       <Toaster />
       <SettingsProvider settings={settings || DEFAULT_SETTINGS} widget={widget}>
-        <CallbackSync />
         <MainView />
       </SettingsProvider>
     </SessionProvider>
   );
-}
-
-function CallbackSync() {
-  const {
-    agentState,
-    remainingSeconds,
-    connectionState
-  } = useSession();
-
-  const { widget } = useSettings();
-
-  useEffect(() => {
-    widget.connectionState = connectionState;
-  }, [connectionState, widget])
-
-  useEffect(() => {
-    widget.agentState = agentState;
-  }, [agentState, widget])
-
-  useEffect(() => {
-    widget.remainingSeconds = remainingSeconds
-  }, [remainingSeconds, widget])
-  
-  return null;
 }
