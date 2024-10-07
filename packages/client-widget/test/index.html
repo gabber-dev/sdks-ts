@@ -18,9 +18,10 @@
 
 <script>
     function tokenGenerator() {
-        var api_key = "71e05660-41f8-405f-a232-f4239eb742c0"
+        var api_key = "<api key>"
         var endpoint = "https://app.gabber.dev/api/v1/usage/token"
         var body = {
+            human_id: "123",
             limits: [
                 {
                     type: "conversational_seconds",
@@ -44,8 +45,7 @@
             return token;
         });
     }
-    console.log("NEIL", Gabber)
-    // window.neil = Gabber.ConversationalWidget.create({
+    //Gabber.ConversationalWidget.create({
     //     elementID: "gabber",
     //     tokenGenerator,
     //     settings: {
@@ -64,7 +64,7 @@
     //         }
     //     }
     // })
-    window.neil = Gabber.VoiceGenerationWidget.create({
+    Gabber.VoiceGenerationWidget.create({
         elementID: "gabber",
         tokenGenerator,
         settings: {
