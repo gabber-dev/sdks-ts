@@ -12,7 +12,7 @@ type Props = {
   widget: InternalVoiceGenerationWidget;
 };
 
-export function Root({ tokenGenerator, settings, widget }: Props) {
+export function Root({ tokenGenerator, settings }: Props) {
   const [token, setToken] = React.useState<string | null>(null);
   if (!token) {
     tokenGenerator().then(setToken);
@@ -21,7 +21,7 @@ export function Root({ tokenGenerator, settings, widget }: Props) {
   return (
     <>
       <Toaster />
-      <SettingsProvider settings={settings || DEFAULT_SETTINGS} widget={widget}>
+      <SettingsProvider settings={settings || DEFAULT_SETTINGS}>
         <MainView token={token} />
       </SettingsProvider>
     </>

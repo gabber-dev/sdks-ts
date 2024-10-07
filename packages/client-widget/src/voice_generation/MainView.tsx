@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useSettings } from "./SettingsProvider";
 import toast from "react-hot-toast";
 import { Gabber } from "gabber-client-core";
 
@@ -8,7 +7,6 @@ type Props = {
 }
 
 export function MainView({ token }: Props) {
-  const { settings } = useSettings();
   const [text, setText] = React.useState<string>("");
   const [voices, setVoices] = React.useState<Gabber.Voice[]>([]);
   const [selectedVoiceIndex, setSelectedVoiceIndex] = useState(0);
@@ -16,7 +14,6 @@ export function MainView({ token }: Props) {
   const [playing, setPlaying] = useState(false);
   const mp3BufferRef = useRef<ArrayBuffer | null>(null);
   const [pcmBuffer, setPcmBuffer] = useState<AudioBuffer | null>(null);
-  const [audioDuration, setAudioDuration] = useState<number | null>(null);
 
   const api = useRef<Gabber.Api | null>(null); 
   const apiProm = useRef<Promise<Gabber.Api> | null>(null);
@@ -112,7 +109,7 @@ export function MainView({ token }: Props) {
       return;
     }
 
-    const url = `/api/v1/voice/generate`;
+    const url = `https://app.gabber.dev/api/v1/voice/generate`;
     const body = {
       text,
       voice_id: voices[selectedVoiceIndex].id,
@@ -124,6 +121,9 @@ export function MainView({ token }: Props) {
       const response = await fetch(url, {
         method: "POST",
         body: JSON.stringify(body),
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       const arrayBuffer = await response.arrayBuffer();
       mp3BufferRef.current = arrayBuffer.slice(0);

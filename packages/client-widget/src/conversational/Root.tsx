@@ -19,13 +19,13 @@ type Props = {
   widget: InternalConversationalWidget;
 };
 
-export function Root({ tokenGenerator, settings, widget }: Props) {
+export function Root({ tokenGenerator, settings }: Props) {
   const [connectionOpts, setConnectionOpts] =
     useState<Gabber.ConnectOptions | null>(null);
 
   if (!connectionOpts) {
     return (
-      <SettingsProvider settings={settings || DEFAULT_SETTINGS} widget={widget}>
+      <SettingsProvider settings={settings || DEFAULT_SETTINGS}>
         <ConnectionView
           tokenGenerator={tokenGenerator}
           onConnectPressed={async (info) => {
@@ -54,7 +54,7 @@ export function Root({ tokenGenerator, settings, widget }: Props) {
   return (
     <SessionProvider connectionOpts={connectionOpts}>
       <Toaster />
-      <SettingsProvider settings={settings || DEFAULT_SETTINGS} widget={widget}>
+      <SettingsProvider settings={settings || DEFAULT_SETTINGS}>
         <MainView />
       </SettingsProvider>
     </SessionProvider>

@@ -13,7 +13,7 @@ export class VoiceGenerationWidget extends InternalVoiceGenerationWidget {
     settings,
     tokenGenerator,
   }: VoiceGenerationWidgetCreateParams) {
-    const w = new VoiceGenerationWidget({});
+    const w = new VoiceGenerationWidget();
     const el = document.getElementById(elementID);
     if (!el) {
       console.error("Can't find the element with id", elementID);

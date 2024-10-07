@@ -474,6 +474,11 @@ export namespace Gabber {
         total_count: data.total_count,
       };
     }
+
+    async generateVoice(req: { text: string; voice_id: string }) {
+      const response = await this.api.apiV1VoiceGeneratePost(req);
+      return response;
+    }
   }
 
   export type Persona = ApiV1SessionStartPost200ResponsePersona;
