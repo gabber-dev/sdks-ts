@@ -2,23 +2,38 @@
 
 <head>
     <script src="../dist/index.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <!-- <script src="https://unpkg.com/gabber-client-widget/dist/index.js"></script> -->
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Proxima+Nova:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Proxima Nova', sans-serif;
+        }
+
         .gabber {
             width: 100vw;
             height: 100vh;
+        }
+
+        button:hover {
+            color: white !important;
+            background-color: currentColor !important;
+        }
+        button:hover span {
+            color: white !important;
         }
     </style>
 </head>
 
 <body>
-    <div class="gabber" id="gabber">
-    </div>
+    <div class="gabber" id="gabber-conversational"></div>
 </body>
+
 
 <script>
     function tokenGenerator() {
-        var api_key = "<api key>"
+        var api_key = "e3da8c0e-af40-4dc1-a587-a7a366e59fa7"
         var endpoint = "https://app.gabber.dev/api/v1/usage/token"
         var body = {
             human_id: "123",
@@ -45,43 +60,49 @@
             return token;
         });
     }
-    //Gabber.ConversationalWidget.create({
-    //     elementID: "gabber",
-    //     tokenGenerator,
-    //     settings: {
-    //         connectText: "connect",
-    //         primaryColor: "#ff0000",
-    //         primaryColorContent: "#ffffff",
-    //         secondaryColor: "#00ff00",
-    //         secondaryColorContent: "#ffffff",
-    //         baseColor: "#000000",
-    //         baseColorPlusOne: "#1c1c1c",
-    //         baseColorPlusTwo: "#373636",
-    //         baseColorContent: "#ffffff",
-    //         audioPlaybackFailed: {
-    //             descriptionText: "AP Failed",
-    //             buttonText: "Start"
-    //         }
-    //     }
-    // })
-    Gabber.VoiceGenerationWidget.create({
-        elementID: "gabber",
-        tokenGenerator,
-        settings: {
-            connectText: "connect",
-            primaryColor: "#ff0000",
-            primaryColorContent: "#ffffff",
-            secondaryColor: "#00ff00",
-            secondaryColorContent: "#ffffff",
-            baseColor: "#000000",
-            baseColorPlusOne: "#1c1c1c",
-            baseColorPlusTwo: "#373636",
-            baseColorContent: "#ffffff",
-            audioPlaybackFailed: {
-                descriptionText: "AP Failed",
-                buttonText: "Start"
+
+    document.addEventListener('DOMContentLoaded', function() {
+        Gabber.ConversationalWidget.create({
+            elementID: "gabber-conversational",
+            tokenGenerator,
+            settings: {
+                connectText: "connect",
+                primaryColor: "#FFD700", // Gold
+                primaryColorContent: "#000000", // Black
+                secondaryColor: "#FF0000", // Red
+                secondaryColorContent: "#FFFFFF", // White
+                baseColor: "#000000", // Black
+                baseColorPlusOne: "#1C1C1C", // Dark gray
+                baseColorPlusTwo: "#373636", // Lighter gray
+                baseColorContent: "#FFFFFF", // White
+                accentColor: "#0000FF", // Blue
+                audioPlaybackFailed: {
+                    descriptionText: "AP Failed",
+                    buttonText: "Start"
+                }
             }
-        }
+        })
+
+        Gabber.VoiceGenerationWidget.create({
+            elementID: "gabber-voice-generation",
+            tokenGenerator,
+            settings: {
+                connectText: "connect",
+                primaryColor: "#FFD700", // Gold
+                primaryColorContent: "#000000", // Black
+                secondaryColor: "#FF0000", // Red
+                secondaryColorContent: "#FFFFFF", // White
+                baseColor: "#000000", // Black
+                baseColorPlusOne: "#1C1C1C", // Dark gray
+                baseColorPlusTwo: "#373636", // Lighter gray
+                baseColorContent: "#FFFFFF", // White
+                accentColor: "#0000FF", // Blue
+                audioPlaybackFailed: {
+                    descriptionText: "AP Failed",
+                    buttonText: "Start"
+                }
+            }
+        })
     })
 </script>
 
