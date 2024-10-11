@@ -16,14 +16,14 @@ export function Root({ tokenGenerator, settings }: Props) {
   const [token, setToken] = React.useState<string | null>(null);
   if (!token) {
     tokenGenerator().then(setToken);
-    return <div>Loading...</div>;
+    return <div style={{ width: '100%', height: '100%' }}>Loading...</div>;
   }
   return (
-    <>
+    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
       <Toaster />
       <SettingsProvider settings={settings || DEFAULT_SETTINGS}>
         <MainView token={token} />
       </SettingsProvider>
-    </>
+    </div>
   );
 }

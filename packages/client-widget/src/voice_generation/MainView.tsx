@@ -1,12 +1,15 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { Gabber } from "gabber-client-core";
+import { useSettings } from "../conversational/SettingsProvider";
+import { BarAudioVisualizer } from "../conversational/BarAudioVisualizer";
 
 type Props = {
   token: string;
 }
 
 export function MainView({ token }: Props) {
+  const { settings } = useSettings();
   const [text, setText] = React.useState<string>("");
   const [voices, setVoices] = React.useState<Gabber.Voice[]>([]);
   const [selectedVoiceIndex, setSelectedVoiceIndex] = useState(0);
@@ -14,6 +17,7 @@ export function MainView({ token }: Props) {
   const [playing, setPlaying] = useState(false);
   const mp3BufferRef = useRef<ArrayBuffer | null>(null);
   const [pcmBuffer, setPcmBuffer] = useState<AudioBuffer | null>(null);
+  const [audioVisualizerValues, setAudioVisualizerValues] = useState<number[]>([]);
 
   const api = useRef<Gabber.Api | null>(null); 
   const apiProm = useRef<Promise<Gabber.Api> | null>(null);
@@ -150,12 +154,38 @@ export function MainView({ token }: Props) {
     text,
   ]);
 
+  useEffect(() => {
+    if (playing && pcmBuffer) {
+      const intervalId = setInterval(() => {
+        setAudioVisualizerValues(Array.from({ length: 10 }, () => Math.random()));
+      }, 100);
+      return () => clearInterval(intervalId);
+    } else {
+      setAudioVisualizerValues([]);
+    }
+  }, [playing, pcmBuffer]);
+
   return (
-    <div className="w-full flex flex-col items-center gap-8 p-4">
-      <div className="w-full max-w-[800px] flex flex-col gap-4 items-center">
-        <h2 className="text-2xl font-bold">Voice Preview</h2>
+    <div 
+      className="flex flex-col items-center justify-center p-4" 
+      style={{ 
+        backgroundColor: settings.baseColor,
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+        top: 0,
+        left: 0
+      }}
+    >
+      <div className="w-full max-w-[800px] flex flex-col gap-4 items-center bg-white rounded-lg shadow-md p-6" style={{ borderColor: settings.primaryColor }}>
+        <h2 className="text-2xl font-bold" style={{ color: settings.primaryColor }}>Voice Preview</h2>
         <textarea
-          className="textarea textarea-bordered w-full"
+          className="w-full p-2 rounded-md border"
+          style={{ 
+            backgroundColor: settings.baseColorPlusOne,
+            color: settings.baseColorContent,
+            borderColor: settings.primaryColor
+          }}
           placeholder="Type something..."
           onChange={(e) => {
             if (pcmBuffer) {
@@ -166,24 +196,43 @@ export function MainView({ token }: Props) {
           }}
           value={text}
         />
-        <div className="flex gap-2">
-          <div>Voice Id:</div>
-          <div className="italic">{voices[selectedVoiceIndex]?.id}</div>
+        <div className="flex gap-2 items-center">
+          <div style={{ color: settings.baseColorContent }}>Voice:</div>
+          <div className="italic" style={{ color: settings.primaryColor }}>{voices[selectedVoiceIndex]?.name}</div>
         </div>
         <div className="flex gap-2">
           {text !== "" && (
-            <button className="btn w-[200px]" onClick={onPlay}>
+            <button 
+              className="px-4 py-2 rounded-md font-semibold transition-colors border"
+              style={{ 
+                color: settings.primaryColor,
+                borderColor: settings.primaryColor,
+              }}
+              onClick={onPlay}
+            >
               {playButtonText}
             </button>
           )}
           {pcmBuffer && (
-            <button className="btn w-[200px]" onClick={onDownload}>
+            <button 
+              className="px-4 py-2 rounded-md font-semibold"
+              style={{ 
+                backgroundColor: settings.secondaryColor,
+                color: settings.secondaryColorContent
+              }}
+              onClick={onDownload}
+            >
               Download
             </button>
           )}
         </div>
         <select
-          className="select select-bordered select-sm"
+          className="p-2 rounded-md border"
+          style={{ 
+            backgroundColor: settings.baseColorPlusOne,
+            color: settings.baseColorContent,
+            borderColor: settings.primaryColor
+          }}
           onChange={(e) => {
             if (pcmBuffer) {
               mp3BufferRef.current = null;
@@ -200,6 +249,13 @@ export function MainView({ token }: Props) {
             </option>
           ))}
         </select>
+        <div className="w-full h-24">
+          <BarAudioVisualizer
+            color={settings.secondaryColor}
+            gap={4}
+            values={audioVisualizerValues}
+          />
+        </div>
       </div>
     </div>
   );
