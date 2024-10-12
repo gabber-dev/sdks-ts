@@ -139,9 +139,9 @@ export function MainView() {
             style={{ backgroundColor: settings.baseColorPlusOne || '#333333' }}
           >
             <ul className="space-y-2">
-              {localMessages.map((msg, index) => (
+              {localMessages.map((msg) => (
                 <li 
-                  key={index} 
+                  key={`${msg.agent ? 'agent' : 'user'}-${msg.id}`}
                   className={`text-xs p-2 rounded-lg ${msg.agent ? 'text-left' : 'text-right'}`}
                   style={{ 
                     backgroundColor: msg.agent ? settings.baseColorPlusTwo || '#444444' : settings.primaryColor,
