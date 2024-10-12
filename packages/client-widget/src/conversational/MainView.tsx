@@ -21,15 +21,25 @@ export function MainView() {
   const [inputMessage, setInputMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
 
   useEffect(() => {
-    if (messagesContainerRef.current) {
-      const isScrolledToBottom = messagesContainerRef.current.scrollHeight - messagesContainerRef.current.clientHeight <= messagesContainerRef.current.scrollTop + 1;
-      if (isScrolledToBottom) {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-      }
+    const scrollToBottom = () => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    if (shouldAutoScroll) {
+      scrollToBottom();
     }
-  }, [messages]);
+  }, [messages, shouldAutoScroll]);
+
+  const handleScroll = () => {
+    if (messagesContainerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
+      const isScrolledToBottom = scrollHeight - scrollTop - clientHeight < 1;
+      setShouldAutoScroll(isScrolledToBottom);
+    }
+  };
 
   const handleSendMessage = () => {
     if (inputMessage.trim()) {
@@ -108,6 +118,7 @@ export function MainView() {
             ref={messagesContainerRef}
             className="flex-grow overflow-y-auto p-1 rounded h-[400px] md:h-[280px]"
             style={{ backgroundColor: settings.baseColorPlusOne || '#333333' }}
+            onScroll={handleScroll}
           >
             <ul className="space-y-1">
               {messages.map((msg) => (
