@@ -56,4 +56,3 @@ export type VoiceGenerationWidgetSettings = {
     buttonText?: string
   }
 };
-

@@ -1,10 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useSettings } from "./SettingsProvider";
 import { Gabber } from "gabber-client-core";
-import { useSettings } from "../conversational/SettingsProvider";
 
 type Props = {
-  onConnectPressed: (info: { prompt: string; voice: string }) => void;
+  onConnectPressed: (info: ConnectionInfo) => Promise<void>;
   tokenGenerator: () => Promise<string>;
+};
+
+export type ConnectionInfo = {
+  prompt: string;
+  voice: string;
 };
 
 export function ConnectionView({ onConnectPressed, tokenGenerator }: Props) {
@@ -13,15 +18,20 @@ export function ConnectionView({ onConnectPressed, tokenGenerator }: Props) {
   const [personas, setPersonas] = useState<Gabber.Persona[]>([]);
   const [scenarios, setScenarios] = useState<Gabber.Scenario[]>([]);
   const [voices, setVoices] = useState<Gabber.Voice[]>([]);
-  const [selectedPersonaIdx, setSelectedPersonaIdx] = useState(0);
+  const [selectedPersonaIdx, setSelectedPersonaIdx] = useState(0)
   const [selectedScenarioIdx, setSelectedScenarioIdx] = useState(0);
   const [selectedVoiceIdx, setSelectedVoiceIdx] = useState(0);
-  const api = useRef<Gabber.Api | null>(null);
+  const api = useRef<Gabber.Api | null>(null); 
   const apiProm = useRef<Promise<Gabber.Api> | null>(null);
 
   const createApi = useCallback(async () => {
-    if (api.current) return api.current;
-    if (apiProm.current) return apiProm.current;
+    if (api.current) {
+      return api.current;
+    }
+
+    if (apiProm.current) {
+      return apiProm.current;
+    }
 
     const prom = new Promise<Gabber.Api>(async (resolve, reject) => {
       try {
@@ -34,25 +44,26 @@ export function ConnectionView({ onConnectPressed, tokenGenerator }: Props) {
     });
     apiProm.current = prom;
     return prom;
-  }, [tokenGenerator]);
+  }, []);
 
   const getPersonas = useCallback(async () => {
     const api = await createApi();
-    const personas = await api.getPersonas();
+    const personas = await api.getPersonas()
     setPersonas(personas.values);
-  }, [createApi]);
+  }, []);
 
   const getScenarios = useCallback(async () => {
     const api = await createApi();
-    const scenarios = await api.getScenarios();
-    setScenarios(scenarios.values);
-  }, [createApi]);
+    const scenarios = api.getScenarios()
+    setScenarios((await scenarios).values);
+  }, []);
 
   const getVoices = useCallback(async () => {
     const api = await createApi();
-    const voices = await api.getVoices();
+    const voices = await api.getVoices()
     setVoices(voices.values);
-  }, [createApi]);
+  }, []);
+
 
   useEffect(() => {
     const p = `You are a ${personas[selectedPersonaIdx]?.name}. ${scenarios[selectedScenarioIdx]?.name}.`;
@@ -65,74 +76,77 @@ export function ConnectionView({ onConnectPressed, tokenGenerator }: Props) {
     getVoices();
   }, [getPersonas, getScenarios, getVoices]);
 
+  useEffect(() => {
+    console.log({ personas, scenarios, voices });
+  }, []);
+
   return (
-    <div style={{ backgroundColor: settings?.baseColor || '#ffffff', padding: '20px' }}>
+    <div className="w-full h-full flex flex-col items-center justify-center">
       <textarea
         value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
-        style={{
-          width: '100%',
-          padding: '10px',
-          marginBottom: '20px',
-          backgroundColor: settings?.baseColorPlusOne || '#f0f0f0',
-          color: settings?.baseColorContent || '#000000',
-          border: `1px solid ${settings?.primaryColor || '#000000'}`,
+        onChange={(e) => {
+          setPrompt(e.target.value);
         }}
       />
-      <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
-        <SelectionColumn title="Personas" items={personas} selectedIdx={selectedPersonaIdx} onSelect={setSelectedPersonaIdx} />
-        <SelectionColumn title="Scenarios" items={scenarios} selectedIdx={selectedScenarioIdx} onSelect={setSelectedScenarioIdx} />
-        <SelectionColumn title="Voices" items={voices} selectedIdx={selectedVoiceIdx} onSelect={setSelectedVoiceIdx} />
+      <div className="flex gap-2">
+        <div className="flex flex-col max-h-[200px] overflow-y-scroll">
+          <div>Personas</div>
+          {personas.map((p, idx) => {
+            return (
+              <button
+                onClick={() => {
+                  setSelectedPersonaIdx(idx);
+                  const vIdx = voices.findIndex((v) => v.id === p.voice);
+                  if (vIdx !== -1) {
+                    setSelectedVoiceIdx(vIdx);
+                  }
+                }}
+              >
+                <Item label={p.name} selected={selectedPersonaIdx === idx} />
+              </button>
+            );
+          })}
+        </div>
+        <div className="flex flex-col max-h-[200px] overflow-y-scroll">
+          <div>Scenarios</div>
+          {scenarios.map((p, idx) => {
+            return (
+              <button onClick={() => setSelectedScenarioIdx(idx)}>
+                <Item label={p.name} selected={selectedScenarioIdx === idx} />
+              </button>
+            );
+          })}
+        </div>
+        <div className="flex flex-col max-h-[200px] overflow-y-scroll">
+          <div>Voices</div>
+          {voices.map((p, idx) => {
+            return (
+              <button onClick={() => setSelectedVoiceIdx(idx)}>
+                <Item label={p.name} selected={selectedVoiceIdx === idx} />
+              </button>
+            );
+          })}
+        </div>
       </div>
       <button
-        onClick={() => onConnectPressed({ prompt, voice: voices[selectedVoiceIdx]?.id })}
-        style={{
-          width: '100%',
-          padding: '10px',
-          backgroundColor: settings?.primaryColor || 'rgb(255, 215, 0)',
-          color: settings?.baseColor || '#ffffff',
-          border: 'none',
-          cursor: 'pointer',
-        }}
+        onClick={() =>
+          onConnectPressed({
+            prompt: prompt,
+            voice: voices[selectedVoiceIdx].id,
+          })
+        }
       >
         {settings?.connectText || "Connect"}
       </button>
     </div>
   );
-}
+} 
 
-function SelectionColumn({ title, items, selectedIdx, onSelect }: { 
-  title: string, 
-  items: any[], 
-  selectedIdx: number, 
-  onSelect: (idx: number) => void 
-}) {
-  const { settings } = useSettings();
-  
+function Item({ label, selected }: { label: string; selected: boolean }) {
   return (
-    <div style={{ flex: 1 }}>
-      <div style={{ fontWeight: 'bold', marginBottom: '10px', color: settings?.primaryColorContent || '#000000' }}>{title}</div>
-      <div style={{ 
-        height: '200px', 
-        overflowY: 'auto', 
-        backgroundColor: settings?.baseColorPlusTwo || '#e0e0e0',
-        border: `1px solid ${settings?.primaryColor || '#000000'}`,
-      }}>
-        {items.map((item, idx) => (
-          <div
-            key={item.id}
-            onClick={() => onSelect(idx)}
-            style={{
-              padding: '5px',
-              backgroundColor: selectedIdx === idx ? settings?.secondaryColor || '#cccccc' : 'transparent',
-              color: settings?.baseColorContent || '#000000',
-              cursor: 'pointer',
-            }}
-          >
-            {item.name}
-          </div>
-        ))}
-      </div>
+    <div className="flex justify-between">
+      <div>{label}</div>
+      {selected ? <div className="bg-black w-[12px] h-[12px]" /> : null}
     </div>
   );
 }

@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { Gabber } from "gabber-client-core";
-import { useSettings } from "../conversational/SettingsProvider";
-import { BarAudioVisualizer } from "../conversational/BarAudioVisualizer";
+import { useSettings } from "./SettingsProvider";
 
 type Props = {
   token: string;
@@ -17,7 +16,6 @@ export function MainView({ token }: Props) {
   const [playing, setPlaying] = useState(false);
   const mp3BufferRef = useRef<ArrayBuffer | null>(null);
   const [pcmBuffer, setPcmBuffer] = useState<AudioBuffer | null>(null);
-  const [audioVisualizerValues, setAudioVisualizerValues] = useState<number[]>([]);
 
   const api = useRef<Gabber.Api | null>(null); 
   const apiProm = useRef<Promise<Gabber.Api> | null>(null);
@@ -154,107 +152,96 @@ export function MainView({ token }: Props) {
     text,
   ]);
 
-  useEffect(() => {
-    if (playing && pcmBuffer) {
-      const intervalId = setInterval(() => {
-        setAudioVisualizerValues(Array.from({ length: 10 }, () => Math.random()));
-      }, 100);
-      return () => clearInterval(intervalId);
-    } else {
-      setAudioVisualizerValues([]);
-    }
-  }, [playing, pcmBuffer]);
-
   return (
-    <div 
-      className="flex flex-col items-center justify-center p-4" 
-      style={{ 
-        backgroundColor: settings.baseColor,
-        width: '100%',
-        height: '100%',
-        position: 'absolute',
-        top: 0,
-        left: 0
-      }}
-    >
-      <div className="w-full max-w-[800px] flex flex-col gap-4 items-center bg-white rounded-lg shadow-md p-6" style={{ borderColor: settings.primaryColor }}>
-        <h2 className="text-2xl font-bold" style={{ color: settings.primaryColor }}>Voice Preview</h2>
-        <textarea
-          className="w-full p-2 rounded-md border"
-          style={{ 
-            backgroundColor: settings.baseColorPlusOne,
-            color: settings.baseColorContent,
-            borderColor: settings.primaryColor
-          }}
-          placeholder="Type something..."
-          onChange={(e) => {
-            if (pcmBuffer) {
-              mp3BufferRef.current = null;
-              setPcmBuffer(null);
-            }
-            setText(e.target.value);
-          }}
-          value={text}
-        />
-        <div className="flex gap-2 items-center">
-          <div style={{ color: settings.baseColorContent }}>Voice:</div>
-          <div className="italic" style={{ color: settings.primaryColor }}>{voices[selectedVoiceIndex]?.name}</div>
-        </div>
-        <div className="flex gap-2">
-          {text !== "" && (
-            <button 
-              className="px-4 py-2 rounded-md font-semibold transition-colors border"
+    <div className="w-full min-h-screen flex flex-col items-center justify-center p-4" style={{ backgroundColor: settings.baseColor }}>
+      <div className="w-full max-w-[800px] rounded-lg shadow-lg p-6" style={{ backgroundColor: settings.baseColorPlusOne, borderColor: settings.primaryColor, borderWidth: '1px', borderStyle: 'solid' }}>
+        <h2 className="text-3xl font-bold text-center mb-6" style={{ color: settings.primaryColor }}>Voice Preview</h2>
+        <div className="space-y-4">
+          <textarea
+            className="textarea w-full h-32 text-lg transition-all duration-300 ease-in-out p-3"
+            placeholder="Type something..."
+            onChange={(e) => {
+              if (pcmBuffer) {
+                mp3BufferRef.current = null;
+                setPcmBuffer(null);
+              }
+              setText(e.target.value);
+            }}
+            value={text}
+            style={{ 
+              backgroundColor: settings.baseColorPlusTwo,
+              color: settings.baseColorContent,
+              borderColor: settings.primaryColor
+            }}
+          />
+          <div className="flex items-center justify-between p-3 rounded-md" style={{ backgroundColor: settings.baseColorPlusTwo }}>
+            <div className="flex items-center gap-2">
+              <span className="font-semibold" style={{ color: settings.primaryColor }}>Voice:</span>
+              <select
+                className="select select-sm h-10 rounded-md pl-2"
+                onChange={(e) => {
+                  if (pcmBuffer) {
+                    mp3BufferRef.current = null;
+                    setPcmBuffer(null);
+                  }
+                  const idx = parseInt(e.target.value);
+                  setSelectedVoiceIndex(idx);
+                }}
+                value={selectedVoiceIndex}
+                style={{ 
+                  backgroundColor: settings.primaryColor,
+                  color: settings.primaryColorContent,
+                  borderColor: settings.primaryColor
+                }}
+              >
+                {voices.map((voice, idx) => (
+                  <option key={voice.id} value={idx}>
+                    {voice.name} ({voice.language})
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="font-semibold" style={{ color: settings.primaryColor }}>Voice ID:</span>
+              <span className="italic" style={{ color: settings.baseColorContent }}>{voices[selectedVoiceIndex]?.id}</span>
+            </div>
+          </div>
+          <div className="flex justify-center gap-4 mt-6">
+            <button
+              className="btn w-[200px] h-12 transition-colors duration-300 ease-in-out rounded-md"
+              onClick={onPlay}
+              disabled={generating || playing || text.trim() === ""}
               style={{ 
+                backgroundColor: 'transparent',
                 color: settings.primaryColor,
                 borderColor: settings.primaryColor,
+                borderWidth: '2px',
+                borderStyle: 'solid',
+                opacity: text.trim() === "" ? 0.5 : 1
               }}
-              onClick={onPlay}
             >
-              {playButtonText}
+              <span className="transition-colors duration-300 ease-in-out">
+                {playButtonText || "Generate"}
+              </span>
             </button>
-          )}
-          {pcmBuffer && (
-            <button 
-              className="px-4 py-2 rounded-md font-semibold"
-              style={{ 
-                backgroundColor: settings.secondaryColor,
-                color: settings.secondaryColorContent
-              }}
-              onClick={onDownload}
-            >
-              Download
-            </button>
-          )}
-        </div>
-        <select
-          className="p-2 rounded-md border"
-          style={{ 
-            backgroundColor: settings.baseColorPlusOne,
-            color: settings.baseColorContent,
-            borderColor: settings.primaryColor
-          }}
-          onChange={(e) => {
-            if (pcmBuffer) {
-              mp3BufferRef.current = null;
-              setPcmBuffer(null);
-            }
-            const idx = parseInt(e.target.value);
-            setSelectedVoiceIndex(idx);
-          }}
-          value={selectedVoiceIndex}
-        >
-          {voices.map((voice, idx) => (
-            <option key={voice.id} value={idx}>
-              {voice.name} ({voice.language})
-            </option>
-          ))}
-        </select>
-        <div className="w-full h-24">
-          <BarAudioVisualizer
-            color={settings.secondaryColor}
-            gap={4}
-            values={audioVisualizerValues}
-          />
+            {pcmBuffer && (
+              <button
+                className="btn w-[200px] h-12 transition-colors duration-300 ease-in-out rounded-md"
+                onClick={onDownload}
+                style={{ 
+                  backgroundColor: 'transparent',
+                  color: settings.secondaryColor,
+                  borderColor: settings.secondaryColor,
+                  borderWidth: '2px',
+                  borderStyle: 'solid'
+                }}
+              >
+                <span className="transition-colors duration-300 ease-in-out">
+                  Download
+                </span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
