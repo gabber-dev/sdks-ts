@@ -1,7 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import { Input } from "./Input";
 import { useSettings } from "./SettingsProvider";
-import { AgentVisualizer } from "./AgentVisualizer";
 import { useSession } from "gabber-client-react";
 import { IoMdSend } from "react-icons/io";
 
@@ -21,13 +19,8 @@ export function MainView() {
     sendChatMessage
   } = useSession();
   const [inputMessage, setInputMessage] = useState("");
-  const [localMessages, setLocalMessages] = useState<Array<{agent: boolean, text: string}>>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setLocalMessages(messages);
-  }, [messages]);
 
   useEffect(() => {
     if (messagesContainerRef.current) {
@@ -36,12 +29,10 @@ export function MainView() {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
       }
     }
-  }, [localMessages]);
+  }, [messages]);
 
   const handleSendMessage = () => {
     if (inputMessage.trim()) {
-      const newMessage = { agent: false, text: inputMessage };
-      setLocalMessages(prevMessages => [...prevMessages, newMessage]);
       sendChatMessage({ text: inputMessage });
       setInputMessage("");
     }
@@ -138,10 +129,10 @@ export function MainView() {
             className="flex-grow overflow-y-auto p-1 rounded h-[280px]"
             style={{ backgroundColor: settings.baseColorPlusOne || '#333333' }}
           >
-            <ul className="space-y-2">
-              {localMessages.map((msg) => (
+            <ul className="space-y-1">
+              {messages.map((msg) => (
                 <li 
-                  key={`${msg.agent ? 'agent' : 'user'}-${msg.id}`}
+                  key={`${msg.id}_${msg.agent}`}
                   className={`text-xs p-2 rounded-lg ${msg.agent ? 'text-left' : 'text-right'}`}
                   style={{ 
                     backgroundColor: msg.agent ? settings.baseColorPlusTwo || '#444444' : settings.primaryColor,
@@ -154,7 +145,7 @@ export function MainView() {
                   <strong>{msg.agent ? 'Agent: ' : 'You: '}</strong>{msg.text}
                 </li>
               ))}
-              {transcription.text && !transcription.final && (
+              {transcription.text && (
                 <li className="text-xs italic p-2" style={{ color: settings.baseColorContent }}>Transcription: {transcription.text}</li>
               )}
               <div ref={messagesEndRef} />
