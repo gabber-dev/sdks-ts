@@ -220,7 +220,7 @@ function SelectionColumn({ title, items, selectedIdx, onSelect }: {
         {items.map((item, idx) => (
           <button
             key={item.id}
-            className="w-full p-2 text-left hover:bg-opacity-20 transition-colors"
+            className="w-full p-2 text-left transition-colors"
             style={{ 
               backgroundColor: selectedIdx === idx ? `${settings?.secondaryColor}20` || '#cccccc20' : 'transparent',
               color: settings?.baseColorContent || '#000000',
@@ -233,6 +233,12 @@ function SelectionColumn({ title, items, selectedIdx, onSelect }: {
           </button>
         ))}
       </div>
+      <style jsx>{`
+        button:hover {
+          background-color: ${settings?.secondaryColor}40 !important;
+          color: ${settings?.baseColorContent || '#000000'} !important;
+        }
+      `}</style>
     </div>
   );
 }

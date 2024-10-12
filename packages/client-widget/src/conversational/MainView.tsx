@@ -76,11 +76,11 @@ export function MainView() {
             onClick={() => setMicrophoneEnabled(!microphoneEnabled)}
             className="mb-4 px-3 py-1 md:px-4 md:py-2 rounded font-semibold text-xs md:text-sm transition-colors"
             style={{ 
-              color: microphoneEnabled ? settings.secondaryColor : settings.primaryColor,
-              borderColor: microphoneEnabled ? settings.secondaryColor : settings.primaryColor,
-              borderWidth: '1px',
-              borderStyle: 'solid',
-              backgroundColor: 'transparent'
+              backgroundColor: microphoneEnabled ? settings.secondaryColor : 'transparent',
+              color: microphoneEnabled ? settings.baseColor : settings.primaryColor,
+              border: `2px solid ${microphoneEnabled ? settings.secondaryColor : settings.primaryColor}`,
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
             }}
           >
             {microphoneEnabled ? 'Disable Mic' : 'Enable Mic'}
