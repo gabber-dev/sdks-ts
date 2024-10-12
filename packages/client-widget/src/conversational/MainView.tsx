@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { useSettings } from "./SettingsProvider";
 import { useSession } from "gabber-client-react";
 import { IoMdSend } from "react-icons/io";
+import { BarAudioVisualizer } from "./BarAudioVisualizer";
 
 export function MainView() {
   const { settings } = useSettings();
@@ -11,8 +12,7 @@ export function MainView() {
     microphoneEnabled,
     setMicrophoneEnabled,
     agentVolumeBands,
-    agentVolume,
-    userVolume,
+    userVolumeBands,
     remainingSeconds,
     messages,
     transcription,
@@ -78,40 +78,20 @@ export function MainView() {
           </button>
           <div className="flex flex-col overflow-hidden">
             <h4 className="font-semibold mb-2 text-sm" style={{ color: settings.primaryColor }}>Volume Bands:</h4>
-            <div className="flex space-x-1 h-16 mb-4 overflow-hidden">
-              {agentVolumeBands.map((band, index) => (
-                <div
-                  key={index}
-                  className="w-1 md:w-2 self-end transition-all duration-75"
-                  style={{ 
-                    height: `${band * 100}%`,
-                    backgroundColor: settings.secondaryColor
-                  }}
-                ></div>
-              ))}
-            </div>
-            <div className="mb-4">
-              <h4 className="font-semibold mb-1 text-sm" style={{ color: settings.primaryColor }}>Agent Volume:</h4>
-              <div className="w-full bg-gray-200 rounded-full h-1.5">
-                <div 
-                  className="h-1.5 rounded-full transition-all duration-75" 
-                  style={{ 
-                    width: `${agentVolume * 100}%`,
-                    backgroundColor: settings.secondaryColor
-                  }}
-                ></div>
+            <div className="flex space-x-2 h-16 mb-4 overflow-hidden">
+              <div className="w-1/2">
+                <BarAudioVisualizer
+                  gap={1}
+                  color={settings.secondaryColor}
+                  values={agentVolumeBands}
+                />
               </div>
-            </div>
-            <div className="mb-4">
-              <h4 className="font-semibold mb-1 text-sm" style={{ color: settings.primaryColor }}>User Volume:</h4>
-              <div className="w-full bg-gray-200 rounded-full h-1.5">
-                <div 
-                  className="h-1.5 rounded-full transition-all duration-75" 
-                  style={{ 
-                    width: `${userVolume * 100}%`,
-                    backgroundColor: settings.primaryColor
-                  }}
-                ></div>
+              <div className="w-1/2">
+                <BarAudioVisualizer
+                  gap={1}
+                  color={settings.primaryColor}
+                  values={userVolumeBands}
+                />
               </div>
             </div>
             {remainingSeconds !== null && (
@@ -126,7 +106,7 @@ export function MainView() {
           <h4 className="font-semibold mb-1 text-sm" style={{ color: settings.primaryColor }}>Messages:</h4>
           <div 
             ref={messagesContainerRef}
-            className="flex-grow overflow-y-auto p-1 rounded h-[280px]"
+            className="flex-grow overflow-y-auto p-1 rounded h-[400px] md:h-[280px]"
             style={{ backgroundColor: settings.baseColorPlusOne || '#333333' }}
           >
             <ul className="space-y-1">
