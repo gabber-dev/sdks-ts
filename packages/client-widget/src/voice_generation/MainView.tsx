@@ -154,11 +154,11 @@ export function MainView({ token }: Props) {
 
   return (
     <div className="w-full min-h-screen flex flex-col items-center justify-center p-4" style={{ backgroundColor: settings.baseColor }}>
-      <div className="w-full max-w-[800px] rounded-lg shadow-lg p-6" style={{ backgroundColor: settings.baseColorPlusOne, borderColor: settings.primaryColor, borderWidth: '1px', borderStyle: 'solid' }}>
-        <h2 className="text-3xl font-bold text-center mb-6" style={{ color: settings.primaryColor }}>Voice Preview</h2>
+      <div className="w-full max-w-[800px] rounded-lg shadow-lg p-4 md:p-6" style={{ backgroundColor: settings.baseColorPlusOne, borderColor: settings.primaryColor, borderWidth: '1px', borderStyle: 'solid' }}>
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-4 md:mb-6" style={{ color: settings.primaryColor }}>Voice Preview</h2>
         <div className="space-y-4">
           <textarea
-            className="textarea w-full h-32 text-lg transition-all duration-300 ease-in-out p-3"
+            className="textarea w-full h-24 md:h-32 text-base md:text-lg transition-all duration-300 ease-in-out p-2 md:p-3"
             placeholder="Type something..."
             onChange={(e) => {
               if (pcmBuffer) {
@@ -174,11 +174,11 @@ export function MainView({ token }: Props) {
               borderColor: settings.primaryColor
             }}
           />
-          <div className="flex items-center justify-between p-3 rounded-md" style={{ backgroundColor: settings.baseColorPlusTwo }}>
-            <div className="flex items-center gap-2">
-              <span className="font-semibold" style={{ color: settings.primaryColor }}>Voice:</span>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between p-2 md:p-3 rounded-md" style={{ backgroundColor: settings.baseColorPlusTwo }}>
+            <div className="flex flex-col md:flex-row md:items-center gap-2 mb-2 md:mb-0">
+              <span className="font-semibold text-sm md:text-base" style={{ color: settings.primaryColor }}>Voice:</span>
               <select
-                className="select select-sm h-10 rounded-md pl-2"
+                className="select select-sm h-8 md:h-10 rounded-md pl-1 md:pl-2 text-xs md:text-sm"
                 onChange={(e) => {
                   if (pcmBuffer) {
                     mp3BufferRef.current = null;
@@ -201,14 +201,14 @@ export function MainView({ token }: Props) {
                 ))}
               </select>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 text-xs md:text-sm">
               <span className="font-semibold" style={{ color: settings.primaryColor }}>Voice ID:</span>
               <span className="italic" style={{ color: settings.baseColorContent }}>{voices[selectedVoiceIndex]?.id}</span>
             </div>
           </div>
-          <div className="flex justify-center gap-4 mt-6">
+          <div className="flex flex-col md:flex-row justify-center gap-2 md:gap-4 mt-4 md:mt-6">
             <button
-              className="btn w-[200px] h-12 transition-colors duration-300 ease-in-out rounded-md"
+              className="btn w-full md:w-[200px] h-8 md:h-10 transition-colors duration-300 ease-in-out rounded-md mb-2 md:mb-0"
               onClick={onPlay}
               disabled={generating || playing || text.trim() === ""}
               style={{ 
@@ -220,13 +220,13 @@ export function MainView({ token }: Props) {
                 opacity: text.trim() === "" ? 0.5 : 1
               }}
             >
-              <span className="transition-colors duration-300 ease-in-out">
+              <span className="transition-colors duration-300 ease-in-out text-xs md:text-sm">
                 {playButtonText || "Generate"}
               </span>
             </button>
             {pcmBuffer && (
               <button
-                className="btn w-[200px] h-12 transition-colors duration-300 ease-in-out rounded-md"
+                className="btn w-full md:w-[200px] h-8 md:h-10 transition-colors duration-300 ease-in-out rounded-md"
                 onClick={onDownload}
                 style={{ 
                   backgroundColor: 'transparent',
@@ -236,7 +236,7 @@ export function MainView({ token }: Props) {
                   borderStyle: 'solid'
                 }}
               >
-                <span className="transition-colors duration-300 ease-in-out">
+                <span className="transition-colors duration-300 ease-in-out text-xs md:text-sm">
                   Download
                 </span>
               </button>
