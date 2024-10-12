@@ -1,9 +1,11 @@
-<html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gabber Voice Generation Widget Test</title>
     <script src="../dist/index.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- <script src="https://unpkg.com/gabber-client-widget/dist/index.js"></script> -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Proxima+Nova:wght@400;600;700&display=swap');
 
@@ -25,85 +27,62 @@
         }
     </style>
 </head>
-
 <body>
-    <div class="gabber" id="gabber-conversational"></div>
-</body>
+    <div class="gabber" id="gabber-voice-generation"></div>
 
-
-<script>
-    function tokenGenerator() {
-        var api_key = ""
-        var endpoint = "https://app.gabber.dev/api/v1/usage/token"
-        var body = {
-            human_id: "123",
-            limits: [
-                {
-                    type: "conversational_seconds",
-                    value: 10
-                }
-            ],
-
+    <script>
+        function tokenGenerator() {
+            var api_key = "e3da8c0e-af40-4dc1-a587-a7a366e59fa7"
+            var endpoint = "https://app.gabber.dev/api/v1/usage/token"
+            var body = {
+                human_id: "123",
+                limits: [
+                    {
+                        type: "conversational_seconds",
+                        value: 10
+                    }
+                ],
+            }
+            return fetch(endpoint, {
+                method: "POST",
+                headers: {
+                    "x-api-key": api_key,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(body)
+            }).then(res => res.json())
+              .then(res => {
+                console.log("Got token", res)
+                return res.token;
+              });
         }
-        return fetch(endpoint, {
-            method: "POST",
-            headers: {
-                "x-api-key": api_key,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(body)
-        }).then(res => {
-            return res.json()
-        }).then(res => {
-            console.log("Got token", res)
-            const token = res.token;
-            return token;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof Gabber !== 'undefined' && Gabber.VoiceGenerationWidget && Gabber.VoiceGenerationWidget.create) {
+                Gabber.VoiceGenerationWidget.create({
+                    elementID: "gabber-voice-generation",
+                    tokenGenerator: tokenGenerator,
+                    settings: {
+                        connectText: "connect",
+                        primaryColor: "#FFD700",
+                        primaryColorContent: "#000000",
+                        secondaryColor: "#FF0000",
+                        secondaryColorContent: "#FFFFFF",
+                        baseColor: "#000000",
+                        baseColorPlusOne: "#1C1C1C",
+                        baseColorPlusTwo: "#373636",
+                        baseColorContent: "#FFFFFF",
+                        accentColor: "#0000FF",
+                        audioPlaybackFailed: {
+                            descriptionText: "AP Failed",
+                            buttonText: "Start"
+                        }
+                    }
+                });
+            } else {
+                console.error('Gabber.VoiceGenerationWidget.create is not available');
+            }
         });
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        Gabber.ConversationalWidget.create({
-            elementID: "gabber-conversational",
-            tokenGenerator,
-            settings: {
-                connectText: "connect",
-                primaryColor: "#FFD700", // Gold
-                primaryColorContent: "#000000", // Black
-                secondaryColor: "#FF0000", // Red
-                secondaryColorContent: "#FFFFFF", // White
-                baseColor: "#000000", // Black
-                baseColorPlusOne: "#1C1C1C", // Dark gray
-                baseColorPlusTwo: "#373636", // Lighter gray
-                baseColorContent: "#FFFFFF", // White
-                accentColor: "#0000FF", // Blue
-                audioPlaybackFailed: {
-                    descriptionText: "AP Failed",
-                    buttonText: "Start"
-                }
-            }
-        })
-
-        Gabber.VoiceGenerationWidget.create({
-            elementID: "gabber-voice-generation",
-            tokenGenerator,
-            settings: {
-                connectText: "connect",
-                primaryColor: "#FFD700", // Gold
-                primaryColorContent: "#000000", // Black
-                secondaryColor: "#FF0000", // Red
-                secondaryColorContent: "#FFFFFF", // White
-                baseColor: "#000000", // Black
-                baseColorPlusOne: "#1C1C1C", // Dark gray
-                baseColorPlusTwo: "#373636", // Lighter gray
-                baseColorContent: "#FFFFFF", // White
-                accentColor: "#0000FF", // Blue
-                audioPlaybackFailed: {
-                    descriptionText: "AP Failed",
-                    buttonText: "Start"
-                }
-            }
-        })
-    })
-</script>
-
+    </script>
+</body>
 </html>
