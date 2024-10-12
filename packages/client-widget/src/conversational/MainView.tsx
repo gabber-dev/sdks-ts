@@ -75,11 +75,11 @@ export function MainView() {
           </div>
           <button
             onClick={() => setMicrophoneEnabled(!microphoneEnabled)}
-            className="mb-4 px-3 py-1 md:px-4 md:py-2 rounded font-semibold text-xs md:text-sm transition-colors"
+            className="mb-4 px-3 py-1 md:px-4 md:py-2 rounded font-semibold text-xs md:text-sm"
             style={{ 
-              backgroundColor: microphoneEnabled ? settings.secondaryColor : 'transparent',
-              color: microphoneEnabled ? settings.baseColor : settings.primaryColor,
-              border: `2px solid ${microphoneEnabled ? settings.secondaryColor : settings.primaryColor}`,
+              backgroundColor: 'transparent',
+              color: microphoneEnabled ? settings.primaryColor : settings.baseColorContent,
+              border: `2px solid ${microphoneEnabled ? settings.primaryColor : settings.baseColorContent}`,
               cursor: 'pointer',
               transition: 'all 0.3s ease',
             }}

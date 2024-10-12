@@ -17,13 +17,6 @@
             height: 100vh;
         }
 
-        button:hover {
-            color: white !important;
-            background-color: currentColor !important;
-        }
-        button:hover span {
-            color: white !important;
-        }
     </style>
 </head>
 
@@ -34,7 +27,7 @@
 
 <script>
     function tokenGenerator() {
-        var api_key = "e3da8c0e-af40-4dc1-a587-a7a366e59fa7"
+        var api_key = ""
         var endpoint = "https://app.gabber.dev/api/v1/usage/token"
         var body = {
             human_id: "123",
@@ -61,45 +54,45 @@
             return token;
         });
     }
-    Gabber.ConversationalWidget.create({
-        elementID: "gabber",
-        tokenGenerator,
-        settings: {
-            connectText: "connect",
-            primaryColor: "#FFD700",         // Gold
-            primaryColorContent: "#000000",  // Black text on gold
-            secondaryColor: "#B22234",       // Soft/muted red
-            secondaryColorContent: "#FFFFFF", // White text on red
-            baseColor: "#000000",            // Black background
-            baseColorPlusOne: "#1A1A1A",     // Slightly lighter black
-            baseColorPlusTwo: "#333333",     // Even lighter black
-            baseColorContent: "#FFFFFF",     // White text on black
-            accentColor: "#3C3B6E",          // Soft/muted blue
-            audioPlaybackFailed: {
-                descriptionText: "AP Failed",
-                buttonText: "Start"
-            }
-        }
-    })
-    //Gabber.VoiceGenerationWidget.create({
+    //Gabber.ConversationalWidget.create({
     //    elementID: "gabber",
     //    tokenGenerator,
     //    settings: {
     //        connectText: "connect",
-    //        primaryColor: "#FFD700",
-    //        primaryColorContent: "#000000",
-    //        secondaryColor: "#B22234",
-    //        secondaryColorContent: "#FFFFFF",
-    //        baseColor: "#000000",
-    //        baseColorPlusOne: "#1A1A1A",
-    //        baseColorPlusTwo: "#333333",
-    //        baseColorContent: "#FFFFFF",
+    //        primaryColor: "#FFD700",         // Gold
+    //        primaryColorContent: "#000000",  // Black text on gold
+    //        secondaryColor: "#B22234",       // Soft/muted red
+    //        secondaryColorContent: "#FFFFFF", // White text on red
+    //        baseColor: "#000000",            // Black background
+    //        baseColorPlusOne: "#1A1A1A",     // Slightly lighter black
+    //        baseColorPlusTwo: "#333333",     // Even lighter black
+    //        baseColorContent: "#FFFFFF",     // White text on black
+    //        accentColor: "#3C3B6E",          // Soft/muted blue
     //        audioPlaybackFailed: {
     //            descriptionText: "AP Failed",
     //            buttonText: "Start"
     //        }
     //    }
     //})
+    Gabber.VoiceGenerationWidget.create({
+        elementID: "gabber",
+        tokenGenerator,
+        settings: {
+            connectText: "connect",
+            primaryColor: "#FFD700",
+            primaryColorContent: "#000000",
+            secondaryColor: "#B22234",
+            secondaryColorContent: "#FFFFFF",
+            baseColor: "#000000",
+            baseColorPlusOne: "#1A1A1A",
+            baseColorPlusTwo: "#333333",
+            baseColorContent: "#FFFFFF",
+            audioPlaybackFailed: {
+                descriptionText: "AP Failed",
+                buttonText: "Start"
+            }
+        }
+    })
 </script>
 
 </html>
