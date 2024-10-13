@@ -609,13 +609,19 @@ export interface ApiV1SessionStartPostRequestOneOf {
      * @type {string}
      * @memberof ApiV1SessionStartPostRequestOneOf
      */
-    'webhook'?: string;
+    'persona'?: string;
     /**
-     * 
-     * @type {string}
+     * save session messages
+     * @type {boolean}
      * @memberof ApiV1SessionStartPostRequestOneOf
      */
-    'persona'?: string;
+    'save_messages'?: boolean;
+    /**
+     * reserved for internal use
+     * @type {object}
+     * @memberof ApiV1SessionStartPostRequestOneOf
+     */
+    '_extra'?: object;
 }
 /**
  * 
@@ -646,12 +652,6 @@ export interface ApiV1SessionStartPostRequestOneOf1 {
      * @type {string}
      * @memberof ApiV1SessionStartPostRequestOneOf1
      */
-    'webhook'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ApiV1SessionStartPostRequestOneOf1
-     */
     'scenario'?: string;
     /**
      * 
@@ -659,6 +659,18 @@ export interface ApiV1SessionStartPostRequestOneOf1 {
      * @memberof ApiV1SessionStartPostRequestOneOf1
      */
     'persona'?: string;
+    /**
+     * save session messages
+     * @type {boolean}
+     * @memberof ApiV1SessionStartPostRequestOneOf1
+     */
+    'save_messages'?: boolean;
+    /**
+     * reserved for internal use
+     * @type {object}
+     * @memberof ApiV1SessionStartPostRequestOneOf1
+     */
+    '_extra'?: object;
 }
 /**
  * 
@@ -677,7 +689,7 @@ export interface ApiV1SessionStartPostRequestOneOfHistoryInner {
      * @type {string}
      * @memberof ApiV1SessionStartPostRequestOneOfHistoryInner
      */
-    'import_id': string;
+    'import_id'?: string;
     /**
      * 
      * @type {string}
@@ -701,7 +713,7 @@ export type ApiV1SessionStartPostRequestOneOfHistoryInnerRoleEnum = typeof ApiV1
  */
 export interface ApiV1UsageTokenPost200Response {
     /**
-     * Usage token, typically good for one request
+     * 
      * @type {string}
      * @memberof ApiV1UsageTokenPost200Response
      */
@@ -842,50 +854,26 @@ export interface ApiV1VoiceListGet200ResponseValuesInner {
      */
     'language': string;
 }
+/**
+ * 
+ * @export
+ * @interface ApiV1VoicePreviewPostRequest
+ */
+export interface ApiV1VoicePreviewPostRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof ApiV1VoicePreviewPostRequest
+     */
+    'voice': string;
+}
 
 /**
- * DefaultApi - axios parameter creator
+ * PersonaApi - axios parameter creator
  * @export
  */
-export const DefaultApiAxiosParamCreator = function (configuration?: Configuration) {
+export const PersonaApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
-        /**
-         * 
-         * @summary Check authentication
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiV1AuthCheckGet: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/auth/check`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication ApiKeyAuth required
-            await setApiKeyToObject(localVarHeaderParameter, "x-api-key", configuration)
-
-            // authentication BearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
         /**
          * 
          * @summary Get a list of personas
@@ -923,6 +911,77 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 options: localVarRequestOptions,
             };
         },
+    }
+};
+
+/**
+ * PersonaApi - functional programming interface
+ * @export
+ */
+export const PersonaApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = PersonaApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Get a list of personas
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1PersonaListGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiV1PersonaListGet200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1PersonaListGet(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['PersonaApi.apiV1PersonaListGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * PersonaApi - factory interface
+ * @export
+ */
+export const PersonaApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = PersonaApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Get a list of personas
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1PersonaListGet(options?: RawAxiosRequestConfig): AxiosPromise<ApiV1PersonaListGet200Response> {
+            return localVarFp.apiV1PersonaListGet(options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * PersonaApi - object-oriented interface
+ * @export
+ * @class PersonaApi
+ * @extends {BaseAPI}
+ */
+export class PersonaApi extends BaseAPI {
+    /**
+     * 
+     * @summary Get a list of personas
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonaApi
+     */
+    public apiV1PersonaListGet(options?: RawAxiosRequestConfig) {
+        return PersonaApiFp(this.configuration).apiV1PersonaListGet(options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * ScenarioApi - axios parameter creator
+ * @export
+ */
+export const ScenarioApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
         /**
          * 
          * @summary Get a list of scenarios
@@ -960,6 +1019,77 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 options: localVarRequestOptions,
             };
         },
+    }
+};
+
+/**
+ * ScenarioApi - functional programming interface
+ * @export
+ */
+export const ScenarioApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = ScenarioApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Get a list of scenarios
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1ScenarioListGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiV1ScenarioListGet200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1ScenarioListGet(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ScenarioApi.apiV1ScenarioListGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * ScenarioApi - factory interface
+ * @export
+ */
+export const ScenarioApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = ScenarioApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Get a list of scenarios
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1ScenarioListGet(options?: RawAxiosRequestConfig): AxiosPromise<ApiV1ScenarioListGet200Response> {
+            return localVarFp.apiV1ScenarioListGet(options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * ScenarioApi - object-oriented interface
+ * @export
+ * @class ScenarioApi
+ * @extends {BaseAPI}
+ */
+export class ScenarioApi extends BaseAPI {
+    /**
+     * 
+     * @summary Get a list of scenarios
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScenarioApi
+     */
+    public apiV1ScenarioListGet(options?: RawAxiosRequestConfig) {
+        return ScenarioApiFp(this.configuration).apiV1ScenarioListGet(options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * SessionApi - axios parameter creator
+ * @export
+ */
+export const SessionApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
         /**
          * 
          * @summary End a session
@@ -1214,6 +1344,295 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 options: localVarRequestOptions,
             };
         },
+    }
+};
+
+/**
+ * SessionApi - functional programming interface
+ * @export
+ */
+export const SessionApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = SessionApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary End a session
+         * @param {string} sessionId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1SessionSessionIdEndPost(sessionId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiV1SessionStartPost200ResponseSession>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1SessionSessionIdEndPost(sessionId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['SessionApi.apiV1SessionSessionIdEndPost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Get a session by id
+         * @param {string} sessionId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1SessionSessionIdGet(sessionId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiV1SessionSessionIdGet200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1SessionSessionIdGet(sessionId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['SessionApi.apiV1SessionSessionIdGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Get session messages
+         * @param {string} sessionId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1SessionSessionIdMessagesGet(sessionId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiV1SessionSessionIdMessagesGet200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1SessionSessionIdMessagesGet(sessionId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['SessionApi.apiV1SessionSessionIdMessagesGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Update a session by id
+         * @param {string} sessionId 
+         * @param {ApiV1SessionSessionIdPutRequest} apiV1SessionSessionIdPutRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1SessionSessionIdPut(sessionId: string, apiV1SessionSessionIdPutRequest: ApiV1SessionSessionIdPutRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<{ [key: string]: any; }>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1SessionSessionIdPut(sessionId, apiV1SessionSessionIdPutRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['SessionApi.apiV1SessionSessionIdPut']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Get a session timeline
+         * @param {string} sessionId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1SessionSessionIdTimelineGet(sessionId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiV1SessionSessionIdTimelineGet200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1SessionSessionIdTimelineGet(sessionId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['SessionApi.apiV1SessionSessionIdTimelineGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Creates a new session based on the input request data
+         * @summary Create a new session
+         * @param {ApiV1SessionStartPostRequest} apiV1SessionStartPostRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1SessionStartPost(apiV1SessionStartPostRequest: ApiV1SessionStartPostRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiV1SessionStartPost200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1SessionStartPost(apiV1SessionStartPostRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['SessionApi.apiV1SessionStartPost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * SessionApi - factory interface
+ * @export
+ */
+export const SessionApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = SessionApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary End a session
+         * @param {string} sessionId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1SessionSessionIdEndPost(sessionId: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiV1SessionStartPost200ResponseSession> {
+            return localVarFp.apiV1SessionSessionIdEndPost(sessionId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get a session by id
+         * @param {string} sessionId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1SessionSessionIdGet(sessionId: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiV1SessionSessionIdGet200Response> {
+            return localVarFp.apiV1SessionSessionIdGet(sessionId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get session messages
+         * @param {string} sessionId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1SessionSessionIdMessagesGet(sessionId: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiV1SessionSessionIdMessagesGet200Response> {
+            return localVarFp.apiV1SessionSessionIdMessagesGet(sessionId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Update a session by id
+         * @param {string} sessionId 
+         * @param {ApiV1SessionSessionIdPutRequest} apiV1SessionSessionIdPutRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1SessionSessionIdPut(sessionId: string, apiV1SessionSessionIdPutRequest: ApiV1SessionSessionIdPutRequest, options?: RawAxiosRequestConfig): AxiosPromise<{ [key: string]: any; }> {
+            return localVarFp.apiV1SessionSessionIdPut(sessionId, apiV1SessionSessionIdPutRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get a session timeline
+         * @param {string} sessionId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1SessionSessionIdTimelineGet(sessionId: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiV1SessionSessionIdTimelineGet200Response> {
+            return localVarFp.apiV1SessionSessionIdTimelineGet(sessionId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Creates a new session based on the input request data
+         * @summary Create a new session
+         * @param {ApiV1SessionStartPostRequest} apiV1SessionStartPostRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1SessionStartPost(apiV1SessionStartPostRequest: ApiV1SessionStartPostRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiV1SessionStartPost200Response> {
+            return localVarFp.apiV1SessionStartPost(apiV1SessionStartPostRequest, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * SessionApi - object-oriented interface
+ * @export
+ * @class SessionApi
+ * @extends {BaseAPI}
+ */
+export class SessionApi extends BaseAPI {
+    /**
+     * 
+     * @summary End a session
+     * @param {string} sessionId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SessionApi
+     */
+    public apiV1SessionSessionIdEndPost(sessionId: string, options?: RawAxiosRequestConfig) {
+        return SessionApiFp(this.configuration).apiV1SessionSessionIdEndPost(sessionId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get a session by id
+     * @param {string} sessionId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SessionApi
+     */
+    public apiV1SessionSessionIdGet(sessionId: string, options?: RawAxiosRequestConfig) {
+        return SessionApiFp(this.configuration).apiV1SessionSessionIdGet(sessionId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get session messages
+     * @param {string} sessionId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SessionApi
+     */
+    public apiV1SessionSessionIdMessagesGet(sessionId: string, options?: RawAxiosRequestConfig) {
+        return SessionApiFp(this.configuration).apiV1SessionSessionIdMessagesGet(sessionId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Update a session by id
+     * @param {string} sessionId 
+     * @param {ApiV1SessionSessionIdPutRequest} apiV1SessionSessionIdPutRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SessionApi
+     */
+    public apiV1SessionSessionIdPut(sessionId: string, apiV1SessionSessionIdPutRequest: ApiV1SessionSessionIdPutRequest, options?: RawAxiosRequestConfig) {
+        return SessionApiFp(this.configuration).apiV1SessionSessionIdPut(sessionId, apiV1SessionSessionIdPutRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get a session timeline
+     * @param {string} sessionId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SessionApi
+     */
+    public apiV1SessionSessionIdTimelineGet(sessionId: string, options?: RawAxiosRequestConfig) {
+        return SessionApiFp(this.configuration).apiV1SessionSessionIdTimelineGet(sessionId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Creates a new session based on the input request data
+     * @summary Create a new session
+     * @param {ApiV1SessionStartPostRequest} apiV1SessionStartPostRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SessionApi
+     */
+    public apiV1SessionStartPost(apiV1SessionStartPostRequest: ApiV1SessionStartPostRequest, options?: RawAxiosRequestConfig) {
+        return SessionApiFp(this.configuration).apiV1SessionStartPost(apiV1SessionStartPostRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * UsageApi - axios parameter creator
+ * @export
+ */
+export const UsageApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Gets the usage limits of a token
+         * @summary Get usage limits
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1UsageLimitsGet: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/usage/limits`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication ApiKeyAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "x-api-key", configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * Requests a token for a human
          * @summary Request new human token
@@ -1300,6 +1719,147 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 options: localVarRequestOptions,
             };
         },
+    }
+};
+
+/**
+ * UsageApi - functional programming interface
+ * @export
+ */
+export const UsageApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = UsageApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Gets the usage limits of a token
+         * @summary Get usage limits
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1UsageLimitsGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ApiV1UsageTokenPutRequestLimitsInner>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1UsageLimitsGet(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UsageApi.apiV1UsageLimitsGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Requests a token for a human
+         * @summary Request new human token
+         * @param {ApiV1UsageTokenPutRequest} apiV1UsageTokenPutRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1UsageTokenPost(apiV1UsageTokenPutRequest: ApiV1UsageTokenPutRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiV1UsageTokenPost200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1UsageTokenPost(apiV1UsageTokenPutRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UsageApi.apiV1UsageTokenPost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Updates the usage limits of a human
+         * @summary Update human usage limits
+         * @param {ApiV1UsageTokenPutRequest} apiV1UsageTokenPutRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1UsageTokenPut(apiV1UsageTokenPutRequest: ApiV1UsageTokenPutRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<{ [key: string]: any; }>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1UsageTokenPut(apiV1UsageTokenPutRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UsageApi.apiV1UsageTokenPut']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * UsageApi - factory interface
+ * @export
+ */
+export const UsageApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = UsageApiFp(configuration)
+    return {
+        /**
+         * Gets the usage limits of a token
+         * @summary Get usage limits
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1UsageLimitsGet(options?: RawAxiosRequestConfig): AxiosPromise<Array<ApiV1UsageTokenPutRequestLimitsInner>> {
+            return localVarFp.apiV1UsageLimitsGet(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Requests a token for a human
+         * @summary Request new human token
+         * @param {ApiV1UsageTokenPutRequest} apiV1UsageTokenPutRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1UsageTokenPost(apiV1UsageTokenPutRequest: ApiV1UsageTokenPutRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiV1UsageTokenPost200Response> {
+            return localVarFp.apiV1UsageTokenPost(apiV1UsageTokenPutRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Updates the usage limits of a human
+         * @summary Update human usage limits
+         * @param {ApiV1UsageTokenPutRequest} apiV1UsageTokenPutRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1UsageTokenPut(apiV1UsageTokenPutRequest: ApiV1UsageTokenPutRequest, options?: RawAxiosRequestConfig): AxiosPromise<{ [key: string]: any; }> {
+            return localVarFp.apiV1UsageTokenPut(apiV1UsageTokenPutRequest, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * UsageApi - object-oriented interface
+ * @export
+ * @class UsageApi
+ * @extends {BaseAPI}
+ */
+export class UsageApi extends BaseAPI {
+    /**
+     * Gets the usage limits of a token
+     * @summary Get usage limits
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UsageApi
+     */
+    public apiV1UsageLimitsGet(options?: RawAxiosRequestConfig) {
+        return UsageApiFp(this.configuration).apiV1UsageLimitsGet(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Requests a token for a human
+     * @summary Request new human token
+     * @param {ApiV1UsageTokenPutRequest} apiV1UsageTokenPutRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UsageApi
+     */
+    public apiV1UsageTokenPost(apiV1UsageTokenPutRequest: ApiV1UsageTokenPutRequest, options?: RawAxiosRequestConfig) {
+        return UsageApiFp(this.configuration).apiV1UsageTokenPost(apiV1UsageTokenPutRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Updates the usage limits of a human
+     * @summary Update human usage limits
+     * @param {ApiV1UsageTokenPutRequest} apiV1UsageTokenPutRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UsageApi
+     */
+    public apiV1UsageTokenPut(apiV1UsageTokenPutRequest: ApiV1UsageTokenPutRequest, options?: RawAxiosRequestConfig) {
+        return UsageApiFp(this.configuration).apiV1UsageTokenPut(apiV1UsageTokenPutRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * VoiceApi - axios parameter creator
+ * @export
+ */
+export const VoiceApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
         /**
          * Creates a new cloned voice based on the input audio file
          * @summary Clone a voice
@@ -1442,157 +2002,59 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Previews a voice based on the input text
+         * @summary Preview a voice
+         * @param {ApiV1VoicePreviewPostRequest} apiV1VoicePreviewPostRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1VoicePreviewPost: async (apiV1VoicePreviewPostRequest: ApiV1VoicePreviewPostRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'apiV1VoicePreviewPostRequest' is not null or undefined
+            assertParamExists('apiV1VoicePreviewPost', 'apiV1VoicePreviewPostRequest', apiV1VoicePreviewPostRequest)
+            const localVarPath = `/api/v1/voice/preview`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication ApiKeyAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "x-api-key", configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(apiV1VoicePreviewPostRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
 /**
- * DefaultApi - functional programming interface
+ * VoiceApi - functional programming interface
  * @export
  */
-export const DefaultApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = DefaultApiAxiosParamCreator(configuration)
+export const VoiceApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = VoiceApiAxiosParamCreator(configuration)
     return {
-        /**
-         * 
-         * @summary Check authentication
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async apiV1AuthCheckGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1AuthCheckGet(options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.apiV1AuthCheckGet']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary Get a list of personas
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async apiV1PersonaListGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiV1PersonaListGet200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1PersonaListGet(options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.apiV1PersonaListGet']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary Get a list of scenarios
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async apiV1ScenarioListGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiV1ScenarioListGet200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1ScenarioListGet(options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.apiV1ScenarioListGet']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary End a session
-         * @param {string} sessionId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async apiV1SessionSessionIdEndPost(sessionId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiV1SessionStartPost200ResponseSession>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1SessionSessionIdEndPost(sessionId, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.apiV1SessionSessionIdEndPost']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary Get a session by id
-         * @param {string} sessionId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async apiV1SessionSessionIdGet(sessionId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiV1SessionSessionIdGet200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1SessionSessionIdGet(sessionId, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.apiV1SessionSessionIdGet']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary Get session messages
-         * @param {string} sessionId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async apiV1SessionSessionIdMessagesGet(sessionId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiV1SessionSessionIdMessagesGet200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1SessionSessionIdMessagesGet(sessionId, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.apiV1SessionSessionIdMessagesGet']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary Update a session by id
-         * @param {string} sessionId 
-         * @param {ApiV1SessionSessionIdPutRequest} apiV1SessionSessionIdPutRequest 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async apiV1SessionSessionIdPut(sessionId: string, apiV1SessionSessionIdPutRequest: ApiV1SessionSessionIdPutRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<{ [key: string]: any; }>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1SessionSessionIdPut(sessionId, apiV1SessionSessionIdPutRequest, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.apiV1SessionSessionIdPut']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary Get a session timeline
-         * @param {string} sessionId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async apiV1SessionSessionIdTimelineGet(sessionId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiV1SessionSessionIdTimelineGet200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1SessionSessionIdTimelineGet(sessionId, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.apiV1SessionSessionIdTimelineGet']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * Creates a new session based on the input request data
-         * @summary Create a new session
-         * @param {ApiV1SessionStartPostRequest} apiV1SessionStartPostRequest 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async apiV1SessionStartPost(apiV1SessionStartPostRequest: ApiV1SessionStartPostRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiV1SessionStartPost200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1SessionStartPost(apiV1SessionStartPostRequest, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.apiV1SessionStartPost']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * Requests a token for a human
-         * @summary Request new human token
-         * @param {ApiV1UsageTokenPutRequest} apiV1UsageTokenPutRequest 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async apiV1UsageTokenPost(apiV1UsageTokenPutRequest: ApiV1UsageTokenPutRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiV1UsageTokenPost200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1UsageTokenPost(apiV1UsageTokenPutRequest, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.apiV1UsageTokenPost']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * Updates the usage limits of a human
-         * @summary Update human usage limits
-         * @param {ApiV1UsageTokenPutRequest} apiV1UsageTokenPutRequest 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async apiV1UsageTokenPut(apiV1UsageTokenPutRequest: ApiV1UsageTokenPutRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<{ [key: string]: any; }>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1UsageTokenPut(apiV1UsageTokenPutRequest, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.apiV1UsageTokenPut']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
         /**
          * Creates a new cloned voice based on the input audio file
          * @summary Clone a voice
@@ -1605,7 +2067,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         async apiV1VoiceClonePost(name: string, language: string, file: File, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiV1VoiceClonePost200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1VoiceClonePost(name, language, file, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.apiV1VoiceClonePost']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['VoiceApi.apiV1VoiceClonePost']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -1618,7 +2080,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         async apiV1VoiceGeneratePost(apiV1VoiceGeneratePostRequest: ApiV1VoiceGeneratePostRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<File>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1VoiceGeneratePost(apiV1VoiceGeneratePostRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.apiV1VoiceGeneratePost']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['VoiceApi.apiV1VoiceGeneratePost']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -1630,127 +2092,32 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         async apiV1VoiceListGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiV1VoiceListGet200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1VoiceListGet(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.apiV1VoiceListGet']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['VoiceApi.apiV1VoiceListGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Previews a voice based on the input text
+         * @summary Preview a voice
+         * @param {ApiV1VoicePreviewPostRequest} apiV1VoicePreviewPostRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV1VoicePreviewPost(apiV1VoicePreviewPostRequest: ApiV1VoicePreviewPostRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<File>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1VoicePreviewPost(apiV1VoicePreviewPostRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['VoiceApi.apiV1VoicePreviewPost']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
 };
 
 /**
- * DefaultApi - factory interface
+ * VoiceApi - factory interface
  * @export
  */
-export const DefaultApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = DefaultApiFp(configuration)
+export const VoiceApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = VoiceApiFp(configuration)
     return {
-        /**
-         * 
-         * @summary Check authentication
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiV1AuthCheckGet(options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.apiV1AuthCheckGet(options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Get a list of personas
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiV1PersonaListGet(options?: RawAxiosRequestConfig): AxiosPromise<ApiV1PersonaListGet200Response> {
-            return localVarFp.apiV1PersonaListGet(options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Get a list of scenarios
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiV1ScenarioListGet(options?: RawAxiosRequestConfig): AxiosPromise<ApiV1ScenarioListGet200Response> {
-            return localVarFp.apiV1ScenarioListGet(options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary End a session
-         * @param {string} sessionId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiV1SessionSessionIdEndPost(sessionId: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiV1SessionStartPost200ResponseSession> {
-            return localVarFp.apiV1SessionSessionIdEndPost(sessionId, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Get a session by id
-         * @param {string} sessionId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiV1SessionSessionIdGet(sessionId: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiV1SessionSessionIdGet200Response> {
-            return localVarFp.apiV1SessionSessionIdGet(sessionId, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Get session messages
-         * @param {string} sessionId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiV1SessionSessionIdMessagesGet(sessionId: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiV1SessionSessionIdMessagesGet200Response> {
-            return localVarFp.apiV1SessionSessionIdMessagesGet(sessionId, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Update a session by id
-         * @param {string} sessionId 
-         * @param {ApiV1SessionSessionIdPutRequest} apiV1SessionSessionIdPutRequest 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiV1SessionSessionIdPut(sessionId: string, apiV1SessionSessionIdPutRequest: ApiV1SessionSessionIdPutRequest, options?: RawAxiosRequestConfig): AxiosPromise<{ [key: string]: any; }> {
-            return localVarFp.apiV1SessionSessionIdPut(sessionId, apiV1SessionSessionIdPutRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Get a session timeline
-         * @param {string} sessionId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiV1SessionSessionIdTimelineGet(sessionId: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiV1SessionSessionIdTimelineGet200Response> {
-            return localVarFp.apiV1SessionSessionIdTimelineGet(sessionId, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * Creates a new session based on the input request data
-         * @summary Create a new session
-         * @param {ApiV1SessionStartPostRequest} apiV1SessionStartPostRequest 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiV1SessionStartPost(apiV1SessionStartPostRequest: ApiV1SessionStartPostRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiV1SessionStartPost200Response> {
-            return localVarFp.apiV1SessionStartPost(apiV1SessionStartPostRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * Requests a token for a human
-         * @summary Request new human token
-         * @param {ApiV1UsageTokenPutRequest} apiV1UsageTokenPutRequest 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiV1UsageTokenPost(apiV1UsageTokenPutRequest: ApiV1UsageTokenPutRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiV1UsageTokenPost200Response> {
-            return localVarFp.apiV1UsageTokenPost(apiV1UsageTokenPutRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * Updates the usage limits of a human
-         * @summary Update human usage limits
-         * @param {ApiV1UsageTokenPutRequest} apiV1UsageTokenPutRequest 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiV1UsageTokenPut(apiV1UsageTokenPutRequest: ApiV1UsageTokenPutRequest, options?: RawAxiosRequestConfig): AxiosPromise<{ [key: string]: any; }> {
-            return localVarFp.apiV1UsageTokenPut(apiV1UsageTokenPutRequest, options).then((request) => request(axios, basePath));
-        },
         /**
          * Creates a new cloned voice based on the input audio file
          * @summary Clone a voice
@@ -1782,146 +2149,26 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         apiV1VoiceListGet(options?: RawAxiosRequestConfig): AxiosPromise<ApiV1VoiceListGet200Response> {
             return localVarFp.apiV1VoiceListGet(options).then((request) => request(axios, basePath));
         },
+        /**
+         * Previews a voice based on the input text
+         * @summary Preview a voice
+         * @param {ApiV1VoicePreviewPostRequest} apiV1VoicePreviewPostRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV1VoicePreviewPost(apiV1VoicePreviewPostRequest: ApiV1VoicePreviewPostRequest, options?: RawAxiosRequestConfig): AxiosPromise<File> {
+            return localVarFp.apiV1VoicePreviewPost(apiV1VoicePreviewPostRequest, options).then((request) => request(axios, basePath));
+        },
     };
 };
 
 /**
- * DefaultApi - object-oriented interface
+ * VoiceApi - object-oriented interface
  * @export
- * @class DefaultApi
+ * @class VoiceApi
  * @extends {BaseAPI}
  */
-export class DefaultApi extends BaseAPI {
-    /**
-     * 
-     * @summary Check authentication
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public apiV1AuthCheckGet(options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).apiV1AuthCheckGet(options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Get a list of personas
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public apiV1PersonaListGet(options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).apiV1PersonaListGet(options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Get a list of scenarios
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public apiV1ScenarioListGet(options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).apiV1ScenarioListGet(options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary End a session
-     * @param {string} sessionId 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public apiV1SessionSessionIdEndPost(sessionId: string, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).apiV1SessionSessionIdEndPost(sessionId, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Get a session by id
-     * @param {string} sessionId 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public apiV1SessionSessionIdGet(sessionId: string, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).apiV1SessionSessionIdGet(sessionId, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Get session messages
-     * @param {string} sessionId 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public apiV1SessionSessionIdMessagesGet(sessionId: string, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).apiV1SessionSessionIdMessagesGet(sessionId, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Update a session by id
-     * @param {string} sessionId 
-     * @param {ApiV1SessionSessionIdPutRequest} apiV1SessionSessionIdPutRequest 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public apiV1SessionSessionIdPut(sessionId: string, apiV1SessionSessionIdPutRequest: ApiV1SessionSessionIdPutRequest, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).apiV1SessionSessionIdPut(sessionId, apiV1SessionSessionIdPutRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Get a session timeline
-     * @param {string} sessionId 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public apiV1SessionSessionIdTimelineGet(sessionId: string, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).apiV1SessionSessionIdTimelineGet(sessionId, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * Creates a new session based on the input request data
-     * @summary Create a new session
-     * @param {ApiV1SessionStartPostRequest} apiV1SessionStartPostRequest 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public apiV1SessionStartPost(apiV1SessionStartPostRequest: ApiV1SessionStartPostRequest, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).apiV1SessionStartPost(apiV1SessionStartPostRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * Requests a token for a human
-     * @summary Request new human token
-     * @param {ApiV1UsageTokenPutRequest} apiV1UsageTokenPutRequest 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public apiV1UsageTokenPost(apiV1UsageTokenPutRequest: ApiV1UsageTokenPutRequest, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).apiV1UsageTokenPost(apiV1UsageTokenPutRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * Updates the usage limits of a human
-     * @summary Update human usage limits
-     * @param {ApiV1UsageTokenPutRequest} apiV1UsageTokenPutRequest 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public apiV1UsageTokenPut(apiV1UsageTokenPutRequest: ApiV1UsageTokenPutRequest, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).apiV1UsageTokenPut(apiV1UsageTokenPutRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
+export class VoiceApi extends BaseAPI {
     /**
      * Creates a new cloned voice based on the input audio file
      * @summary Clone a voice
@@ -1930,10 +2177,10 @@ export class DefaultApi extends BaseAPI {
      * @param {File} file Audio file for voice cloning (MP3 format)
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
+     * @memberof VoiceApi
      */
     public apiV1VoiceClonePost(name: string, language: string, file: File, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).apiV1VoiceClonePost(name, language, file, options).then((request) => request(this.axios, this.basePath));
+        return VoiceApiFp(this.configuration).apiV1VoiceClonePost(name, language, file, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1942,10 +2189,10 @@ export class DefaultApi extends BaseAPI {
      * @param {ApiV1VoiceGeneratePostRequest} apiV1VoiceGeneratePostRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
+     * @memberof VoiceApi
      */
     public apiV1VoiceGeneratePost(apiV1VoiceGeneratePostRequest: ApiV1VoiceGeneratePostRequest, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).apiV1VoiceGeneratePost(apiV1VoiceGeneratePostRequest, options).then((request) => request(this.axios, this.basePath));
+        return VoiceApiFp(this.configuration).apiV1VoiceGeneratePost(apiV1VoiceGeneratePostRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1953,10 +2200,22 @@ export class DefaultApi extends BaseAPI {
      * @summary Get a list of voices
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
+     * @memberof VoiceApi
      */
     public apiV1VoiceListGet(options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).apiV1VoiceListGet(options).then((request) => request(this.axios, this.basePath));
+        return VoiceApiFp(this.configuration).apiV1VoiceListGet(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Previews a voice based on the input text
+     * @summary Preview a voice
+     * @param {ApiV1VoicePreviewPostRequest} apiV1VoicePreviewPostRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof VoiceApi
+     */
+    public apiV1VoicePreviewPost(apiV1VoicePreviewPostRequest: ApiV1VoicePreviewPostRequest, options?: RawAxiosRequestConfig) {
+        return VoiceApiFp(this.configuration).apiV1VoicePreviewPost(apiV1VoicePreviewPostRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

@@ -18,7 +18,12 @@ import {
   ApiV1SessionStartPost200ResponsePersona,
   ApiV1SessionStartPost200ResponseScenario,
   Configuration,
-  DefaultApi,
+  PersonaApi,
+  SessionApi,
+  ScenarioApi,
+  UsageApi,
+  VoiceApi,
+  ApiV1UsageTokenPutRequestLimitsInner
 } from "./generated";
 
 export namespace Gabber {
@@ -111,7 +116,7 @@ export namespace Gabber {
         connectionDetails = opts.connectionDetails;
       } else if('token' in opts && 'sessionConnectOptions' in opts) {
         const config = new Configuration({ accessToken: opts.token });
-        const api = new DefaultApi(config);
+        const api = new SessionApi(config);
         const res = await api.apiV1SessionStartPost(opts.sessionConnectOptions);
         connectionDetails = {
           url: res.data.connection_details.url!,
@@ -428,15 +433,23 @@ export namespace Gabber {
       };
 
   export class Api {
-    private api: DefaultApi;
+    private sessionApi: SessionApi;
+    private personaApi: PersonaApi;
+    private voiceApi: VoiceApi;
+    private scenarioApi: ScenarioApi;
+    private usageApi: UsageApi;
 
     constructor(token: string) {
       const config = new Configuration({ accessToken: token });
-      this.api = new DefaultApi(config);
+      this.sessionApi = new SessionApi(config);
+      this.personaApi = new PersonaApi(config);
+      this.voiceApi = new VoiceApi(config);
+      this.scenarioApi = new ScenarioApi(config);
+      this.usageApi = new UsageApi(config);
     }
 
     async getPersonas() {
-      const response = await this.api.apiV1PersonaListGet();
+      const response = await this.personaApi.apiV1PersonaListGet();
       const data = response.data;
       const values = data.values as Persona[];
       return {
@@ -447,7 +460,7 @@ export namespace Gabber {
     }
 
     async getScenarios() {
-      const response = await this.api.apiV1ScenarioListGet();
+      const response = await this.scenarioApi.apiV1ScenarioListGet();
       const data = response.data;
       const values = data.values as Scenario[];
       return {
@@ -458,7 +471,7 @@ export namespace Gabber {
     }
 
     async getVoices() {
-      const response = await this.api.apiV1VoiceListGet();
+      const response = await this.voiceApi.apiV1VoiceListGet();
       const data = response.data;
       const values = data.values;
       const voices: Voice[] = values.map((v) => {
@@ -476,12 +489,18 @@ export namespace Gabber {
     }
 
     async generateVoice(req: { text: string; voice_id: string }) {
-      const response = await this.api.apiV1VoiceGeneratePost(req);
+      const response = await this.voiceApi.apiV1VoiceGeneratePost(req);
       return response;
+    }
+
+    async getUsageLimits() {
+      const response = await this.usageApi.apiV1UsageLimitsGet();
+      return response.data as UsageLimit[];
     }
   }
 
   export type Persona = ApiV1SessionStartPost200ResponsePersona;
   export type Scenario = ApiV1SessionStartPost200ResponseScenario;
   export type Voice = { id: string; name: string; language: string };
+  export type UsageLimit = ApiV1UsageTokenPutRequestLimitsInner
 }
