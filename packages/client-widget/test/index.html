@@ -27,7 +27,7 @@
 
 <script>
     function tokenGenerator() {
-        var api_key = ""
+        var api_key = "e3da8c0e-af40-4dc1-a587-a7a366e59fa7"
         var endpoint = "https://app.gabber.dev/api/v1/usage/token"
         var body = {
             human_id: "123",
@@ -58,13 +58,15 @@
             return token;
         });
     }
-    // Gabber.ConversationalWidget.create({
+    //Gabber.ConversationalWidget.create({
     //    elementID: "gabber",
     //    tokenGenerator,
     //    usageLimitExceededCallback: function() {
     //        console.log("Usage exceeded")
     //    },
     //    settings: {
+    //        liveTitleText: "Test1",
+    //        createTitleText: "Test2",
     //        connectText: "connect",
     //        primaryColor: "#FFD700",         // Gold
     //        primaryColorContent: "#000000",  // Black text on gold
@@ -80,7 +82,7 @@
     //            buttonText: "Start"
     //        }
     //    }
-    // })
+    //})
     Gabber.VoiceGenerationWidget.create({
         elementID: "gabber",
         tokenGenerator,
@@ -88,6 +90,8 @@
             console.log("Usage exceeded")
         },
         settings: {
+            titleText: "Generate A Voice Snippet",
+            generateText: "GenerateR",
             connectText: "connect",
             primaryColor: "#FFD700",
             primaryColorContent: "#000000",

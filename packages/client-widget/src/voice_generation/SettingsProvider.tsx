@@ -1,8 +1,8 @@
 import React, { createContext } from "react";
-import { ConversationalWidgetSettings } from "../ConversationalWidget";
+import { VoiceGenerationWidgetSettings } from "../VoiceGenerationWidget";
 
 type SettingsContextData = {
-  settings: ConversationalWidgetSettings;
+  settings: VoiceGenerationWidgetSettings;
 };
 
 const SettingsContext = createContext<SettingsContextData | undefined>(
@@ -10,7 +10,7 @@ const SettingsContext = createContext<SettingsContextData | undefined>(
 );
 
 type Props = {
-  settings: ConversationalWidgetSettings;
+  settings: VoiceGenerationWidgetSettings;
   children: React.ReactNode;
 };
 
