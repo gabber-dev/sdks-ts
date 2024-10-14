@@ -3,8 +3,6 @@ import { useSettings } from "./SettingsProvider";
 import { useSession } from "gabber-client-react";
 import { IoMdSend } from "react-icons/io";
 import { BarAudioVisualizer } from "./BarAudioVisualizer";
-import { Gabber } from "gabber-client-core";
-import { useToken } from "../providers/TokenProvider";
 import { useUsage } from "../providers/UsageProvider";
 
 
@@ -26,7 +24,6 @@ export function LiveView() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
-  const { token } = useToken();
   const { checkUsage } = useUsage();
 
   useEffect(() => {
@@ -184,16 +181,6 @@ export function LiveView() {
             }}
           >
             <IoMdSend size={20} />
-          </button>
-          <button onClick={async () => {
-            if(!token) {
-              return
-            }
-            const api = new Gabber.Api(token);
-            const limits = await api.getUsageLimits();
-            console.log(limits);
-          }}>
-            Check Usage
           </button>
         </div>
       </div>
