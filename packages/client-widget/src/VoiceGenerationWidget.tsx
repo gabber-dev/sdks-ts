@@ -12,6 +12,7 @@ export class VoiceGenerationWidget extends InternalVoiceGenerationWidget {
     elementID,
     settings,
     tokenGenerator,
+    usageLimitExceededCallback,
   }: VoiceGenerationWidgetCreateParams) {
     const w = new VoiceGenerationWidget();
     const el = document.getElementById(elementID);
@@ -26,18 +27,13 @@ export class VoiceGenerationWidget extends InternalVoiceGenerationWidget {
           widget={w}
           settings={settings}
           tokenGenerator={tokenGenerator}
+          usageLimitExceededCallback={usageLimitExceededCallback}
         />
       </React.StrictMode>
     );
     return w;
   }
 }
-
-export type VoiceGenerationWidgetCreateParams = {
-  elementID: string;
-  settings?: VoiceGenerationWidgetSettings;
-  tokenGenerator: () => Promise<string>;
-};
 
 export type VoiceGenerationWidgetSettings = {
   connectText?: string;
@@ -55,4 +51,11 @@ export type VoiceGenerationWidgetSettings = {
     descriptionText?: string
     buttonText?: string
   }
+};
+
+export type VoiceGenerationWidgetCreateParams = {
+  elementID: string;
+  settings?: VoiceGenerationWidgetSettings;
+  usageLimitExceededCallback?: () => void;
+  tokenGenerator: () => Promise<string>;
 };

@@ -35,6 +35,10 @@
                 {
                     type: "conversational_seconds",
                     value: 10
+                },
+                {
+                    type: "voice_synthesis_seconds",
+                    value: 10
                 }
             ],
 
@@ -54,9 +58,12 @@
             return token;
         });
     }
-    //Gabber.ConversationalWidget.create({
+    // Gabber.ConversationalWidget.create({
     //    elementID: "gabber",
     //    tokenGenerator,
+    //    usageLimitExceededCallback: function() {
+    //        console.log("Usage exceeded")
+    //    },
     //    settings: {
     //        connectText: "connect",
     //        primaryColor: "#FFD700",         // Gold
@@ -73,10 +80,13 @@
     //            buttonText: "Start"
     //        }
     //    }
-    //})
+    // })
     Gabber.VoiceGenerationWidget.create({
         elementID: "gabber",
         tokenGenerator,
+        usageLimitExceededCallback: function () {
+            console.log("Usage exceeded")
+        },
         settings: {
             connectText: "connect",
             primaryColor: "#FFD700",

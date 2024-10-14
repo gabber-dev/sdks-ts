@@ -1,13 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import toast from "react-hot-toast";
 import { Gabber } from "gabber-client-core";
 import { useSettings } from "./SettingsProvider";
+import { useToken } from "../providers/TokenProvider";
+import { VoiceItem } from "./VoiceItem";
+import { useUsage } from "../providers/UsageProvider";
 
-type Props = {
-  token: string;
-}
+type Props = {};
 
-export function MainView({ token }: Props) {
+export function MainView({  }: Props) {
+  const { token } = useToken();
   const { settings } = useSettings();
   const [text, setText] = React.useState<string>("");
   const [voices, setVoices] = React.useState<Gabber.Voice[]>([]);
@@ -16,40 +17,26 @@ export function MainView({ token }: Props) {
   const [playing, setPlaying] = useState(false);
   const mp3BufferRef = useRef<ArrayBuffer | null>(null);
   const [pcmBuffer, setPcmBuffer] = useState<AudioBuffer | null>(null);
+  const { checkUsage } = useUsage();
 
-  const api = useRef<Gabber.Api | null>(null); 
-  const apiProm = useRef<Promise<Gabber.Api> | null>(null);
-
-  const createApi = useCallback(async () => {
-    if (api.current) {
-      return api.current;
+  const api = useMemo(() => {
+    if (!token) {
+      return null;
     }
-
-    if (apiProm.current) {
-      return apiProm.current;
-    }
-
-    const prom = new Promise<Gabber.Api>(async (resolve, reject) => {
-      try {
-        api.current = new Gabber.Api(token);
-        resolve(api.current);
-      } catch (e) {
-        reject(e);
-      }
-    });
-    apiProm.current = prom;
-    return prom;
-  }, []);
+    return new Gabber.Api(token);
+  }, [token]);
 
   const loadVoices = useCallback(async () => {
-    const api = await createApi();
+    if (!api) {
+      return;
+    }
     const voices = await api.getVoices();
     setVoices(voices.values);
-  }, []);
+  }, [api]);
 
   useEffect(() => {
     loadVoices();
-  }, []);
+  }, [loadVoices]);
 
   const playAudioBuffer = useCallback(async (buffer: AudioBuffer) => {
     const audioContext = new AudioContext();
@@ -118,6 +105,7 @@ export function MainView({ token }: Props) {
     };
 
     let audioBuffer: AudioBuffer | null = null;
+    let error: Error | null = null;
     try {
       setGenerating(true);
       const response = await fetch(url, {
@@ -134,9 +122,17 @@ export function MainView({ token }: Props) {
 
       setPcmBuffer(audioBuffer);
     } catch (e) {
-      toast.error("Failed to generate audio" + e);
+      error = e as Error;
     } finally {
       setGenerating(false);
+    }
+
+    if(error) {
+      const allowed = await checkUsage("voice_synthesis_seconds");
+      // This error was unrelated
+      if(allowed) {
+        throw error;
+      }
     }
 
     if (audioBuffer) {
@@ -152,10 +148,30 @@ export function MainView({ token }: Props) {
     text,
   ]);
 
+  if(!api) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <div className="w-full min-h-screen flex flex-col items-center justify-center p-4" style={{ backgroundColor: settings.baseColor }}>
-      <div className="w-full max-w-[800px] rounded-lg shadow-lg p-4 md:p-6" style={{ backgroundColor: settings.baseColorPlusOne, borderColor: settings.primaryColor, borderWidth: '1px', borderStyle: 'solid' }}>
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-4 md:mb-6" style={{ color: settings.primaryColor }}>Voice Preview</h2>
+    <div
+      className="w-full min-h-screen flex flex-col items-center justify-center p-4"
+      style={{ backgroundColor: settings.baseColor }}
+    >
+      <div
+        className="w-full max-w-[800px] rounded-lg shadow-lg p-4 md:p-6"
+        style={{
+          backgroundColor: settings.baseColorPlusOne,
+          borderColor: settings.primaryColor,
+          borderWidth: "1px",
+          borderStyle: "solid",
+        }}
+      >
+        <h2
+          className="text-2xl md:text-3xl font-bold text-center mb-4 md:mb-6"
+          style={{ color: settings.primaryColor }}
+        >
+          Voice Preview
+        </h2>
         <div className="space-y-4">
           <textarea
             className="textarea w-full h-24 md:h-32 text-base md:text-lg transition-all duration-300 ease-in-out p-2 md:p-3"
@@ -168,42 +184,36 @@ export function MainView({ token }: Props) {
               setText(e.target.value);
             }}
             value={text}
-            style={{ 
+            style={{
               backgroundColor: settings.baseColorPlusTwo,
               color: settings.baseColorContent,
-              borderColor: settings.primaryColor
+              borderColor: settings.primaryColor,
             }}
           />
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between p-2 md:p-3 rounded-md" style={{ backgroundColor: settings.baseColorPlusTwo }}>
-            <div className="flex flex-col md:flex-row md:items-center gap-2 mb-2 md:mb-0">
-              <span className="font-semibold text-sm md:text-base" style={{ color: settings.primaryColor }}>Voice:</span>
-              <select
-                className="select select-sm h-8 md:h-10 rounded-md pl-1 md:pl-2 text-xs md:text-sm"
-                onChange={(e) => {
-                  if (pcmBuffer) {
-                    mp3BufferRef.current = null;
-                    setPcmBuffer(null);
-                  }
-                  const idx = parseInt(e.target.value);
-                  setSelectedVoiceIndex(idx);
-                }}
-                value={selectedVoiceIndex}
-                style={{ 
-                  backgroundColor: settings.primaryColor,
-                  color: settings.primaryColorContent,
-                  borderColor: settings.primaryColor
-                }}
+          <div
+            className="flex flex-col md:items-center md:justify-between p-2 md:p-3 rounded-md"
+            style={{ backgroundColor: settings.baseColorPlusTwo }}
+          >
+            <div className="flex flex-col w-full items-center gap-2 mb-2 md:mb-0">
+              <div
+                className="font-semibold text-sm md:text-base"
+                style={{ color: settings.primaryColor }}
               >
+                Voice:
+              </div>
+              <div className="flex flex-col w-full max-h-[300px] overflow-y-scroll">
                 {voices.map((voice, idx) => (
-                  <option key={voice.id} value={idx}>
-                    {voice.name} ({voice.language})
-                  </option>
+                  <div key={voice.id}>
+                    <VoiceItem
+                      selected={selectedVoiceIndex === idx}
+                      onClick={() => {
+                        setSelectedVoiceIndex(idx);
+                      }}
+                      voice={voice}
+                    />
+                  </div>
                 ))}
-              </select>
-            </div>
-            <div className="flex items-center gap-2 text-xs md:text-sm">
-              <span className="font-semibold" style={{ color: settings.primaryColor }}>Voice ID:</span>
-              <span className="italic" style={{ color: settings.baseColorContent }}>{voices[selectedVoiceIndex]?.id}</span>
+              </div>
             </div>
           </div>
           <div className="flex flex-col md:flex-row justify-center gap-2 md:gap-4 mt-4 md:mt-6">
@@ -211,13 +221,13 @@ export function MainView({ token }: Props) {
               className="btn w-full md:w-[200px] h-8 md:h-10 transition-colors duration-300 ease-in-out rounded-md mb-2 md:mb-0"
               onClick={onPlay}
               disabled={generating || playing || text.trim() === ""}
-              style={{ 
-                backgroundColor: 'transparent',
+              style={{
+                backgroundColor: "transparent",
                 color: settings.primaryColor,
                 borderColor: settings.primaryColor,
-                borderWidth: '2px',
-                borderStyle: 'solid',
-                opacity: text.trim() === "" ? 0.5 : 1
+                borderWidth: "2px",
+                borderStyle: "solid",
+                opacity: text.trim() === "" ? 0.5 : 1,
               }}
             >
               <span className="transition-colors duration-300 ease-in-out text-xs md:text-sm">
@@ -228,12 +238,12 @@ export function MainView({ token }: Props) {
               <button
                 className="btn w-full md:w-[200px] h-8 md:h-10 transition-colors duration-300 ease-in-out rounded-md"
                 onClick={onDownload}
-                style={{ 
-                  backgroundColor: 'transparent',
+                style={{
+                  backgroundColor: "transparent",
                   color: settings.secondaryColor,
                   borderColor: settings.secondaryColor,
-                  borderWidth: '2px',
-                  borderStyle: 'solid'
+                  borderWidth: "2px",
+                  borderStyle: "solid",
                 }}
               >
                 <span className="transition-colors duration-300 ease-in-out text-xs md:text-sm">

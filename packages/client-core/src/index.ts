@@ -23,7 +23,8 @@ import {
   ScenarioApi,
   UsageApi,
   VoiceApi,
-  ApiV1UsageTokenPutRequestLimitsInner
+  ApiV1UsageTokenPutRequestLimitsInner,
+  ApiV1UsageTokenPutRequestLimitsInnerTypeEnum
 } from "./generated";
 
 export namespace Gabber {
@@ -433,7 +434,6 @@ export namespace Gabber {
       };
 
   export class Api {
-    private sessionApi: SessionApi;
     private personaApi: PersonaApi;
     private voiceApi: VoiceApi;
     private scenarioApi: ScenarioApi;
@@ -441,7 +441,6 @@ export namespace Gabber {
 
     constructor(token: string) {
       const config = new Configuration({ accessToken: token });
-      this.sessionApi = new SessionApi(config);
       this.personaApi = new PersonaApi(config);
       this.voiceApi = new VoiceApi(config);
       this.scenarioApi = new ScenarioApi(config);
@@ -503,4 +502,5 @@ export namespace Gabber {
   export type Scenario = ApiV1SessionStartPost200ResponseScenario;
   export type Voice = { id: string; name: string; language: string };
   export type UsageLimit = ApiV1UsageTokenPutRequestLimitsInner
+  export type UsageType = ApiV1UsageTokenPutRequestLimitsInnerTypeEnum; 
 }

@@ -3,27 +3,27 @@ import { MainView } from "./MainView";
 import { SettingsProvider } from "./SettingsProvider";
 import { Toaster } from "react-hot-toast";
 import {VoiceGenerationWidgetSettings, InternalVoiceGenerationWidget} from "../VoiceGenerationWidget";
+import { TokenProvider } from "../providers/TokenProvider";
+import { UsageProvider } from "../providers/UsageProvider";
 
 const DEFAULT_SETTINGS: VoiceGenerationWidgetSettings = {};
 
 type Props = {
   tokenGenerator: () => Promise<string>;
+  usageLimitExceededCallback?: () => void;
   settings?: VoiceGenerationWidgetSettings;
   widget: InternalVoiceGenerationWidget;
 };
 
-export function Root({ tokenGenerator, settings }: Props) {
-  const [token, setToken] = React.useState<string | null>(null);
-  if (!token) {
-    tokenGenerator().then(setToken);
-    return <div>Loading...</div>;
-  }
+export function Root({ tokenGenerator, usageLimitExceededCallback, settings }: Props) {
   return (
-    <>
-      <Toaster />
-      <SettingsProvider settings={settings || DEFAULT_SETTINGS}>
-        <MainView token={token} />
-      </SettingsProvider>
-    </>
+    <TokenProvider tokenGenerator={tokenGenerator}>
+      <UsageProvider usageLimitExceededCallback={usageLimitExceededCallback}>
+        <Toaster />
+        <SettingsProvider settings={settings || DEFAULT_SETTINGS}>
+          <MainView />
+        </SettingsProvider>
+      </UsageProvider>
+    </TokenProvider>
   );
 }

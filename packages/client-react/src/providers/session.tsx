@@ -188,7 +188,7 @@ export function SessionProvider({
 export function useSession() {
     const context = React.useContext(SessionContext)
     if(!context) {
-        throw "useSession must be used within a SessionProvider"
+        throw new Error("useSession must be used within a SessionProvider")
     }
     return context;
 }
