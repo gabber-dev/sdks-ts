@@ -58,51 +58,55 @@
             return token;
         });
     }
-    // Gabber.ConversationalWidget.create({
-    //    elementID: "gabber",
-    //    tokenGenerator,
-    //    usageLimitExceededCallback: function() {
-    //        console.log("Usage exceeded")
-    //    },
-    //    settings: {
-    //        connectText: "connect",
-    //        primaryColor: "#FFD700",         // Gold
-    //        primaryColorContent: "#000000",  // Black text on gold
-    //        secondaryColor: "#B22234",       // Soft/muted red
-    //        secondaryColorContent: "#FFFFFF", // White text on red
-    //        baseColor: "#000000",            // Black background
-    //        baseColorPlusOne: "#1A1A1A",     // Slightly lighter black
-    //        baseColorPlusTwo: "#333333",     // Even lighter black
-    //        baseColorContent: "#FFFFFF",     // White text on black
-    //        accentColor: "#3C3B6E",          // Soft/muted blue
-    //        audioPlaybackFailed: {
-    //            descriptionText: "AP Failed",
-    //            buttonText: "Start"
-    //        }
-    //    }
-    // })
-    Gabber.VoiceGenerationWidget.create({
+    Gabber.ConversationalWidget.create({
         elementID: "gabber",
         tokenGenerator,
-        usageLimitExceededCallback: function () {
+        usageLimitExceededCallback: function() {
             console.log("Usage exceeded")
         },
         settings: {
-            connectText: "connect",
-            primaryColor: "#FFD700",
-            primaryColorContent: "#000000",
-            secondaryColor: "#B22234",
-            secondaryColorContent: "#FFFFFF",
-            baseColor: "#000000",
-            baseColorPlusOne: "#1A1A1A",
-            baseColorPlusTwo: "#333333",
-            baseColorContent: "#FFFFFF",
+            liveTitleText: "Test1",
+            createTitleText: "Test2",
+            connectButtonText: "connect buton",
+            primaryColor: "#FFD700",         // Gold
+            primaryColorContent: "#000000",  // Black text on gold
+            secondaryColor: "#B22234",       // Soft/muted red
+            secondaryColorContent: "#FFFFFF", // White text on red
+            baseColor: "#000000",            // Black background
+            baseColorPlusOne: "#1A1A1A",     // Slightly lighter black
+            baseColorPlusTwo: "#333333",     // Even lighter black
+            baseColorContent: "#FFFFFF",     // White text on black
+            accentColor: "#3C3B6E",          // Soft/muted blue
             audioPlaybackFailed: {
                 descriptionText: "AP Failed",
                 buttonText: "Start"
             }
         }
     })
+    //Gabber.VoiceGenerationWidget.create({
+    //    elementID: "gabber",
+    //    tokenGenerator,
+    //    usageLimitExceededCallback: function () {
+    //        console.log("Usage exceeded")
+    //    },
+    //    settings: {
+    //        titleText: "Generate A Voice Snippet",
+    //        generateButtonText: "Genehvbjhkbe",
+    //        connectButtonText: "connect",
+    //        primaryColor: "#FFD700",
+    //        primaryColorContent: "#000000",
+    //        secondaryColor: "#B22234",
+    //        secondaryColorContent: "#FFFFFF",
+    //        baseColor: "#000000",
+    //        baseColorPlusOne: "#1A1A1A",
+    //        baseColorPlusTwo: "#333333",
+    //        baseColorContent: "#FFFFFF",
+    //        audioPlaybackFailed: {
+    //            descriptionText: "AP Failed",
+    //            buttonText: "Start"
+    //        }
+    //    }
+    //})
 </script>
 
 </html>

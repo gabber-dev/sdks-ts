@@ -61,14 +61,14 @@ export function MainView({  }: Props) {
     }
 
     if (!pcmBuffer && text !== "") {
-      return "Generate";
+      return settings.generateButtonText || "Generate";
     }
     if (pcmBuffer) {
       return "Play Again";
     }
 
-    return "";
-  }, [generating, pcmBuffer, playing, text]);
+    return settings.generateButtonText || "Generate";
+  }, [generating, pcmBuffer, playing, text, settings.generateButtonText]);
 
   const onDownload = useCallback(() => {
     if (!mp3BufferRef.current) return;
@@ -170,7 +170,7 @@ export function MainView({  }: Props) {
           className="text-2xl md:text-3xl font-bold text-center mb-4 md:mb-6"
           style={{ color: settings.primaryColor }}
         >
-          Voice Preview
+          {settings.titleText || "Voice Preview"}
         </h2>
         <div className="space-y-4">
           <textarea
@@ -231,7 +231,7 @@ export function MainView({  }: Props) {
               }}
             >
               <span className="transition-colors duration-300 ease-in-out text-xs md:text-sm">
-                {playButtonText || "Generate"}
+                {playButtonText}
               </span>
             </button>
             {pcmBuffer && (
