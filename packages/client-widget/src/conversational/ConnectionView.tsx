@@ -154,7 +154,7 @@ export function ConnectionView({ onConnectPressed }: Props) {
             )}
           </div>
         </div>
-        <div className="hidden md:flex md:flex-row gap-4 mb-4">
+        <div className="hidden md:flex gap-4 mb-4">
           <SelectionColumn
             title="Personas"
             items={personas}
