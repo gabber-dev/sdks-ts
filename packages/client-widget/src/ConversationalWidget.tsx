@@ -3,22 +3,11 @@ import { createRoot } from 'react-dom/client';
 import { Root } from "./conversational/Root";
 import './index.css';
 
-export class InternalConversationalWidget {
-  private _disconnectHandler: () => void = () => null;
-
-  public registerDisconnectHandler(h: () => void) {
-    this._disconnectHandler = h;
-  }
-
-  public disconnect() {
-    this._disconnectHandler();
-  }
-}
-
-export class ConversationalWidget extends InternalConversationalWidget {
+export class ConversationalWidget {
   static create({
     elementID,
     settings,
+    usageLimitExceededCallback,
     tokenGenerator,
   }: ConversationalWidgetCreateParams) {
     const w = new ConversationalWidget();
@@ -30,20 +19,21 @@ export class ConversationalWidget extends InternalConversationalWidget {
     const root = createRoot(el);
     root.render(
       <React.StrictMode>
-        <Root widget={w} settings={settings} tokenGenerator={tokenGenerator} />
+        <Root
+          settings={settings}
+          tokenGenerator={tokenGenerator}
+          usageLimitExceededCallback={usageLimitExceededCallback}
+        />
       </React.StrictMode>
     );
     return w;
-  }
-
-  public disconnect() {
-    super.disconnect();
   }
 }
 
 export type ConversationalWidgetCreateParams = {
   elementID: string;
   settings?: ConversationalWidgetSettings;
+  usageLimitExceededCallback?: () => void;
   tokenGenerator: () => Promise<string>;
 };
 

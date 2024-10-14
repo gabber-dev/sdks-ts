@@ -1,13 +1,22 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="../dist/index.js"></script>
     <!-- <script src="https://unpkg.com/gabber-client-widget/dist/index.js"></script> -->
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Proxima+Nova:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Proxima Nova', sans-serif;
+        }
+
         .gabber {
             width: 100vw;
             height: 100vh;
         }
+
     </style>
 </head>
 
@@ -18,13 +27,17 @@
 
 <script>
     function tokenGenerator() {
-        var api_key = "<api key>"
+        var api_key = ""
         var endpoint = "https://app.gabber.dev/api/v1/usage/token"
         var body = {
             human_id: "123",
             limits: [
                 {
                     type: "conversational_seconds",
+                    value: 10
+                },
+                {
+                    type: "voice_synthesis_seconds",
                     value: 10
                 }
             ],
@@ -45,38 +58,45 @@
             return token;
         });
     }
-    //Gabber.ConversationalWidget.create({
-    //     elementID: "gabber",
-    //     tokenGenerator,
-    //     settings: {
-    //         connectText: "connect",
-    //         primaryColor: "#ff0000",
-    //         primaryColorContent: "#ffffff",
-    //         secondaryColor: "#00ff00",
-    //         secondaryColorContent: "#ffffff",
-    //         baseColor: "#000000",
-    //         baseColorPlusOne: "#1c1c1c",
-    //         baseColorPlusTwo: "#373636",
-    //         baseColorContent: "#ffffff",
-    //         audioPlaybackFailed: {
-    //             descriptionText: "AP Failed",
-    //             buttonText: "Start"
-    //         }
-    //     }
+    // Gabber.ConversationalWidget.create({
+    //    elementID: "gabber",
+    //    tokenGenerator,
+    //    usageLimitExceededCallback: function() {
+    //        console.log("Usage exceeded")
+    //    },
+    //    settings: {
+    //        connectText: "connect",
+    //        primaryColor: "#FFD700",         // Gold
+    //        primaryColorContent: "#000000",  // Black text on gold
+    //        secondaryColor: "#B22234",       // Soft/muted red
+    //        secondaryColorContent: "#FFFFFF", // White text on red
+    //        baseColor: "#000000",            // Black background
+    //        baseColorPlusOne: "#1A1A1A",     // Slightly lighter black
+    //        baseColorPlusTwo: "#333333",     // Even lighter black
+    //        baseColorContent: "#FFFFFF",     // White text on black
+    //        accentColor: "#3C3B6E",          // Soft/muted blue
+    //        audioPlaybackFailed: {
+    //            descriptionText: "AP Failed",
+    //            buttonText: "Start"
+    //        }
+    //    }
     // })
     Gabber.VoiceGenerationWidget.create({
         elementID: "gabber",
         tokenGenerator,
+        usageLimitExceededCallback: function () {
+            console.log("Usage exceeded")
+        },
         settings: {
             connectText: "connect",
-            primaryColor: "#ff0000",
-            primaryColorContent: "#ffffff",
-            secondaryColor: "#00ff00",
-            secondaryColorContent: "#ffffff",
+            primaryColor: "#FFD700",
+            primaryColorContent: "#000000",
+            secondaryColor: "#B22234",
+            secondaryColorContent: "#FFFFFF",
             baseColor: "#000000",
-            baseColorPlusOne: "#1c1c1c",
-            baseColorPlusTwo: "#373636",
-            baseColorContent: "#ffffff",
+            baseColorPlusOne: "#1A1A1A",
+            baseColorPlusTwo: "#333333",
+            baseColorContent: "#FFFFFF",
             audioPlaybackFailed: {
                 descriptionText: "AP Failed",
                 buttonText: "Start"

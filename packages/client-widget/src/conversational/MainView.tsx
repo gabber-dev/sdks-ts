@@ -1,43 +1,50 @@
-import React from "react";
-import { Input } from "./Input";
-import { useSettings } from "./SettingsProvider";
-import { AgentVisualizer } from "./AgentVisualizer";
-import { useSession } from "gabber-client-react";
+import React, { useMemo, useState } from "react";
+import { ConnectionView } from "./ConnectionView";
+import { LiveView } from "./LiveView";
+import { SessionProvider } from "gabber-client-react";
+import { useToken } from "../providers/TokenProvider";
+import { useUsage } from "../providers/UsageProvider";
 
 export function MainView() {
-  const { settings } = useSettings();
-  const { connectionState } = useSession();
+  const {token} = useToken();
+  const [prompt, setPrompt] = useState<string | null>(null);
+  const [voice, setVoice] = useState<string | null>(null);
 
+  const { exceededLimits } = useUsage();
+
+  const connectionOpts = useMemo(() => {
+    console.log("ConnectionOpts", exceededLimits, token, prompt, voice);
+    if (exceededLimits.includes("conversational_seconds")) {
+      return null;
+    }
+    if (!token || !prompt || !voice) {
+      return null;
+    }
+
+    return {
+      token,
+      sessionConnectOptions: {
+        history: [{ role: "system", content: prompt }],
+        voice_override: voice,
+      },
+    };
+  }, [exceededLimits, token, prompt, voice]);
+
+  if (!connectionOpts) {
+    return (
+      <ConnectionView
+        onConnectPressed={(opts) => {
+          console.log("Connection", opts);
+          setPrompt(opts.prompt);
+          setVoice(opts.voice);
+        }}
+      />
+    );
+  }
 
   return (
-    <div
-      className="relative w-full h-full"
-      style={{
-        backgroundColor: settings.baseColor,
-      }}
-    >
-      <div className="absolute left-0 right-0 bottom-0 top-0">
-        <div className="relative w-full h-full flex flex-col items-center justify-center">
-          {connectionState === "connected" && (
-            <div className="w-1/2 aspect-square">
-              <AgentVisualizer
-                gap={12}
-                shadowColor={settings.baseColorContent || "#ff0000"}
-                color={settings.secondaryColor || "#ff0000"}
-              />
-            </div>
-          )}
-          <div
-            style={{
-              background: `linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 60%, ${settings.baseColor} 80%)`,
-            }}
-            className={`absolute top-0 left-0 right-0 bottom-0 z-10`}
-          />
-        </div>
-      </div>
-      <div className="absolute left-0 right-0 bottom-0 h-[120px] m-2 z-10">
-        <Input heightPixels={120} />
-      </div>
-    </div>
+    <SessionProvider connectionOpts={connectionOpts}>
+      <LiveView />
+    </SessionProvider>
   );
 }

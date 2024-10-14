@@ -1,3 +1,4 @@
 import './index.css';
-export { ConversationalWidget } from "./ConversationalWidget";
-export { VoiceGenerationWidget } from "./VoiceGenerationWidget";
+import { ConversationalWidget } from "./ConversationalWidget";
+import { VoiceGenerationWidget } from "./VoiceGenerationWidget";
+export { ConversationalWidget, VoiceGenerationWidget };

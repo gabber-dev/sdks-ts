@@ -5,7 +5,8 @@
   "scripts": {
     "build": "pnpm -r run build",
     "test": "pnpm -r run test",
-    "clean": "pnpm -r run clean"
+    "clean": "pnpm -r run clean",
+    "lint": "eslint --fix"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
