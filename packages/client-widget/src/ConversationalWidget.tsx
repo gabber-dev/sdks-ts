@@ -40,7 +40,7 @@ export type ConversationalWidgetCreateParams = {
 export type ConversationalWidgetSettings = {
   createTitleText?: string;
   liveTitleText?: string;
-  connectText?: string;
+  connectButtonText?: string;
   personaName?: string;
   personaImage?: string;
   primaryColor?: string;

@@ -192,7 +192,7 @@ export function ConnectionView({ onConnectPressed }: Props) {
             })
           }
         >
-          {settings?.connectText || "Connect"}
+          {settings?.connectButtonText || "Connect"}
         </button>
         <style>{`
         .selection-container {

@@ -37,8 +37,7 @@ export class VoiceGenerationWidget extends InternalVoiceGenerationWidget {
 
 export type VoiceGenerationWidgetSettings = {
   titleText?: string;
-  generateText?: string;
-  connectText?: string;
+  generateButtonText?: string;
   personaName?: string;
   personaImage?: string;
   primaryColor?: string;

@@ -61,14 +61,14 @@ export function MainView({  }: Props) {
     }
 
     if (!pcmBuffer && text !== "") {
-      return "Generate";
+      return settings.generateButtonText || "Generate";
     }
     if (pcmBuffer) {
       return "Play Again";
     }
 
-    return "";
-  }, [generating, pcmBuffer, playing, text]);
+    return settings.generateButtonText || "Generate";
+  }, [generating, pcmBuffer, playing, text, settings.generateButtonText]);
 
   const onDownload = useCallback(() => {
     if (!mp3BufferRef.current) return;
@@ -231,7 +231,7 @@ export function MainView({  }: Props) {
               }}
             >
               <span className="transition-colors duration-300 ease-in-out text-xs md:text-sm">
-                {settings.generateText || "Generate"}
+                {playButtonText}
               </span>
             </button>
             {pcmBuffer && (
