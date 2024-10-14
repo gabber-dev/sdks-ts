@@ -60,8 +60,7 @@ export function ConnectionViewBottom({ onConnectPressed, onSelectionChange }: Pr
 
   const handleConnect = () => {
     if (selectedPersona && selectedScenario && selectedVoice) {
-      const prompt = generatePrompt(selectedPersona, selectedScenario);
-      onConnectPressed({ prompt, voice: selectedVoice.id });
+      onConnectPressed({ prompt: generatePrompt(selectedPersona, selectedScenario), voice: selectedVoice.id });
     }
   };
 
@@ -110,17 +109,6 @@ export function ConnectionViewBottom({ onConnectPressed, onSelectionChange }: Pr
           </div>
         </div>
       </div>
-      <button
-        onClick={handleConnect}
-        className="w-full p-3 md:p-4 rounded font-semibold text-sm md:text-base sticky bottom-0"
-        style={{
-          backgroundColor: settings.primaryColor,
-          color: settings.baseColor,
-        }}
-        disabled={!selectedPersona || !selectedScenario || !selectedVoice}
-      >
-        {settings.connectButtonText || "Connect"}
-      </button>
     </div>
   );
 }

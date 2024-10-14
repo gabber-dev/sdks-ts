@@ -27,6 +27,7 @@ export function LiveView() {
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
   const { checkUsage } = useUsage();
   const [activeTab, setActiveTab] = useState<"messages" | "connection">("connection");
+  const [isConnecting, setIsConnecting] = useState(false);
 
   useEffect(() => {
     const scrollToBottom = () => {
@@ -226,7 +227,6 @@ export function LiveView() {
 
             {/* Connection view */}
             <div className={`h-full flex flex-col ${activeTab === "connection" ? "block" : "hidden md:block"}`}>
-              <h4 className="font-semibold mb-1 text-sm" style={{ color: settings.primaryColor }}>Connection:</h4>
               <div className="flex-grow overflow-y-auto">
                 <textarea
                   value={prompt}
@@ -241,7 +241,7 @@ export function LiveView() {
                   }}
                   placeholder="Enter your prompt here..."
                 />
-                <div className="h-auto max-h-[50vh] overflow-y-auto">
+                <div className="h-auto max-h-[50vh] overflow-y-auto mb-4">
                   <ConnectionViewBottom 
                     onConnectPressed={(info) => {
                       // Handle connection info
@@ -251,6 +251,25 @@ export function LiveView() {
                     onSelectionChange={handlePromptChange}
                   />
                 </div>
+                <button
+                  className="w-full py-2 px-4 rounded-md font-semibold text-sm md:text-base"
+                  style={{
+                    backgroundColor: settings.primaryColor,
+                    color: settings.baseColor,
+                    opacity: isConnecting ? 0.7 : 1,
+                    cursor: isConnecting ? 'not-allowed' : 'pointer',
+                  }}
+                  onClick={() => {
+                    if (!isConnecting) {
+                      setIsConnecting(true);
+                      // Implement the connection logic here
+                      // Once connected, set setIsConnecting(false)
+                    }
+                  }}
+                  disabled={isConnecting}
+                >
+                  {isConnecting ? 'Connecting...' : (settings.connectButtonText || 'Connect')}
+                </button>
               </div>
             </div>
           </div>
