@@ -93,6 +93,12 @@ export function ConnectionView({ onConnectPressed }: Props) {
       style={{ backgroundColor: settings?.baseColor || "#ffffff" }}
     >
       <div className="w-full max-w-2xl">
+        <h2
+          className="text-2xl md:text-3xl font-bold text-center mb-4 md:mb-6"
+          style={{ color: settings?.primaryColor }}
+        >
+          {settings?.createTitleText || "Define Your Fantasy"}
+        </h2>
         <textarea
           className="w-full mb-4 p-2 rounded-md border"
           style={{
@@ -186,7 +192,7 @@ export function ConnectionView({ onConnectPressed }: Props) {
             })
           }
         >
-          {settings?.connectText || "Connect"}
+          {settings?.connectButtonText || "Connect"}
         </button>
         <style>{`
         .selection-container {

@@ -76,7 +76,7 @@ export function LiveView() {
     >
       <div className="p-4 flex-grow flex flex-col md:flex-row overflow-hidden space-y-4 md:space-y-0 md:space-x-4">
         <div className="w-full md:w-1/2 flex flex-col overflow-hidden">
-          <h3 className="text-xl md:text-2xl font-semibold mb-4" style={{ color: settings.primaryColor }}>Gabber AI Chat</h3>
+          <h3 className="text-xl md:text-2xl font-semibold mb-4" style={{ color: settings.primaryColor }}>{settings.liveTitleText || "Chat"}</h3>
           <div className="mb-2 text-xs md:text-sm" style={{ color: settings.baseColorContent }}>
             <span className="font-semibold">Connection:</span> {connectionState}
           </div>
