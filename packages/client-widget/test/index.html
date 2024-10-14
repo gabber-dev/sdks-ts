@@ -34,7 +34,7 @@
             limits: [
                 {
                     type: "conversational_seconds",
-                    value: 30
+                    value: 20
                 },
                 {
                     type: "voice_synthesis_seconds",
@@ -46,7 +46,7 @@
         return fetch(endpoint, {
             method: "POST",
             headers: {
-                "x-api-key":'e3da8c0e-af40-4dc1-a587-a7a366e59fa7',
+                "x-api-key": api_key,
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(body)
