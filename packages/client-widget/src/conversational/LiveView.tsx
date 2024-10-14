@@ -28,6 +28,10 @@ export function LiveView() {
   const { checkUsage } = useUsage();
   const [activeTab, setActiveTab] = useState<"messages" | "connection">("connection");
   const [isConnecting, setIsConnecting] = useState(false);
+  const [userTypedPrompt, setUserTypedPrompt] = useState("");
+  const [selectedPersona, setSelectedPersona] = useState<string | null>(null);
+  const [selectedScenario, setSelectedScenario] = useState<string | null>(null);
+  const [userEditedPrompt, setUserEditedPrompt] = useState(false);
 
   useEffect(() => {
     const scrollToBottom = () => {
@@ -70,6 +74,16 @@ export function LiveView() {
 
   const handlePromptChange = (newPrompt: string) => {
     setPrompt(newPrompt);
+    setUserEditedPrompt(true);
+  };
+
+  const handleSelectionChange = (persona: string | null, scenario: string | null) => {
+    if (!userEditedPrompt) {
+      let newPrompt = "";
+      if (persona) newPrompt += `You are a ${persona}. `;
+      if (scenario) newPrompt += scenario;
+      setPrompt(newPrompt.trim());
+    }
   };
 
   return (
@@ -227,10 +241,11 @@ export function LiveView() {
 
             {/* Connection view */}
             <div className={`h-full flex flex-col ${activeTab === "connection" ? "block" : "hidden md:block"}`}>
+              <div className="text-lg md:text-2xl font-semibold mb-2 md:mb-4" style={{ color: settings.primaryColor }}>{settings.createTitleText || "Create"}</div>
               <div className="flex-grow overflow-y-auto">
                 <textarea
                   value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
+                  onChange={(e) => handlePromptChange(e.target.value)}
                   className="w-full mb-4 p-2 rounded-md border"
                   style={{
                     backgroundColor: settings.baseColorPlusOne || '#f0f0f0',
@@ -248,7 +263,7 @@ export function LiveView() {
                       console.log("New connection info:", info);
                       // Implement the logic to update the session with the new connection info
                     }} 
-                    onSelectionChange={handlePromptChange}
+                    onSelectionChange={handleSelectionChange}
                   />
                 </div>
                 <button

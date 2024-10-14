@@ -5,7 +5,7 @@ import { useToken } from "../providers/TokenProvider";
 
 type Props = {
   onConnectPressed: (info: { prompt: string; voice: string }) => void;
-  onSelectionChange: (prompt: string) => void;
+  onSelectionChange: (persona: string | null, scenario: string | null) => void;
 };
 
 export function ConnectionViewBottom({ onConnectPressed, onSelectionChange }: Props) {
@@ -46,8 +46,10 @@ export function ConnectionViewBottom({ onConnectPressed, onSelectionChange }: Pr
   }, [fetchData]);
 
   useEffect(() => {
-    const prompt = generatePrompt(selectedPersona, selectedScenario);
-    onSelectionChange(prompt);
+    onSelectionChange(
+      selectedPersona ? selectedPersona.name : null,
+      selectedScenario ? selectedScenario.prompt : null
+    );
   }, [selectedPersona, selectedScenario, onSelectionChange]);
 
   const generatePrompt = (persona: Gabber.Persona | null, scenario: Gabber.Scenario | null) => {
