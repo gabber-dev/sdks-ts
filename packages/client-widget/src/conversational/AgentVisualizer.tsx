@@ -75,7 +75,7 @@ export const AgentVisualizer = ({ color, shadowColor, gap }: Props) => {
               height: `calc(5% + ${frequency} * 80%)`,
               transform: "",
               backgroundColor: color,
-              boxShadow: `5px 5px 0px 0px ${shadowColor}`,
+              boxShadow: `3px 3px 0px 0px ${shadowColor}`,
             }}
           ></div>
         );

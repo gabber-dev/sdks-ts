@@ -32,7 +32,6 @@ export function UsageProvider({
   const checkUsage = useCallback(async (type: Gabber.UsageType) => {
     console.log('Checking usage for', type);
     if(!api) {
-      console.error('API not initialized');
       if(usageLimitExceededCallback) {
         usageLimitExceededCallback(type);
       }
