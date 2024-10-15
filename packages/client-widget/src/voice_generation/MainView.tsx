@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Gabber } from "gabber-client-core";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useSettings } from "./SettingsProvider";
 import { useToken } from "../providers/TokenProvider";
 import { VoiceItem } from "./VoiceItem";
 import { useUsage } from "../providers/UsageProvider";
+import { useVoice } from "../providers/VoiceProvider";
 
 type Props = {};
 
@@ -11,44 +11,31 @@ export function MainView({  }: Props) {
   const { token } = useToken();
   const { settings } = useSettings();
   const [text, setText] = React.useState<string>("");
-  const [voices, setVoices] = React.useState<Gabber.Voice[]>([]);
   const [selectedVoiceIndex, setSelectedVoiceIndex] = useState(0);
   const [generating, setGenerating] = useState(false);
   const [playing, setPlaying] = useState(false);
   const mp3BufferRef = useRef<ArrayBuffer | null>(null);
   const [pcmBuffer, setPcmBuffer] = useState<AudioBuffer | null>(null);
   const { checkUsage } = useUsage();
-
-  const api = useMemo(() => {
-    if (!token) {
-      return null;
-    }
-    return new Gabber.Api(token);
-  }, [token]);
-
-  const loadVoices = useCallback(async () => {
-    if (!api) {
-      return;
-    }
-    const voices = await api.getVoices();
-    setVoices(voices.values);
-  }, [api]);
-
-  useEffect(() => {
-    loadVoices();
-  }, [loadVoices]);
+  const {voices} = useVoice();
+  const audioContext = useRef(new AudioContext());
 
   const playAudioBuffer = useCallback(async (buffer: AudioBuffer) => {
-    const audioContext = new AudioContext();
-    const source = audioContext.createBufferSource();
-    source.buffer = buffer;
-    source.connect(audioContext.destination);
-    setPlaying(true);
-    source.start(0);
-    source.onended = () => {
-      console.log("ended");
+    try {
+      audioContext.current.resume();
+      const source = audioContext.current.createBufferSource();
+      source.buffer = buffer;
+      source.connect(audioContext.current.destination);
+      setPlaying(true);
+      source.start(0);
+      source.onended = () => {
+        console.log("ended");
+        setPlaying(false);
+      };
+    } catch (e) {
+      console.error(e);
       setPlaying(false);
-    };
+    }
   }, []);
 
   const playButtonText = useMemo(() => {
@@ -148,10 +135,6 @@ export function MainView({  }: Props) {
     text,
   ]);
 
-  if(!api) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <div
       className="w-full min-h-screen flex flex-col items-center justify-center p-4"
@@ -207,7 +190,12 @@ export function MainView({  }: Props) {
                     <VoiceItem
                       selected={selectedVoiceIndex === idx}
                       onClick={() => {
-                        setSelectedVoiceIndex(idx);
+                        setSelectedVoiceIndex((prev) => {
+                          if(prev !== idx) {
+                            setPcmBuffer(null);
+                          }
+                          return idx;
+                        });
                       }}
                       voice={voice}
                     />

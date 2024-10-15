@@ -5,6 +5,7 @@ import { Toaster } from "react-hot-toast";
 import {VoiceGenerationWidgetSettings, InternalVoiceGenerationWidget} from "../VoiceGenerationWidget";
 import { TokenProvider } from "../providers/TokenProvider";
 import { UsageProvider } from "../providers/UsageProvider";
+import { VoiceProvider } from "../providers/VoiceProvider";
 
 const DEFAULT_SETTINGS: VoiceGenerationWidgetSettings = {};
 
@@ -21,7 +22,9 @@ export function Root({ tokenGenerator, usageLimitExceededCallback, settings }: P
       <UsageProvider usageLimitExceededCallback={usageLimitExceededCallback}>
         <Toaster />
         <SettingsProvider settings={settings || DEFAULT_SETTINGS}>
-          <MainView />
+          <VoiceProvider>
+            <MainView />
+          </VoiceProvider>
         </SettingsProvider>
       </UsageProvider>
     </TokenProvider>
