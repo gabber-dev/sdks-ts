@@ -21,10 +21,6 @@ function useIsMobile() {
   return isMobile;
 }
 
-function truncateText(text: string, maxLength: number) {
-  return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
-}
-
 export function SelectedOptions({ isFreeform }: Props) {
   const { settings } = useSettings();
   const { personas, selectedPersonaIdx } = usePersona();
@@ -36,7 +32,7 @@ export function SelectedOptions({ isFreeform }: Props) {
   const selectedScenario = isFreeform ? "Freeform" : scenarios[selectedScenarioIdx]?.name || "None";
   const selectedVoice = voices[selectedVoiceIdx]?.name || "Default";
 
-  const maxLength = isMobile ? 10 : Infinity;
+  const textClass = isMobile ? "max-w-[80px]" : "max-w-full";
 
   return (
     <div
@@ -45,13 +41,13 @@ export function SelectedOptions({ isFreeform }: Props) {
     >
       <div className="flex space-x-4 overflow-hidden">
         <p className="whitespace-nowrap">
-          Persona: <span className="overflow-hidden text-ellipsis" style={{ color: settings.primaryColor }}>{truncateText(selectedPersona, maxLength)}</span>
+          Persona: <span className={`overflow-hidden text-ellipsis ${textClass}`} style={{ color: settings.primaryColor }}>{selectedPersona}</span>
         </p>
         <p className="whitespace-nowrap">
-          Scenario: <span className="overflow-hidden text-ellipsis" style={{ color: settings.primaryColor }}>{truncateText(selectedScenario, maxLength)}</span>
+          Scenario: <span className={`overflow-hidden text-ellipsis ${textClass}`} style={{ color: settings.primaryColor }}>{selectedScenario}</span>
         </p>
         <p className="whitespace-nowrap">
-          Voice: <span className="overflow-hidden text-ellipsis" style={{ color: settings.primaryColor }}>{truncateText(selectedVoice, maxLength)}</span>
+          Voice: <span className={`overflow-hidden text-ellipsis ${textClass}`} style={{ color: settings.primaryColor }}>{selectedVoice}</span>
         </p>
       </div>
     </div>
