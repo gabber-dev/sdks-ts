@@ -7,6 +7,10 @@ import {
 } from "../ConversationalWidget";
 import { UsageProvider } from "../providers/UsageProvider";
 import { TokenProvider } from "../providers/TokenProvider";
+import { VoiceProvider } from "../providers/VoiceProvider";
+import { ScenarioProvider } from "../providers/ScenarioProvider";
+import { PersonaProvider } from "../providers/PersonaProvider";
+import { ConnectionOptsProvider } from "../providers/ConnectionOptsProvider";
 
 const DEFAULT_SETTINGS: ConversationalWidgetSettings = {};
 
@@ -19,12 +23,22 @@ type Props = {
 export function Root({ tokenGenerator, usageLimitExceededCallback, settings }: Props) {
   return (
     <TokenProvider tokenGenerator={tokenGenerator}>
-      <UsageProvider usageLimitExceededCallback={usageLimitExceededCallback}>
-        <Toaster />
-        <SettingsProvider settings={settings || DEFAULT_SETTINGS}>
-          <MainView />
-        </SettingsProvider>
-      </UsageProvider>
+      <VoiceProvider>
+        <ScenarioProvider>
+          <PersonaProvider>
+            <UsageProvider
+              usageLimitExceededCallback={usageLimitExceededCallback}
+            >
+              <ConnectionOptsProvider>
+                <Toaster />
+                <SettingsProvider settings={settings || DEFAULT_SETTINGS}>
+                  <MainView />
+                </SettingsProvider>
+              </ConnectionOptsProvider>
+            </UsageProvider>
+          </PersonaProvider>
+        </ScenarioProvider>
+      </VoiceProvider>
     </TokenProvider>
   );
 }
