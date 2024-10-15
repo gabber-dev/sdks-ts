@@ -41,6 +41,9 @@ export type ConversationalWidgetSettings = {
   createTitleText?: string;
   liveTitleText?: string;
   connectButtonText?: string;
+  initialPersona?: string;
+  initialScenario?: string;
+  initialVoice?: string;
   personaName?: string;
   personaImage?: string;
   primaryColor?: string;
@@ -56,4 +59,3 @@ export type ConversationalWidgetSettings = {
     buttonText?: string
   }
 };
-

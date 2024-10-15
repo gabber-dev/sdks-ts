@@ -51,7 +51,7 @@ export function BottomBar() {
         disabled={connectionState !== "not_connected"}
       >
         {connectionState === "not_connected"
-          ? settings.connectText || "Connect"
+          ? settings.connectButtonText || "Connect"
           : "Connecting..."}
       </button>
     );

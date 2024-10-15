@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSettings } from "./SettingsProvider";
 import { useVoice } from "../providers/VoiceProvider";
 import { usePersona } from "../providers/PersonaProvider";
 import { useScenario } from "../providers/ScenarioProvider";
 import { Selector } from "./Selector";
 import { useConnectionOpts } from "../providers/ConnectionOptsProvider";
+import { SelectedOptions } from "./SelectedOptions";
 
 type Props = {};
 
@@ -16,6 +17,44 @@ export function ConnectionSettings({}: Props) {
     useScenario();
   const [tab, setTab] = useState<"persona" | "scenario" | "voice">("persona");
   const { prompt, setPrompt } = useConnectionOpts();
+  const [isFreeform, setIsFreeform] = useState(false);
+
+  const handlePersonaSelect = (idx: number) => {
+    setSelectedPersonaIdx(idx);
+    setIsFreeform(false);
+  };
+
+  const handleScenarioSelect = (idx: number) => {
+    setSelectedScenarioIdx(idx);
+    setIsFreeform(false);
+  };
+
+  useEffect(() => {
+    if (settings.initialPersona) {
+      const index = personas.findIndex(p => p.id === settings.initialPersona);
+      if (index !== -1) {
+        setSelectedPersonaIdx(index);
+      }
+    }
+  }, [personas, settings.initialPersona, setSelectedPersonaIdx]);
+
+  useEffect(() => {
+    if (settings.initialScenario) {
+      const index = scenarios.findIndex(s => s.id === settings.initialScenario);
+      if (index !== -1) {
+        setSelectedScenarioIdx(index);
+      }
+    }
+  }, [scenarios, settings.initialScenario, setSelectedScenarioIdx]);
+
+  useEffect(() => {
+    if (settings.initialVoice) {
+      const index = voices.findIndex(v => v.id === settings.initialVoice);
+      if (index !== -1) {
+        setSelectedVoiceIdx(index);
+      }
+    }
+  }, [voices, settings.initialVoice, setSelectedVoiceIdx]);
 
   return (
     <div className="flex flex-col h-full">
@@ -31,6 +70,7 @@ export function ConnectionSettings({}: Props) {
           value={prompt}
           onChange={(e) => {
             setPrompt(e.target.value);
+            setIsFreeform(true);
           }}
           style={{
             backgroundColor: settings.baseColorPlusTwo,
@@ -39,7 +79,8 @@ export function ConnectionSettings({}: Props) {
           }}
         />
       </div>
-      <div className="flex w-full h-[50px]">
+      <SelectedOptions isFreeform={isFreeform} />
+      <div className="flex w-full h-[50px] mt-2">
         <button
           className="grow"
           onClick={() => {
@@ -95,7 +136,7 @@ export function ConnectionSettings({}: Props) {
               return item.name || "";
             }}
             items={personas}
-            setSelectedItemIdx={setSelectedPersonaIdx}
+            setSelectedItemIdx={handlePersonaSelect}
             selectedItemIdx={selectedPersonaIdx}
           />
         </div>
@@ -109,7 +150,7 @@ export function ConnectionSettings({}: Props) {
               return item.name || "";
             }}
             items={scenarios}
-            setSelectedItemIdx={setSelectedScenarioIdx}
+            setSelectedItemIdx={handleScenarioSelect}
             selectedItemIdx={selectedScenarioIdx}
           />
         </div>
