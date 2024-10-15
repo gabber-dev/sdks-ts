@@ -5,6 +5,7 @@ import { usePersona } from "../providers/PersonaProvider";
 import { useScenario } from "../providers/ScenarioProvider";
 import { Selector } from "./Selector";
 import { useConnectionOpts } from "../providers/ConnectionOptsProvider";
+import { SelectedOptions } from "./SelectedOptions";
 
 type Props = {};
 
@@ -16,6 +17,17 @@ export function ConnectionSettings({}: Props) {
     useScenario();
   const [tab, setTab] = useState<"persona" | "scenario" | "voice">("persona");
   const { prompt, setPrompt } = useConnectionOpts();
+  const [isFreeform, setIsFreeform] = useState(false);
+
+  const handlePersonaSelect = (idx: number) => {
+    setSelectedPersonaIdx(idx);
+    setIsFreeform(false);
+  };
+
+  const handleScenarioSelect = (idx: number) => {
+    setSelectedScenarioIdx(idx);
+    setIsFreeform(false);
+  };
 
   useEffect(() => {
     if (settings.initialPersona) {
@@ -58,6 +70,7 @@ export function ConnectionSettings({}: Props) {
           value={prompt}
           onChange={(e) => {
             setPrompt(e.target.value);
+            setIsFreeform(true);
           }}
           style={{
             backgroundColor: settings.baseColorPlusTwo,
@@ -66,7 +79,8 @@ export function ConnectionSettings({}: Props) {
           }}
         />
       </div>
-      <div className="flex w-full h-[50px]">
+      <SelectedOptions isFreeform={isFreeform} />
+      <div className="flex w-full h-[50px] mt-2">
         <button
           className="grow"
           onClick={() => {
@@ -122,7 +136,7 @@ export function ConnectionSettings({}: Props) {
               return item.name || "";
             }}
             items={personas}
-            setSelectedItemIdx={setSelectedPersonaIdx}
+            setSelectedItemIdx={handlePersonaSelect}
             selectedItemIdx={selectedPersonaIdx}
           />
         </div>
@@ -136,7 +150,7 @@ export function ConnectionSettings({}: Props) {
               return item.name || "";
             }}
             items={scenarios}
-            setSelectedItemIdx={setSelectedScenarioIdx}
+            setSelectedItemIdx={handleScenarioSelect}
             selectedItemIdx={selectedScenarioIdx}
           />
         </div>
