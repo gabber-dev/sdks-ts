@@ -25,7 +25,7 @@ export function LiveView() {
 
   return (
     <div
-      className="mx-auto h-full w-full max-w-[800px] flex flex-col overflow-hidden p-2 gap-2"
+      className="mx-auto h-full w-full flex flex-col overflow-hidden p-2 gap-2"
       style={{
         backgroundColor: settings.baseColor || "#000000",
         color: settings.baseColorContent || "#ffffff",
@@ -68,16 +68,25 @@ export function LiveView() {
             {settings.liveTitleText || "Chat"}
           </h3>
           <div className="flex flex-col items-center">
-            <div className="w-1/3 h-[100px]">
-              <AgentVisualizer
-                gap={2}
-                color={settings.secondaryColor || "#ff00ff"}
-                shadowColor={settings.primaryColor || "#ffffff"}
-              />
-            </div>
+            {connectionState === "connected" ? (
+              <div className="w-1/3 h-[100px]">
+                <AgentVisualizer
+                  gap={2}
+                  color={settings.secondaryColor || "#ff00ff"}
+                  shadowColor={settings.primaryColor || "#ffffff"}
+                />
+              </div>
+            ) : (
+              <div
+                className="h-[100px] flex items-center justify-center"
+                style={{ color: settings.baseColorPlusTwo }}
+              >
+                Not Connected
+              </div>
+            )}
           </div>
         </div>
-        <div className="w-full flex">
+        <div className="w-full flex mb-2">
           <button
             className={`flex-1 py-1 px-2 text-sm ${
               activeTab === "connection" ? "border-b-2" : ""
