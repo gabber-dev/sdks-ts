@@ -69,7 +69,7 @@ export function LiveView() {
           </h3>
           <div className="flex flex-col items-center">
             {connectionState === "connected" ? (
-              <div className="w-1/3 h-[100px]">
+              <div className="w-1/2 md:w-1/3 h-[80px]">
                 <AgentVisualizer
                   gap={2}
                   color={settings.secondaryColor || "#ff00ff"}
@@ -78,10 +78,14 @@ export function LiveView() {
               </div>
             ) : (
               <div
-                className="h-[100px] flex items-center justify-center"
-                style={{ color: settings.baseColorPlusTwo }}
+                className="h-[80px] w-1/2 md:w-1/3 flex items-center justify-center rounded-md border-2"
+                style={{
+                  color: settings.primaryColor,
+                  borderColor: settings.baseColorPlusTwo,
+                  backgroundColor: `${settings.baseColorPlusOne}80`,
+                }}
               >
-                Not Connected
+                <span className="font-semibold">Not Connected</span>
               </div>
             )}
           </div>
