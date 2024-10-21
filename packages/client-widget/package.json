@@ -1,6 +1,6 @@
 {
   "name": "gabber-client-widget",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "main": "dist/index.mjs",
   "types": "./dist/index.d.ts",
   "files": [
