@@ -20,7 +20,23 @@ export function MainView({  }: Props) {
   const {voices} = useVoice();
   const audioContext = useRef(new AudioContext());
 
-
+  const playAudioBuffer = useCallback(async (buffer: AudioBuffer) => {
+    try {
+      audioContext.current.resume();
+      const source = audioContext.current.createBufferSource();
+      source.buffer = buffer;
+      source.connect(audioContext.current.destination);
+      setPlaying(true);
+      source.start(0);
+      source.onended = () => {
+        console.log("ended");
+        setPlaying(false);
+      };
+    } catch (e) {
+      console.error(e);
+      setPlaying(false);
+    }
+  }, []);
 
   const playButtonText = useMemo(() => {
     if (playing) {
