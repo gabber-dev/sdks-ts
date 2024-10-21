@@ -3,9 +3,7 @@ import { useSettings } from "./SettingsProvider";
 import { useVoice } from "../providers/VoiceProvider";
 import { usePersona } from "../providers/PersonaProvider";
 import { useScenario } from "../providers/ScenarioProvider";
-import { Selector } from "./Selector";
 import { useConnectionOpts } from "../providers/ConnectionOptsProvider";
-import { SelectedOptions } from "./SelectedOptions";
 
 type Props = {};
 
@@ -13,21 +11,9 @@ export function ConnectionSettings({}: Props) {
   const { settings } = useSettings();
   const { voices, selectedVoiceIdx, setSelectedVoiceIdx } = useVoice();
   const { personas, selectedPersonaIdx, setSelectedPersonaIdx } = usePersona();
-  const { scenarios, selectedScenarioIdx, setSelectedScenarioIdx } =
-    useScenario();
-  const [tab, setTab] = useState<"persona" | "scenario" | "voice">("persona");
+  const { scenarios, selectedScenarioIdx, setSelectedScenarioIdx } = useScenario();
   const { prompt, setPrompt } = useConnectionOpts();
   const [isFreeform, setIsFreeform] = useState(false);
-
-  const handlePersonaSelect = (idx: number) => {
-    setSelectedPersonaIdx(idx);
-    setIsFreeform(false);
-  };
-
-  const handleScenarioSelect = (idx: number) => {
-    setSelectedScenarioIdx(idx);
-    setIsFreeform(false);
-  };
 
   useEffect(() => {
     if (settings.initialPersona) {
@@ -56,11 +42,28 @@ export function ConnectionSettings({}: Props) {
     }
   }, [voices, settings.initialVoice, setSelectedVoiceIdx]);
 
+  const handlePersonaSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const idx = Number(e.target.value);
+    setSelectedPersonaIdx(idx);
+    setIsFreeform(false);
+  };
+
+  const handleScenarioSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const idx = Number(e.target.value);
+    setSelectedScenarioIdx(idx);
+    setIsFreeform(false);
+  };
+
+  const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setPrompt(e.target.value);
+    setIsFreeform(true);
+  };
+
   return (
     <div className="flex flex-col h-full">
-      <div className="h-[100px] w-full flex flex-col">
+      <div className="h-[100px] w-full flex flex-col mb-4">
         <div
-          className="text-xs italic"
+          className="text-xs italic mb-1"
           style={{ color: settings.baseColorContent }}
         >
           Choose a scenario/persona to change the prompt or write your own:
@@ -68,10 +71,7 @@ export function ConnectionSettings({}: Props) {
         <textarea
           className="w-full p-1 select-none"
           value={prompt}
-          onChange={(e) => {
-            setPrompt(e.target.value);
-            setIsFreeform(true);
-          }}
+          onChange={handlePromptChange}
           style={{
             backgroundColor: settings.baseColorPlusTwo,
             border: `1px solid ${settings.baseColorContent}`,
@@ -79,94 +79,59 @@ export function ConnectionSettings({}: Props) {
           }}
         />
       </div>
-      <SelectedOptions isFreeform={isFreeform} />
-      <div className="flex w-full h-[50px] mt-2">
-        <button
-          className="grow"
-          onClick={() => {
-            setTab("persona");
-          }}
-          style={{
-            color: settings.primaryColor,
-            backgroundColor:
-              tab === "persona"
-                ? settings.baseColorPlusOne
-                : settings.baseColor,
-          }}
-        >
-          Persona
-        </button>
-        <button
-          className="grow"
-          onClick={() => {
-            setTab("scenario");
-          }}
-          style={{
-            color: settings.primaryColor,
-            backgroundColor:
-              tab === "scenario"
-                ? settings.baseColorPlusOne
-                : settings.baseColor,
-          }}
-        >
-          Scenario
-        </button>
-        <button
-          className="grow"
-          onClick={() => {
-            setTab("voice");
-          }}
-          style={{
-            color: settings.primaryColor,
-            backgroundColor:
-              tab === "voice" ? settings.baseColorPlusOne : settings.baseColor,
-          }}
-        >
-          Voice
-        </button>
-      </div>
-      <div className="grow relative w-full">
-        <div
-          className={`absolute top-0 bottom-0 left-0 right-0 ${
-            tab === "persona" ? "" : "hidden"
-          }`}
-        >
-          <Selector
-            name={(item) => {
-              return item.name || "";
-            }}
-            items={personas}
-            setSelectedItemIdx={handlePersonaSelect}
-            selectedItemIdx={selectedPersonaIdx}
-          />
+      <div className="flex flex-col space-y-4">
+        <div>
+          <label className="block text-sm font-medium mb-1" style={{ color: settings.primaryColor }}>
+            Persona
+          </label>
+          <select
+            value={isFreeform ? "freeform" : selectedPersonaIdx}
+            onChange={handlePersonaSelect}
+            className="w-full p-2 border border-gray-300 rounded"
+            style={{ backgroundColor: settings.baseColorPlusOne, color: settings.primaryColor }}
+          >
+            <option value="freeform" disabled={!isFreeform}>Freeform</option>
+            {personas.map((persona, idx) => (
+              <option key={persona.id} value={idx}>
+                {persona.name}
+              </option>
+            ))}
+          </select>
         </div>
-        <div
-          className={`absolute top-0 bottom-0 left-0 right-0 ${
-            tab === "scenario" ? "" : "hidden"
-          }`}
-        >
-          <Selector
-            name={(item) => {
-              return item.name || "";
-            }}
-            items={scenarios}
-            setSelectedItemIdx={handleScenarioSelect}
-            selectedItemIdx={selectedScenarioIdx}
-          />
+        <div>
+          <label className="block text-sm font-medium mb-1" style={{ color: settings.primaryColor }}>
+            Scenario
+          </label>
+          <select
+            value={isFreeform ? "freeform" : selectedScenarioIdx}
+            onChange={handleScenarioSelect}
+            className="w-full p-2 border border-gray-300 rounded"
+            style={{ backgroundColor: settings.baseColorPlusOne, color: settings.primaryColor }}
+          >
+            <option value="freeform" disabled={!isFreeform}>Freeform</option>
+            {scenarios.map((scenario, idx) => (
+              <option key={scenario.id} value={idx}>
+                {scenario.name}
+              </option>
+            ))}
+          </select>
         </div>
-        <div
-          className={`absolute top-0 bottom-0 left-0 right-0 ${
-            tab === "voice" ? "" : "hidden"
-          }`}
-        >
-          <Selector
-            name={(item) => {
-              return item.name || "";
-            }}
-            items={voices}
-            setSelectedItemIdx={setSelectedVoiceIdx}
-            selectedItemIdx={selectedVoiceIdx}
-          />
+        <div>
+          <label className="block text-sm font-medium mb-1" style={{ color: settings.primaryColor }}>
+            Voice
+          </label>
+          <select
+            value={selectedVoiceIdx}
+            onChange={(e) => setSelectedVoiceIdx(Number(e.target.value))}
+            className="w-full p-2 border border-gray-300 rounded"
+            style={{ backgroundColor: settings.baseColorPlusOne, color: settings.primaryColor }}
+          >
+            {voices.map((voice, idx) => (
+              <option key={voice.id} value={idx}>
+                {voice.name}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
     </div>
