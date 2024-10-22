@@ -32,7 +32,7 @@ export function LiveView() {
         borderColor: settings.primaryColor,
       }}
     >
-      <div className="flex-grow flex flex-col overflow-hidden">
+      <div className="flex-grow flex flex-col">
         {dirty && connectionState === "connected" ? (
           <div className="flex justify-center items-center w-full h-[0px]">
             <div className="relative w-1/3">
@@ -128,8 +128,10 @@ export function LiveView() {
             Messages
           </button>
         </div>
-        <div className={`grow ${activeTab === "connection" ? "" : "hidden"}`}>
-          <ConnectionSettings />
+        <div className={`grow ${activeTab === "connection" ? "" : "hidden"} overflow-y-auto h-0`}>
+          <div className="h-[360px] overflow-y-auto"> {/* Set a fixed height for scrolling */}
+            <ConnectionSettings />
+          </div>
         </div>
         <div className={`grow ${activeTab === "messages" ? "" : "hidden"}`}>
           <Messages />
