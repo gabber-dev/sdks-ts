@@ -70,7 +70,7 @@ export function ConnectionSettings({}: Props) {
         </div>
         <textarea
           className="w-full p-1 select-none"
-          value={prompt || "You are a...(describe the persona). You and I are ...(what's happening between you two?)."} // Add sample text here
+          value={prompt || "You are a...(describe the persona). You and I are...(what's happening between you two?)."} // Add sample text here
           onChange={handlePromptChange}
           style={{
             backgroundColor: settings.baseColorPlusTwo,
