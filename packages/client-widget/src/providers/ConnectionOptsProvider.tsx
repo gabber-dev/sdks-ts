@@ -71,7 +71,7 @@ export function ConnectionOptsProvider({ children }: Props) {
     if(!persona || !scenario) {
       return;
     }
-    const newPrompt = `You are a ${persona.description}. ${scenario.prompt}`;
+    const newPrompt = `${persona.description}. ${scenario.prompt}`;
     setPrompt((prev) => {
       if (prev === newPrompt) {
         return prev;
