@@ -10,9 +10,7 @@ import { useConnectionOpts } from "../providers/ConnectionOptsProvider";
 
 export function LiveView() {
   const { settings } = useSettings();
-  const {
-    connectionState,
-  } = useSession();
+  const { connectionState } = useSession();
   const { checkUsage } = useUsage();
   const [activeTab, setActiveTab] = useState<"messages" | "connection">("connection");
   const { dirty, restart } = useConnectionOpts();
@@ -32,8 +30,8 @@ export function LiveView() {
         borderColor: settings.primaryColor,
       }}
     >
-      <div className="flex-grow flex flex-col">
-        {dirty && connectionState === "connected" ? (
+      <div className="flex-grow flex flex-col overflow-hidden">
+        {dirty && connectionState === "connected" && (
           <div className="flex justify-center items-center w-full h-[0px]">
             <div className="relative w-1/3">
               <div
@@ -50,24 +48,22 @@ export function LiveView() {
                     backgroundColor: settings.baseColorPlusOne,
                     color: settings.baseColorContent,
                   }}
-                  onClick={() => {
-                    restart();
-                  }}
+                  onClick={restart}
                 >
                   Tap to restart
                 </button>
               </div>
             </div>
           </div>
-        ) : null}
-        <div className="w-full flex flex-col">
+        )}
+        <div className="w-full flex-shrink-0">
           <h3
             className="text-lg md:text-2xl font-semibold mb-2 md:mb-4"
             style={{ color: settings.primaryColor }}
           >
             {settings.liveTitleText || "Chat"}
           </h3>
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center mb-2">
             {connectionState === "connected" ? (
               <div className="w-1/2 md:w-1/3 h-[80px]">
                 <AgentVisualizer
@@ -90,20 +86,14 @@ export function LiveView() {
             )}
           </div>
         </div>
-        <div className="w-full flex mb-2">
+        <div className="w-full flex mb-2 flex-shrink-0">
           <button
             className={`flex-1 py-1 px-2 text-sm ${
               activeTab === "connection" ? "border-b-2" : ""
             }`}
             style={{
-              borderColor:
-                activeTab === "connection"
-                  ? settings.primaryColor
-                  : "transparent",
-              color:
-                activeTab === "connection"
-                  ? settings.primaryColor
-                  : settings.baseColorContent,
+              borderColor: activeTab === "connection" ? settings.primaryColor : "transparent",
+              color: activeTab === "connection" ? settings.primaryColor : settings.baseColorContent,
             }}
             onClick={() => setActiveTab("connection")}
           >
@@ -114,30 +104,26 @@ export function LiveView() {
               activeTab === "messages" ? "border-b-2" : ""
             }`}
             style={{
-              borderColor:
-                activeTab === "messages"
-                  ? settings.primaryColor
-                  : "transparent",
-              color:
-                activeTab === "messages"
-                  ? settings.primaryColor
-                  : settings.baseColorContent,
+              borderColor: activeTab === "messages" ? settings.primaryColor : "transparent",
+              color: activeTab === "messages" ? settings.primaryColor : settings.baseColorContent,
             }}
             onClick={() => setActiveTab("messages")}
           >
             Messages
           </button>
         </div>
-        <div className={`grow ${activeTab === "connection" ? "" : "hidden"} overflow-y-auto h-0`}>
-          <div className="h-[360px] overflow-y-auto"> {/* Set a fixed height for scrolling */}
-            <ConnectionSettings />
+        <div className="flex-grow overflow-hidden">
+          <div className={`h-full ${activeTab === "connection" ? "block" : "hidden"}`}>
+            <div className="h-full overflow-y-auto">
+              <ConnectionSettings />
+            </div>
+          </div>
+          <div className={`h-full ${activeTab === "messages" ? "block" : "hidden"}`}>
+            <Messages />
           </div>
         </div>
-        <div className={`grow ${activeTab === "messages" ? "" : "hidden"}`}>
-          <Messages />
-        </div>
       </div>
-      <div className="w-full h-[50px]">
+      <div className="w-full h-[50px] flex-shrink-0">
         <BottomBar />
       </div>
     </div>
