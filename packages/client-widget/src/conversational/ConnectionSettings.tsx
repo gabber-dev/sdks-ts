@@ -12,7 +12,7 @@ export function ConnectionSettings({}: Props) {
   const { voices, selectedVoiceIdx, setSelectedVoiceIdx } = useVoice();
   const { personas, selectedPersonaIdx, setSelectedPersonaIdx } = usePersona();
   const { scenarios, selectedScenarioIdx, setSelectedScenarioIdx } = useScenario();
-  const { prompt, setPrompt } = useConnectionOpts();
+  const { prompt } = useConnectionOpts();
   const [isFreeform, setIsFreeform] = useState(false);
 
   useEffect(() => {
