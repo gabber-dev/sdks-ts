@@ -54,10 +54,10 @@ export function ConnectionSettings({}: Props) {
     setIsFreeform(false);
   };
 
-  const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setPrompt(e.target.value);
-    setIsFreeform(true);
-  };
+  // const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  //   setPrompt(e.target.value);
+  //   setIsFreeform(true);
+  // };
 
   return (
     <div className="flex flex-col h-full">
@@ -68,16 +68,14 @@ export function ConnectionSettings({}: Props) {
         >
           Choose a scenario/persona to change the prompt or write your own:
         </div>
-        <textarea
-          className="w-full p-1 select-none"
-          value={prompt || "You are a...(describe the persona). You and I are...(what's happening between you two?)."} // Add sample text here
-          onChange={handlePromptChange}
+        <div
+          className="w-full p-1 select-none min-h-[100px]"
           style={{
             backgroundColor: settings.baseColorPlusTwo,
             border: `1px solid ${settings.baseColorContent}`,
             color: settings.baseColorContent,
           }}
-        />
+        >{prompt}</div>
       </div>
       <div className="flex flex-col space-y-4">
         <div>
@@ -90,7 +88,7 @@ export function ConnectionSettings({}: Props) {
             className="w-full p-2 border border-gray-300 rounded"
             style={{ backgroundColor: settings.baseColorPlusOne, color: settings.primaryColor }}
           >
-            <option value="freeform" disabled={!isFreeform}>Freeform</option>
+            {/* <option value="freeform" disabled={!isFreeform}>Freeform</option> */}
             {personas.map((persona, idx) => (
               <option key={persona.id} value={idx}>
                 {persona.name}
@@ -108,7 +106,7 @@ export function ConnectionSettings({}: Props) {
             className="w-full p-2 border border-gray-300 rounded"
             style={{ backgroundColor: settings.baseColorPlusOne, color: settings.primaryColor }}
           >
-            <option value="freeform" disabled={!isFreeform}>Freeform</option>
+            {/* <option value="freeform" disabled={!isFreeform}>Freeform</option> */}
             {scenarios.map((scenario, idx) => (
               <option key={scenario.id} value={idx}>
                 {scenario.name}
