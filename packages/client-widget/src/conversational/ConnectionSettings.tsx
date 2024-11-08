@@ -69,7 +69,7 @@ export function ConnectionSettings({}: Props) {
           Choose a scenario/persona to change the prompt or write your own:
         </div>
         <div
-          className="w-full p-1 select-none min-h-[100px]"
+          className="w-full p-1 select-none min-h-[100px] overflow-y-scroll"
           style={{
             backgroundColor: settings.baseColorPlusTwo,
             border: `1px solid ${settings.baseColorContent}`,
@@ -77,7 +77,7 @@ export function ConnectionSettings({}: Props) {
           }}
         >{prompt}</div>
       </div>
-      <div className="flex flex-col space-y-4">
+      <div className="flex flex-col space-y-4 mt-4">
         <div>
           <label className="block text-sm font-medium mb-1" style={{ color: settings.primaryColor }}>
             Persona
