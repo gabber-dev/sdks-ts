@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "eslint-config-react-app": "^7.0.1",
-    "gabber-client-core": "^0.9.0",
+    "gabber-client-core": "workspace:^",
     "react": "^18"
   },
   "devDependencies": {
