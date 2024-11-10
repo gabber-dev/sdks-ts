@@ -1,9 +1,9 @@
-import { Gabber } from "gabber-client-core";
+import { Api, Voice } from "gabber-client-core";
 import React, { createContext, useCallback, useEffect, useMemo, useState } from "react";
 import { useToken } from "./TokenProvider";
 
 type VoiceContextData = {
-    voices: Gabber.Voice[];
+    voices: Voice[];
     selectedVoiceIdx: number;
     setSelectedVoiceIdx: (idx: number) => void;
 };
@@ -20,13 +20,13 @@ export function VoiceProvider({
   children,
 }: Props) {
   const {token} = useToken();
-  const [voices, setVoices] = useState<Gabber.Voice[]>([]);
+  const [voices, setVoices] = useState<Voice[]>([]);
   const [selectedVoiceIdx, setSelectedVoiceIdx] = useState<number>(0);
   const api = useMemo(() => {
     if(!token) {
       return null;
     }
-    return new Gabber.Api(token);
+    return new Api(token);
   }, [token]);
 
   const loadVoices = useCallback(async () => {

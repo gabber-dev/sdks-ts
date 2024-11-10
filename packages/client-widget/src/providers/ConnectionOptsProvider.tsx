@@ -1,4 +1,4 @@
-import { Gabber } from "gabber-client-core";
+import { ConnectOptions } from "gabber-client-core";
 import React, {
   createContext,
   useCallback,
@@ -13,7 +13,7 @@ import { useScenario } from "./ScenarioProvider";
 import { useToken } from "./TokenProvider";
 
 type ConnectionOptsContextData = {
-  connectionOpts: Gabber.ConnectOptions | null;
+  connectionOpts: ConnectOptions | null;
   prompt: string;
   setPrompt: (prompt: string) => void;
   dirty: boolean;
@@ -37,7 +37,7 @@ export function ConnectionOptsProvider({ children }: Props) {
   const [prompt, setPrompt] = useState("");
   const [dirty, setDirty] = useState<boolean>(true);
   const [connectionOpts, setConnectionOpts] =
-    useState<Gabber.ConnectOptions | null>(null);
+    useState<ConnectOptions | null>(null);
   const prevSelectedVoiceIdx = useRef(selectedVoiceIdx);
 
   const connect = useCallback(() => {

@@ -1,10 +1,10 @@
-import { Gabber } from "gabber-client-core";
+import { Api, UsageType } from "gabber-client-core";
 import React, { createContext, useCallback, useMemo, useState } from "react";
 import { useToken } from "./TokenProvider";
 
 type UsageContextData = {
-  exceededLimits: Gabber.UsageType[];
-  checkUsage: (type: Gabber.UsageType) => Promise<boolean>;
+  exceededLimits: UsageType[];
+  checkUsage: (type: UsageType) => Promise<boolean>;
 };
 
 const UsageContext = createContext<UsageContextData | undefined>(
@@ -13,7 +13,7 @@ const UsageContext = createContext<UsageContextData | undefined>(
 
 type Props = {
   children: React.ReactNode;
-  usageLimitExceededCallback?: (type: Gabber.UsageType) => void;
+  usageLimitExceededCallback?: (type: UsageType) => void;
 };
 
 export function UsageProvider({
@@ -21,15 +21,15 @@ export function UsageProvider({
   usageLimitExceededCallback,
 }: Props) {
   const {token} = useToken();
-  const [exceededLimits, setExceededLimits] = useState<Gabber.UsageType[]>([]);
+  const [exceededLimits, setExceededLimits] = useState<UsageType[]>([]);
   const api = useMemo(() => {
     if(!token) {
       return null;
     }
-    return new Gabber.Api(token);
+    return new Api(token);
   }, [token]);
 
-  const checkUsage = useCallback(async (type: Gabber.UsageType) => {
+  const checkUsage = useCallback(async (type: UsageType) => {
     console.log('Checking usage for', type);
     if(!api) {
       if(usageLimitExceededCallback) {

@@ -1,9 +1,9 @@
-import { Gabber } from "gabber-client-core";
+import { Api, Scenario } from "gabber-client-core";
 import React, { createContext, useCallback, useEffect, useMemo, useState } from "react";
 import { useToken } from "./TokenProvider";
 
 type ScenarioContextData = {
-    scenarios: Gabber.Scenario[];
+    scenarios: Scenario[];
     selectedScenarioIdx: number;
     setSelectedScenarioIdx: (idx: number) => void;
 };
@@ -20,13 +20,13 @@ export function ScenarioProvider({
   children,
 }: Props) {
   const {token} = useToken();
-  const [scenarios, setScenarios] = useState<Gabber.Scenario[]>([]);
+  const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [selectedScenarioIdx, setSelectedScenarioIdx] = useState<number>(0);
   const api = useMemo(() => {
     if(!token) {
       return null;
     }
-    return new Gabber.Api(token);
+    return new Api(token);
   }, [token]);
 
   const loadScenarios = useCallback(async () => {

@@ -1,9 +1,9 @@
-import { Gabber } from "gabber-client-core";
+import { Api, Persona } from "gabber-client-core";
 import React, { createContext, useCallback, useEffect, useMemo, useState } from "react";
 import { useToken } from "./TokenProvider";
 
 type PersonaContextData = {
-    personas: Gabber.Persona[];
+    personas: Persona[];
     selectedPersonaIdx: number;
     setSelectedPersonaIdx: (idx: number) => void;
 };
@@ -20,13 +20,13 @@ export function PersonaProvider({
   children,
 }: Props) {
   const {token} = useToken();
-  const [personas, setPersonas] = useState<Gabber.Persona[]>([]);
+  const [personas, setPersonas] = useState<Persona[]>([]);
   const [selectedPersonaIdx, setSelectedPersonaIdx] = useState<number>(0);
   const api = useMemo(() => {
     if(!token) {
       return null;
     }
-    return new Gabber.Api(token);
+    return new Api(token);
   }, [token]);
 
   const loadPersonas = useCallback(async () => {
