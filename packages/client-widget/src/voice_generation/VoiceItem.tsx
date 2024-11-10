@@ -1,9 +1,9 @@
 import React from "react";
-import { Gabber } from "gabber-client-core";
+import { Voice } from "gabber-client-core";
 import { useSettings } from "./SettingsProvider";
 
 type Props = {
-    voice: Gabber.Voice;
+    voice: Voice;
     selected: boolean;
     onClick: () => void;
 }
