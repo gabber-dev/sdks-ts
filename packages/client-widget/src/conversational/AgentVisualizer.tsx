@@ -1,4 +1,4 @@
-import { Gabber } from "gabber-client-core";
+import { ConnectionState, AgentState } from "gabber-client-core";
 import { useSession } from "gabber-client-react";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -13,8 +13,8 @@ export const AgentVisualizer = ({ color, shadowColor, gap }: Props) => {
   const [heights, setHeights] = useState<number[]>([]);
 
   const agentVolumesRef = useRef<number[]>(agentVolumeBands);
-  const connectionStateRef = useRef<Gabber.ConnectionState>("not_connected");
-  const agentStateRef = useRef<Gabber.AgentState>("listening");
+  const connectionStateRef = useRef<ConnectionState>("not_connected");
+  const agentStateRef = useRef<AgentState>("listening");
   const thinkingIndex = useRef<number>(0);
   const thinkingLastTick = useRef<number>(0);
   const thinkingDirection = useRef(1);

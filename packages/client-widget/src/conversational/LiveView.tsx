@@ -7,13 +7,24 @@ import { Messages } from "./Messages";
 import { ConnectionSettings } from "./ConnectionSettings";
 import { AgentVisualizer } from "./AgentVisualizer";
 import { useConnectionOpts } from "../providers/ConnectionOptsProvider";
+import {toast} from 'react-toastify';
 
 export function LiveView() {
   const { settings } = useSettings();
-  const { connectionState } = useSession();
+  const { connectionState, lastError } = useSession();
   const { checkUsage } = useUsage();
   const [activeTab, setActiveTab] = useState<"messages" | "connection">("connection");
   const { dirty, restart } = useConnectionOpts();
+
+  useEffect(() => {
+    console.log("New Error", lastError);
+    if(lastError) {
+      toast.error(lastError.message);
+      
+    }
+  }, [
+    lastError
+  ]);
 
   useEffect(() => {
     if(connectionState !== 'connected') {

@@ -12,7 +12,7 @@ import React from "react";
 type SessionContextData = {
   connectionState: ConnectionState;
   messages: SessionMessage[];
-  lastError: string | null;
+  lastError: {message: string} | null;
   microphoneEnabled: boolean;
   agentVolumeBands: number[];
   agentVolume: number;
@@ -45,7 +45,7 @@ export function SessionProvider({ connectionOpts, children }: Props) {
   const [userVolume, setUserVolume] = useState<number>(0);
   const [agentState, setAgentState] = useState<AgentState>("listening");
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
-  const [lastError, setLastError] = useState<string | null>(null);
+  const [lastError, setLastError] = useState<{message: string} | null>(null);
   const [canPlayAudio, setCanPlayAudio] = useState(true);
   const createOnce = useRef(false);
   const [transcription, setTranscription] = useState({
@@ -96,8 +96,8 @@ export function SessionProvider({ connectionOpts, children }: Props) {
     setRemainingSeconds(seconds);
   });
 
-  const onAgentError = useRef((msg: string) => {
-    setLastError(msg);
+  const onAgentError = useRef((message: string) => {
+    setLastError({message});
   });
 
   const onCanPlayAudio = useRef((allowed: boolean) => {

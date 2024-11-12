@@ -1,11 +1,12 @@
 import React from "react";
 import { MainView } from "./MainView";
 import { SettingsProvider } from "./SettingsProvider";
-import { Toaster } from "react-hot-toast";
+import { ToastContainer } from "react-toastify";
 import {VoiceGenerationWidgetSettings, InternalVoiceGenerationWidget} from "../VoiceGenerationWidget";
 import { TokenProvider } from "../providers/TokenProvider";
 import { UsageProvider } from "../providers/UsageProvider";
 import { VoiceProvider } from "../providers/VoiceProvider";
+import 'react-toastify/dist/ReactToastify.css';
 
 const DEFAULT_SETTINGS: VoiceGenerationWidgetSettings = {};
 
@@ -20,7 +21,7 @@ export function Root({ tokenGenerator, usageLimitExceededCallback, settings }: P
   return (
     <TokenProvider tokenGenerator={tokenGenerator}>
       <UsageProvider usageLimitExceededCallback={usageLimitExceededCallback}>
-        <Toaster />
+        <ToastContainer />
         <SettingsProvider settings={settings || DEFAULT_SETTINGS}>
           <VoiceProvider>
             <MainView />

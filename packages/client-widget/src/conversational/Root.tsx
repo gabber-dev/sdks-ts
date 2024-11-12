@@ -1,7 +1,6 @@
 import React from "react";
 import { MainView } from "./MainView";
 import { SettingsProvider } from "./SettingsProvider";
-import { Toaster } from "react-hot-toast";
 import {
   ConversationalWidgetSettings,
 } from "../ConversationalWidget";
@@ -11,6 +10,8 @@ import { VoiceProvider } from "../providers/VoiceProvider";
 import { ScenarioProvider } from "../providers/ScenarioProvider";
 import { PersonaProvider } from "../providers/PersonaProvider";
 import { ConnectionOptsProvider } from "../providers/ConnectionOptsProvider";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const DEFAULT_SETTINGS: ConversationalWidgetSettings = {};
 
@@ -30,7 +31,7 @@ export function Root({ tokenGenerator, usageLimitExceededCallback, settings }: P
               usageLimitExceededCallback={usageLimitExceededCallback}
             >
               <ConnectionOptsProvider>
-                <Toaster />
+                <ToastContainer />
                 <SettingsProvider settings={settings || DEFAULT_SETTINGS}>
                   <MainView />
                 </SettingsProvider>
