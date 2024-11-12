@@ -104,9 +104,7 @@ export function MainView({  }: Props) {
       });
       const arrayBuffer = await response.arrayBuffer();
       mp3BufferRef.current = arrayBuffer.slice(0);
-      const audioContext = new AudioContext();
-      audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-
+      audioBuffer = await audioContext.current.decodeAudioData(arrayBuffer);
       setPcmBuffer(audioBuffer);
     } catch (e) {
       error = e as Error;
