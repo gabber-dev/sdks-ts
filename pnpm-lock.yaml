@@ -46,8 +46,8 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1(@babel/plugin-syntax-flow@7.25.7(@babel/core@7.25.8))(@babel/plugin-transform-react-jsx@7.25.7(@babel/core@7.25.8))(eslint@8.57.0)(typescript@5.6.2)
       gabber-client-core:
-        specifier: ^0.9.0
-        version: 0.9.0
+        specifier: ^0.9.1
+        version: 0.9.1
       react:
         specifier: ^18
         version: 18.3.1
@@ -2485,8 +2485,8 @@ packages:
   functions-have-names@1.2.3:
     resolution: {integrity: sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==}
 
-  gabber-client-core@0.9.0:
-    resolution: {integrity: sha512-NFH5VcSANm5KW5KivRptGKmcHgbEWEBsUojQKL4IPLr9w6CZTCPrkJS0QTeVO/Ong4x2Va2WHXqYpJzd9OzVxA==}
+  gabber-client-core@0.9.1:
+    resolution: {integrity: sha512-EWjY5a0ybbsdTNIeTKK8vsrNALheJUQMZptBghUW3p45/lfZbC1gyGvZsle6GwP9SzwGXW1SHcfvHsTuxW4EKQ==}
 
   generic-names@4.0.0:
     resolution: {integrity: sha512-ySFolZQfw9FoDb3ed9d80Cm9f0+r7qj+HJkWjeD9RBfpxEVTlVhol+gvaQB/78WbwYfbnNh8nWHHBSlg072y6A==}
@@ -6853,7 +6853,7 @@ snapshots:
 
   functions-have-names@1.2.3: {}
 
-  gabber-client-core@0.9.0:
+  gabber-client-core@0.9.1:
     dependencies:
       axios: 1.7.7
       livekit-client: 2.5.4
