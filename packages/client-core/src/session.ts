@@ -313,7 +313,7 @@ export class Session {
       if (topic === "message") {
         const message = JSON.parse(decoded) as SessionMessage;
         for (let i = 0; i < this.messages.length; i++) {
-          if (this.messages[i].id === message.id) {
+          if (this.messages[i].id === message.id && this.messages[i].agent == message.agent) {
             this.messages[i] = message;
             this.onMessagesChanged(this.messages);
             return;
