@@ -1,6 +1,6 @@
 {
   "name": "gabber-client-react",
-  "version": "0.10.1",
+  "version": "0.11.0",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "eslint-config-react-app": "^7.0.1",
-    "gabber-client-core": "^0.9.1",
+    "gabber-client-core": "workspace:^",
     "react": "^18"
   },
   "devDependencies": {

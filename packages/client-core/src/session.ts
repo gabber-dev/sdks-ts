@@ -35,6 +35,7 @@ export class Session {
     private _agentState: AgentState = "warmup";
     private _remainingSeconds: number | null = null;
     private divElement: HTMLDivElement;
+    public id: string | null = null;
 
     constructor({
       onConnectionStateChanged: onConnectionStateChanged,
@@ -121,6 +122,8 @@ export class Session {
           autoSubscribe: true,
         }
       );
+
+
       this.onCanPlayAudioChanged(this.livekitRoom.canPlaybackAudio);
     }
 
@@ -247,12 +250,19 @@ export class Session {
       console.log("Room connected");
       this.resolveMicrophoneState();
       this.onConnectionStateChanged("waiting_for_agent");
+
+      // Kind of a hack because session id isn't available through the connection details flow
+      const metadataString = this.livekitRoom.metadata || "{}";
+      const session = (JSON.parse(metadataString))["session"] || {};
+      this.id = session["id"] || null;
     }
 
     private onRoomDisconnected() {
       console.log("Room disconnected");
       this.resolveMicrophoneState();
       this.onConnectionStateChanged("not_connected");
+      this.id = null;
+
     }
 
     private onTrackSubscribed(

@@ -10,6 +10,7 @@ import {
 import React from "react";
 
 type SessionContextData = {
+  id: string | null;
   connectionState: ConnectionState;
   messages: SessionMessage[];
   lastError: {message: string} | null;
@@ -35,6 +36,7 @@ type Props = {
 };
 
 export function SessionProvider({ connectionOpts, children }: Props) {
+  const [id, setId] = useState<string | null>(null);
   const [connectionState, setConnectionState] =
     useState<ConnectionState>("not_connected");
   const [messages, setMessages] = useState<SessionMessage[]>([]);
@@ -68,6 +70,7 @@ export function SessionProvider({ connectionOpts, children }: Props) {
 
   const onConnectionStateChanged = useRef((sessionState: ConnectionState) => {
     setConnectionState(sessionState);
+    setId(sessionEngine.current.id);
   });
 
   const onMessagesChanged = useRef((messages: SessionMessage[]) => {
@@ -163,6 +166,7 @@ export function SessionProvider({ connectionOpts, children }: Props) {
   return (
     <SessionContext.Provider
       value={{
+        id,
         messages,
         connectionState: connectionState,
         microphoneEnabled: microphoneEnabledState,
