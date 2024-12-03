@@ -45,44 +45,38 @@ export function ConnectionOptsProvider({ children }: Props) {
       return;
     }
     setDirty(false);
+
+    const selectedPersona = personas[selectedPersonaIdx];
+    const selectedScenario = scenarios[selectedScenarioIdx];
+    const selectedVoice = voices[selectedVoiceIdx];
+
+    if (!selectedPersona || !selectedScenario || !selectedVoice) {
+      return;
+    }
+
     setConnectionOpts({
       token,
       sessionConnectOptions: {
-        history: [{ role: "system", content: prompt }],
-        voice_override: voices[selectedVoiceIdx]?.id,
+        persona: selectedPersona.id,
+        scenario: selectedScenario.id,
+        voice_override: selectedVoice.id,
       },
     });
-  }, [dirty, prompt, token, voices, selectedVoiceIdx]);
+  }, [
+    dirty,
+    token,
+    personas,
+    selectedPersonaIdx,
+    scenarios,
+    selectedScenarioIdx,
+    voices,
+    selectedVoiceIdx,
+  ]);
 
   const restart = useCallback(() => {
-    setConnectionOpts(null)
-    connect()
-  }, []);
-
-  const persona = useMemo(() => {
-    return personas[selectedPersonaIdx] || null;
-  }, [personas, selectedPersonaIdx]);
-
-  const scenario = useMemo(() => {
-    return scenarios[selectedScenarioIdx] || null;
-  }, [scenarios, selectedScenarioIdx]);
-
-  useEffect(() => {
-    if(!persona || !scenario) {
-      return;
-    }
-    const newPrompt = `${persona.description}. ${scenario.prompt}`;
-    setPrompt((prev) => {
-      if (prev === newPrompt) {
-        return prev;
-      }
-      setDirty(true);
-      return newPrompt;
-    });
-  }, [
-    persona,
-    scenario,
-  ]);
+    setConnectionOpts(null);
+    connect();
+  }, [connect]);
 
   useEffect(() => {
     if (prevSelectedVoiceIdx.current === selectedVoiceIdx) {
@@ -92,19 +86,13 @@ export function ConnectionOptsProvider({ children }: Props) {
     setDirty(true);
   }, [selectedVoiceIdx]);
 
-  const _setPrompt  = useCallback((prompt: string) => {
-    setPrompt(prev => {
-      if (prev === prompt) {
-        return prev;
-      }
-      setDirty(true);
-      return prompt;
-    });
-  }, []);
+  useEffect(() => {
+    setDirty(true);
+  }, [selectedPersonaIdx, selectedScenarioIdx]);
 
   return (
     <ConnectionOptsContext.Provider
-      value={{ connectionOpts, dirty, connect, prompt, setPrompt: _setPrompt, restart }}
+      value={{ connectionOpts, dirty, connect, prompt, setPrompt, restart }}
     >
       {children}
     </ConnectionOptsContext.Provider>
