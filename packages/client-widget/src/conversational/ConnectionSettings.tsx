@@ -12,7 +12,6 @@ export function ConnectionSettings({}: Props) {
   const { voices, selectedVoiceIdx, setSelectedVoiceIdx } = useVoice();
   const { personas, selectedPersonaIdx, setSelectedPersonaIdx } = usePersona();
   const { scenarios, selectedScenarioIdx, setSelectedScenarioIdx } = useScenario();
-  const { prompt } = useConnectionOpts();
   const [isFreeform, setIsFreeform] = useState(false);
 
   useEffect(() => {
@@ -54,30 +53,17 @@ export function ConnectionSettings({}: Props) {
     setIsFreeform(false);
   };
 
-  // const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-  //   setPrompt(e.target.value);
-  //   setIsFreeform(true);
-  // };
-
   return (
     <div className="flex flex-col h-full">
-      <div className="h-[100px] w-full flex flex-col mb-4">
+      <div className="w-full flex flex-col mb-4">
         <div
-          className="text-xs italic mb-1"
+          className="text-xl"
           style={{ color: settings.baseColorContent }}
         >
-          Choose a scenario/persona to change the prompt or write your own:
+          Choose a scenario/persona:
         </div>
-        <div
-          className="w-full p-1 select-none min-h-[100px] overflow-y-scroll"
-          style={{
-            backgroundColor: settings.baseColorPlusTwo,
-            border: `1px solid ${settings.baseColorContent}`,
-            color: settings.baseColorContent,
-          }}
-        >{prompt}</div>
       </div>
-      <div className="flex flex-col space-y-4 mt-4">
+      <div className="flex flex-col">
         <div>
           <label className="block text-sm font-medium mb-1" style={{ color: settings.primaryColor }}>
             Persona
@@ -88,7 +74,6 @@ export function ConnectionSettings({}: Props) {
             className="w-full p-2 border border-gray-300 rounded"
             style={{ backgroundColor: settings.baseColorPlusOne, color: settings.primaryColor }}
           >
-            {/* <option value="freeform" disabled={!isFreeform}>Freeform</option> */}
             {personas.map((persona, idx) => (
               <option key={persona.id} value={idx}>
                 {persona.name}
@@ -106,7 +91,6 @@ export function ConnectionSettings({}: Props) {
             className="w-full p-2 border border-gray-300 rounded"
             style={{ backgroundColor: settings.baseColorPlusOne, color: settings.primaryColor }}
           >
-            {/* <option value="freeform" disabled={!isFreeform}>Freeform</option> */}
             {scenarios.map((scenario, idx) => (
               <option key={scenario.id} value={idx}>
                 {scenario.name}

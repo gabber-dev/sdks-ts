@@ -3,7 +3,6 @@ import React, {
   createContext,
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
@@ -14,8 +13,6 @@ import { useToken } from "./TokenProvider";
 
 type ConnectionOptsContextData = {
   connectionOpts: ConnectOptions | null;
-  prompt: string;
-  setPrompt: (prompt: string) => void;
   dirty: boolean;
   connect: () => void;
   restart: () => void;
@@ -34,77 +31,61 @@ export function ConnectionOptsProvider({ children }: Props) {
   const { personas, selectedPersonaIdx } = usePersona();
   const { voices, selectedVoiceIdx } = useVoice();
   const { scenarios, selectedScenarioIdx } = useScenario();
-  const [prompt, setPrompt] = useState("");
   const [dirty, setDirty] = useState<boolean>(true);
   const [connectionOpts, setConnectionOpts] =
     useState<ConnectOptions | null>(null);
-  const prevSelectedVoiceIdx = useRef(selectedVoiceIdx);
 
   const connect = useCallback(() => {
     if (!dirty || !token) {
       return;
     }
+
+    const selectedPersona = personas[selectedPersonaIdx];
+    const selectedScenario = scenarios[selectedScenarioIdx];
+    const selectedVoice = voices[selectedVoiceIdx];
+
+    if (!selectedPersona || !selectedScenario || !selectedVoice) {
+      return;
+    }
+
     setDirty(false);
     setConnectionOpts({
       token,
       sessionConnectOptions: {
-        history: [{ role: "system", content: prompt }],
-        voice_override: voices[selectedVoiceIdx]?.id,
+        persona: selectedPersona.id,
+        scenario: selectedScenario.id,
+        voice_override: selectedVoice.id,
       },
     });
-  }, [dirty, prompt, token, voices, selectedVoiceIdx]);
-
-  const restart = useCallback(() => {
-    setConnectionOpts(null)
-    connect()
-  }, []);
-
-  const persona = useMemo(() => {
-    return personas[selectedPersonaIdx] || null;
-  }, [personas, selectedPersonaIdx]);
-
-  const scenario = useMemo(() => {
-    return scenarios[selectedScenarioIdx] || null;
-  }, [scenarios, selectedScenarioIdx]);
-
-  useEffect(() => {
-    if(!persona || !scenario) {
-      return;
-    }
-    const newPrompt = `${persona.description}. ${scenario.prompt}`;
-    setPrompt((prev) => {
-      if (prev === newPrompt) {
-        return prev;
-      }
-      setDirty(true);
-      return newPrompt;
-    });
   }, [
-    persona,
-    scenario,
+    dirty,
+    token,
+    personas,
+    selectedPersonaIdx,
+    scenarios,
+    selectedScenarioIdx,
+    voices,
+    selectedVoiceIdx,
   ]);
 
-  useEffect(() => {
-    if (prevSelectedVoiceIdx.current === selectedVoiceIdx) {
-      return;
-    }
-    prevSelectedVoiceIdx.current = selectedVoiceIdx;
+  const restart = useCallback(() => {
+    setConnectionOpts(null);
     setDirty(true);
-  }, [selectedVoiceIdx]);
+    // We need to wait for the next tick to ensure connectionOpts is null
+    // before attempting to connect again
+    setTimeout(() => {
+      connect();
+    }, 0);
+  }, [connect]);
 
-  const _setPrompt  = useCallback((prompt: string) => {
-    setPrompt(prev => {
-      if (prev === prompt) {
-        return prev;
-      }
-      setDirty(true);
-      return prompt;
-    });
-  }, []);
+  // Mark as dirty when any selection changes
+  useEffect(() => {
+    setDirty(true);
+  }, [selectedPersonaIdx, selectedScenarioIdx, selectedVoiceIdx]);
 
   return (
     <ConnectionOptsContext.Provider
-      value={{ connectionOpts, dirty, connect, prompt, setPrompt: _setPrompt, restart }}
+      value={{ connectionOpts, dirty, connect, restart }}
     >
       {children}
     </ConnectionOptsContext.Provider>
