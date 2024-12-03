@@ -60,7 +60,7 @@ export function ConnectionSettings({}: Props) {
           className="text-xl"
           style={{ color: settings.baseColorContent }}
         >
-          Choose a scenario/persona to change the prompt or write your own:
+          Choose a scenario/persona:
         </div>
       </div>
       <div className="flex flex-col">

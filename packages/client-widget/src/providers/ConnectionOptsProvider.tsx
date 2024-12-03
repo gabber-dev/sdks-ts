@@ -3,7 +3,6 @@ import React, {
   createContext,
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
@@ -14,8 +13,6 @@ import { useToken } from "./TokenProvider";
 
 type ConnectionOptsContextData = {
   connectionOpts: ConnectOptions | null;
-  prompt: string;
-  setPrompt: (prompt: string) => void;
   dirty: boolean;
   connect: () => void;
   restart: () => void;
@@ -34,17 +31,14 @@ export function ConnectionOptsProvider({ children }: Props) {
   const { personas, selectedPersonaIdx } = usePersona();
   const { voices, selectedVoiceIdx } = useVoice();
   const { scenarios, selectedScenarioIdx } = useScenario();
-  const [prompt, setPrompt] = useState("");
   const [dirty, setDirty] = useState<boolean>(true);
   const [connectionOpts, setConnectionOpts] =
     useState<ConnectOptions | null>(null);
-  const prevSelectedVoiceIdx = useRef(selectedVoiceIdx);
 
   const connect = useCallback(() => {
     if (!dirty || !token) {
       return;
     }
-    setDirty(false);
 
     const selectedPersona = personas[selectedPersonaIdx];
     const selectedScenario = scenarios[selectedScenarioIdx];
@@ -54,6 +48,7 @@ export function ConnectionOptsProvider({ children }: Props) {
       return;
     }
 
+    setDirty(false);
     setConnectionOpts({
       token,
       sessionConnectOptions: {
@@ -75,24 +70,22 @@ export function ConnectionOptsProvider({ children }: Props) {
 
   const restart = useCallback(() => {
     setConnectionOpts(null);
-    connect();
+    setDirty(true);
+    // We need to wait for the next tick to ensure connectionOpts is null
+    // before attempting to connect again
+    setTimeout(() => {
+      connect();
+    }, 0);
   }, [connect]);
 
-  useEffect(() => {
-    if (prevSelectedVoiceIdx.current === selectedVoiceIdx) {
-      return;
-    }
-    prevSelectedVoiceIdx.current = selectedVoiceIdx;
-    setDirty(true);
-  }, [selectedVoiceIdx]);
-
+  // Mark as dirty when any selection changes
   useEffect(() => {
     setDirty(true);
-  }, [selectedPersonaIdx, selectedScenarioIdx]);
+  }, [selectedPersonaIdx, selectedScenarioIdx, selectedVoiceIdx]);
 
   return (
     <ConnectionOptsContext.Provider
-      value={{ connectionOpts, dirty, connect, prompt, setPrompt, restart }}
+      value={{ connectionOpts, dirty, connect, restart }}
     >
       {children}
     </ConnectionOptsContext.Provider>
