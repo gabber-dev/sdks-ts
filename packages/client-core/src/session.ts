@@ -252,8 +252,7 @@ export class Session {
 
     // Kind of a hack because session id isn't available through the connection details flow
     const metadataString = this.livekitRoom.metadata || "{}";
-    const session = (JSON.parse(metadataString))["session"] || {};
-    this.id = session["id"] || null;
+    this.id = (JSON.parse(metadataString))["session"] || null;
 
     this.onConnectionStateChanged("waiting_for_agent");
   }
