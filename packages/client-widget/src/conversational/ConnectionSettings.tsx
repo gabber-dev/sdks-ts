@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useSettings } from "./SettingsProvider";
 import { useVoice } from "../providers/VoiceProvider";
 import { usePersona } from "../providers/PersonaProvider";
 import { useScenario } from "../providers/ScenarioProvider";
+import { Voice } from "../../node_modules/gabber-client-core/src/generated/model/voice";
 
 export function ConnectionSettings() {
   const { settings } = useSettings();
@@ -11,6 +12,77 @@ export function ConnectionSettings() {
   const { scenarios, selectedScenarioIdx, setSelectedScenarioIdx } =
     useScenario();
   const [isFreeform, setIsFreeform] = useState(false);
+
+  // Separate and sort voices
+  const { customVoices, standardVoices } = useMemo(() => {
+    // Create a Map to track unique voices by ID
+    const uniqueVoices = new Map();
+    
+    // First pass - add all voices to the Map, preferring custom voices
+    voices.forEach(voice => {
+      const existingVoice = uniqueVoices.get(voice.id);
+      // Only add if not exists, or if this is a custom voice replacing a standard one
+      if (!existingVoice || (!existingVoice.project && voice.project)) {
+        uniqueVoices.set(voice.id, voice);
+      }
+    });
+
+    // Separate into custom and standard voices
+    const custom: Voice[] = [];
+    const standard: Voice[] = [];
+    
+    uniqueVoices.forEach(voice => {
+      if (voice.project != null) {
+        custom.push(voice);
+      } else {
+        standard.push(voice);
+      }
+    });
+
+    // Sort both arrays
+    custom.sort((a, b) => a.name.localeCompare(b.name));
+    standard.sort((a, b) => a.name.localeCompare(b.name));
+    
+    return { customVoices: custom, standardVoices: standard };
+  }, [voices]);
+
+  // Create sorted versions of other arrays
+  const sortedPersonas = useMemo(() => {
+    return [...personas].sort((a, b) => a.name.localeCompare(b.name));
+  }, [personas]);
+
+  const sortedScenarios = useMemo(() => {
+    return [...scenarios].sort((a, b) => a.name.localeCompare(b.name));
+  }, [scenarios]);
+
+  // Map original indices
+  const personaIndexMap = useMemo(() => {
+    const map: Record<number, number> = {};
+    sortedPersonas.forEach((persona, sortedIdx) => {
+      const originalIdx = personas.findIndex(p => p.id === persona.id);
+      map[sortedIdx] = originalIdx;
+    });
+    return map;
+  }, [personas, sortedPersonas]);
+
+  const scenarioIndexMap = useMemo(() => {
+    const map: Record<number, number> = {};
+    sortedScenarios.forEach((scenario, sortedIdx) => {
+      const originalIdx = scenarios.findIndex(s => s.id === scenario.id);
+      map[sortedIdx] = originalIdx;
+    });
+    return map;
+  }, [scenarios, sortedScenarios]);
+
+  const voiceIndexMap = useMemo(() => {
+    const map: Record<number, number> = {};
+    const sortedVoices = [...customVoices, ...standardVoices];
+    sortedVoices.forEach((voice, sortedIdx) => {
+      const originalIdx = voices.findIndex(v => v.id === voice.id);
+      map[sortedIdx] = originalIdx;
+    });
+    return map;
+  }, [voices, customVoices, standardVoices]);
 
   useEffect(() => {
     if (settings.initialPersona) {
@@ -42,15 +114,20 @@ export function ConnectionSettings() {
   }, [voices, settings.initialVoice, setSelectedVoiceIdx]);
 
   const handlePersonaSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const idx = Number(e.target.value);
-    setSelectedPersonaIdx(idx);
+    const sortedIdx = Number(e.target.value);
+    setSelectedPersonaIdx(personaIndexMap[sortedIdx]);
     setIsFreeform(false);
   };
 
   const handleScenarioSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const idx = Number(e.target.value);
-    setSelectedScenarioIdx(idx);
+    const sortedIdx = Number(e.target.value);
+    setSelectedScenarioIdx(scenarioIndexMap[sortedIdx]);
     setIsFreeform(false);
+  };
+
+  const handleVoiceSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const sortedIdx = Number(e.target.value);
+    setSelectedVoiceIdx(voiceIndexMap[sortedIdx]);
   };
 
   return (
@@ -69,7 +146,7 @@ export function ConnectionSettings() {
             Persona
           </label>
           <select
-            value={isFreeform ? "freeform" : selectedPersonaIdx}
+            value={isFreeform ? "freeform" : personaIndexMap[selectedPersonaIdx]}
             onChange={handlePersonaSelect}
             className="w-full p-2 border border-gray-300 rounded"
             style={{
@@ -77,7 +154,7 @@ export function ConnectionSettings() {
               color: settings.primaryColor,
             }}
           >
-            {personas.map((persona, idx) => (
+            {sortedPersonas.map((persona, idx) => (
               <option key={persona.id} value={idx}>
                 {persona.name}
               </option>
@@ -92,7 +169,7 @@ export function ConnectionSettings() {
             Scenario
           </label>
           <select
-            value={isFreeform ? "freeform" : selectedScenarioIdx}
+            value={isFreeform ? "freeform" : scenarioIndexMap[selectedScenarioIdx]}
             onChange={handleScenarioSelect}
             className="w-full p-2 border border-gray-300 rounded"
             style={{
@@ -100,7 +177,7 @@ export function ConnectionSettings() {
               color: settings.primaryColor,
             }}
           >
-            {scenarios.map((scenario, idx) => (
+            {sortedScenarios.map((scenario, idx) => (
               <option key={scenario.id} value={idx}>
                 {scenario.name}
               </option>
@@ -115,19 +192,30 @@ export function ConnectionSettings() {
             Voice
           </label>
           <select
-            value={selectedVoiceIdx}
-            onChange={(e) => setSelectedVoiceIdx(Number(e.target.value))}
+            value={voiceIndexMap[selectedVoiceIdx]}
+            onChange={handleVoiceSelect}
             className="w-full p-2 border border-gray-300 rounded"
             style={{
               backgroundColor: settings.baseColorPlusOne,
               color: settings.primaryColor,
             }}
           >
-            {voices.map((voice, idx) => (
-              <option key={voice.id} value={idx}>
-                {voice.name}
-              </option>
-            ))}
+            {customVoices.length > 0 && (
+              <optgroup label="Custom Voices">
+                {customVoices.map((voice, idx) => (
+                  <option key={voice.id} value={idx}>
+                    {voice.name}
+                  </option>
+                ))}
+              </optgroup>
+            )}
+            <optgroup label="Standard Voices">
+              {standardVoices.map((voice, idx) => (
+                <option key={voice.id} value={idx + customVoices.length}>
+                  {voice.name}
+                </option>
+              ))}
+            </optgroup>
           </select>
         </div>
       </div>
