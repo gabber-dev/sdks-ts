@@ -2,11 +2,14 @@ import React from "react";
 import { MainView } from "./MainView";
 import { SettingsProvider } from "./SettingsProvider";
 import { ToastContainer } from "react-toastify";
-import {VoiceGenerationWidgetSettings, InternalVoiceGenerationWidget} from "../VoiceGenerationWidget";
+import {
+  VoiceGenerationWidget,
+  VoiceGenerationWidgetSettings,
+} from "../VoiceGenerationWidget";
 import { TokenProvider } from "../providers/TokenProvider";
 import { UsageProvider } from "../providers/UsageProvider";
 import { VoiceProvider } from "../providers/VoiceProvider";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 
 const DEFAULT_SETTINGS: VoiceGenerationWidgetSettings = {};
 
@@ -14,10 +17,14 @@ type Props = {
   tokenGenerator: () => Promise<string>;
   usageLimitExceededCallback?: () => void;
   settings?: VoiceGenerationWidgetSettings;
-  widget: InternalVoiceGenerationWidget;
+  widget: VoiceGenerationWidget;
 };
 
-export function Root({ tokenGenerator, usageLimitExceededCallback, settings }: Props) {
+export function Root({
+  tokenGenerator,
+  usageLimitExceededCallback,
+  settings,
+}: Props) {
   return (
     <TokenProvider tokenGenerator={tokenGenerator}>
       <UsageProvider usageLimitExceededCallback={usageLimitExceededCallback}>

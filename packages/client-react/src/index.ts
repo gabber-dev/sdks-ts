@@ -1,2 +1,2 @@
-export { SessionProvider, useSession } from './providers/session'
+export { RealtimeSessionEngineProvider, useRealtimeSessionEngine } from './providers/realtime_session_engine'
 

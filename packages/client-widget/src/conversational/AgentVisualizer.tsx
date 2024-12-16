@@ -1,6 +1,6 @@
-import { ConnectionState, AgentState } from "gabber-client-core";
-import { useSession } from "gabber-client-react";
-import React, { useEffect, useRef, useState } from "react";
+import { SDKConnectionState, SDKAgentState } from "gabber-client-core";
+import { useRealtimeSessionEngine } from "gabber-client-react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 type Props = {
   color: string;
@@ -9,12 +9,13 @@ type Props = {
 };
 
 export const AgentVisualizer = ({ color, shadowColor, gap }: Props) => {
-  const { agentVolumeBands, connectionState, agentState } = useSession();
+  const { agentVolumeBands, connectionState, agentState } =
+    useRealtimeSessionEngine();
   const [heights, setHeights] = useState<number[]>([]);
 
   const agentVolumesRef = useRef<number[]>(agentVolumeBands);
-  const connectionStateRef = useRef<ConnectionState>("not_connected");
-  const agentStateRef = useRef<AgentState>("listening");
+  const connectionStateRef = useRef<SDKConnectionState>("not_connected");
+  const agentStateRef = useRef<SDKAgentState>("listening");
   const thinkingIndex = useRef<number>(0);
   const thinkingLastTick = useRef<number>(0);
   const thinkingDirection = useRef(1);
@@ -32,10 +33,10 @@ export const AgentVisualizer = ({ color, shadowColor, gap }: Props) => {
       thinkingLastTick.current += dt;
       if (thinkingLastTick.current > 60) {
         thinkingLastTick.current = 0;
-        if (thinkingIndex.current == 0) {
+        if (thinkingIndex.current === 0) {
           thinkingDirection.current = 1;
         } else if (
-          thinkingIndex.current ==
+          thinkingIndex.current ===
           agentVolumesRef.current.length - 1
         ) {
           thinkingDirection.current = -1;
@@ -47,7 +48,7 @@ export const AgentVisualizer = ({ color, shadowColor, gap }: Props) => {
               return 0.4;
             }
             return 0.2;
-          })
+          }),
         );
       }
     } else {
@@ -89,18 +90,21 @@ const useAnimationFrame = (callback: (dt: number) => void) => {
   // without triggering a re-render on their change
   const requestRef = React.useRef<number>(-1);
   const previousTimeRef = React.useRef<number>();
-  
-  const animate = (time: number) => {
-    if (previousTimeRef.current != undefined) {
-      const deltaTime = time - previousTimeRef.current;
-      callback(deltaTime)
-    }
-    previousTimeRef.current = time;
-    requestRef.current = requestAnimationFrame(animate);
-  }
-  
+
+  const animate = useCallback(
+    (time: number) => {
+      if (previousTimeRef.current !== undefined) {
+        const deltaTime = time - previousTimeRef.current;
+        callback(deltaTime);
+      }
+      previousTimeRef.current = time;
+      requestRef.current = requestAnimationFrame(animate);
+    },
+    [callback],
+  );
+
   React.useEffect(() => {
     requestRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(requestRef.current);
-  }, []);
-}
+  }, [animate]);
+};

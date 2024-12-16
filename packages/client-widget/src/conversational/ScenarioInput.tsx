@@ -1,14 +1,11 @@
-import { useSession } from "gabber-client-react";
+import { useRealtimeSessionEngine } from "gabber-client-react";
 import React, { useState } from "react";
 
-type Props = {
-}
-
-export function ScenarioInput({}: Props) {
+export function ScenarioInput() {
   const [value, setValue] = useState("");
-  const { connectionState } = useSession();
-  if(connectionState !== "not_connected") {
-    return null
+  const { connectionState } = useRealtimeSessionEngine();
+  if (connectionState !== "not_connected") {
+    return null;
   }
 
   return (

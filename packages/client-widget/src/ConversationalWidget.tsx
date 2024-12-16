@@ -1,7 +1,7 @@
-import React from 'react'
-import { createRoot } from 'react-dom/client';
+import React from "react";
+import { createRoot } from "react-dom/client";
 import { Root } from "./conversational/Root";
-import './index.css';
+import "./index.css";
 
 export class ConversationalWidget {
   static create({
@@ -24,7 +24,7 @@ export class ConversationalWidget {
           tokenGenerator={tokenGenerator}
           usageLimitExceededCallback={usageLimitExceededCallback}
         />
-      </React.StrictMode>
+      </React.StrictMode>,
     );
     return w;
   }
@@ -55,7 +55,7 @@ export type ConversationalWidgetSettings = {
   baseColorPlusTwo?: string;
   baseColorContent?: string;
   audioPlaybackFailed?: {
-    descriptionText?: string
-    buttonText?: string
-  }
+    descriptionText?: string;
+    buttonText?: string;
+  };
 };

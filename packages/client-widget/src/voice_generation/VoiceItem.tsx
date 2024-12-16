@@ -3,12 +3,12 @@ import { Voice } from "gabber-client-core";
 import { useSettings } from "./SettingsProvider";
 
 type Props = {
-    voice: Voice;
-    selected: boolean;
-    onClick: () => void;
-}
-export function VoiceItem({voice, selected, onClick}: Props) {
-    const { settings } = useSettings();
+  voice: Voice;
+  selected: boolean;
+  onClick: () => void;
+};
+export function VoiceItem({ voice, selected, onClick }: Props) {
+  const { settings } = useSettings();
   return (
     <button
       className="w-full p-2 text-left transition-colors"

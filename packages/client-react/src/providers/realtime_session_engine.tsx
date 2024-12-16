@@ -1,51 +1,51 @@
 import { createContext, useRef, useEffect, useState, useMemo } from "react";
 import {
-  Session,
-  ConnectionState,
-  SessionMessage,
-  AgentState,
-  SendChatMessageParams,
-  ConnectOptions
+  RealtimeSessionEngine,
+  SDKAgentState,
+  SDKConnectionState,
+  SDKConnectOptions,
+  SDKSendChatMessageParams,
+  SDKSessionTranscription,
 } from "gabber-client-core";
 import React from "react";
 
-type SessionContextData = {
+type RealtimeSessionEngineContextData = {
   id: string | null;
-  connectionState: ConnectionState;
-  messages: SessionMessage[];
+  connectionState: SDKConnectionState;
+  messages: SDKSessionTranscription[];
   lastError: {message: string} | null;
   microphoneEnabled: boolean;
   agentVolumeBands: number[];
   agentVolume: number;
   userVolumeBands: number[];
   userVolume: number;
-  agentState: AgentState;
+  agentState: SDKAgentState;
   remainingSeconds: number | null;
   transcription: { text: string; final: boolean };
   canPlayAudio: boolean;
   setMicrophoneEnabled: (enabled: boolean) => Promise<void>;
-  sendChatMessage: (p: SendChatMessageParams) => Promise<void>;
+  sendChatMessage: (p: SDKSendChatMessageParams) => Promise<void>;
   startAudio: () => Promise<void>;
 };
 
-const SessionContext = createContext<SessionContextData | undefined>(undefined);
+const RealtimeSessionEngineContext = createContext<RealtimeSessionEngineContextData | undefined>(undefined);
 
 type Props = {
-  connectionOpts: ConnectOptions | null;
+  connectionOpts: SDKConnectOptions | null;
   children: React.ReactNode;
 };
 
-export function SessionProvider({ connectionOpts, children }: Props) {
+export function RealtimeSessionEngineProvider({ connectionOpts, children }: Props) {
   const [id, setId] = useState<string | null>(null);
   const [connectionState, setConnectionState] =
-    useState<ConnectionState>("not_connected");
-  const [messages, setMessages] = useState<SessionMessage[]>([]);
+    useState<SDKConnectionState>("not_connected");
+  const [messages, setMessages] = useState<SDKSessionTranscription[]>([]);
   const [microphoneEnabledState, setMicrophoneEnabledState] = useState(false);
   const [agentVolumeBands, setAgentVolumeBands] = useState<number[]>([]);
   const [agentVolume, setAgentVolume] = useState<number>(0);
   const [userVolumeBands, setUserVolumeBands] = useState<number[]>([]);
   const [userVolume, setUserVolume] = useState<number>(0);
-  const [agentState, setAgentState] = useState<AgentState>("listening");
+  const [agentState, setAgentState] = useState<SDKAgentState>("listening");
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
   const [lastError, setLastError] = useState<{message: string} | null>(null);
   const [canPlayAudio, setCanPlayAudio] = useState(true);
@@ -68,12 +68,12 @@ export function SessionProvider({ connectionOpts, children }: Props) {
     setTranscription({ final: false, text: lastUserMessage?.text || "" });
   }, [lastUserMessage]);
 
-  const onConnectionStateChanged = useRef((sessionState: ConnectionState) => {
+  const onConnectionStateChanged = useRef((sessionState: SDKConnectionState) => {
     setConnectionState(sessionState);
     setId(sessionEngine.current.id);
   });
 
-  const onMessagesChanged = useRef((messages: SessionMessage[]) => {
+  const onMessagesChanged = useRef((messages: SDKSessionTranscription[]) => {
     setMessages([...messages]);
   });
 
@@ -91,7 +91,7 @@ export function SessionProvider({ connectionOpts, children }: Props) {
     setUserVolume(volume);
   });
 
-  const onAgentStateChanged = useRef((as: AgentState) => {
+  const onAgentStateChanged = useRef((as: SDKAgentState) => {
     setAgentState(as);
   });
 
@@ -112,10 +112,10 @@ export function SessionProvider({ connectionOpts, children }: Props) {
       // React will always return the first instantiation
       // even though this function will be called multiple times
       if (createOnce.current) {
-        return {} as Session;
+        return {} as RealtimeSessionEngine;
       }
       createOnce.current = true;
-      return new Session({
+      return new RealtimeSessionEngine({
         onAgentError: onAgentError.current,
         onAgentStateChanged: onAgentStateChanged.current,
         onRemainingSecondsChanged: onRemainingSecondsChanged.current,
@@ -137,7 +137,7 @@ export function SessionProvider({ connectionOpts, children }: Props) {
     await sessionEngine.current.setMicrophoneEnabled(enabled);
   });
 
-  const sendChatMessage = useRef(async (p: SendChatMessageParams) => {
+  const sendChatMessage = useRef(async (p: SDKSendChatMessageParams) => {
     if (!sessionEngine.current) {
       console.error("Trying to send chat message when there is no session");
       return;
@@ -164,7 +164,7 @@ export function SessionProvider({ connectionOpts, children }: Props) {
   }, [connectionOpts, connectionState]);
 
   return (
-    <SessionContext.Provider
+    <RealtimeSessionEngineContext.Provider
       value={{
         id,
         messages,
@@ -185,12 +185,12 @@ export function SessionProvider({ connectionOpts, children }: Props) {
       }}
     >
       {children}
-    </SessionContext.Provider>
+    </RealtimeSessionEngineContext.Provider>
   );
 }
 
-export function useSession() {
-  const context = React.useContext(SessionContext);
+export function useRealtimeSessionEngine() {
+  const context = React.useContext(RealtimeSessionEngineContext);
   if (!context) {
     throw new Error("useSession must be used within a SessionProvider");
   }

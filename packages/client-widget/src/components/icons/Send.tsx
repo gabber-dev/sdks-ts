@@ -13,4 +13,3 @@ export function Send(props: any) {
     </svg>
   );
 }
-  

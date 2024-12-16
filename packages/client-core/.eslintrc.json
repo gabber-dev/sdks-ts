@@ -1,0 +1,14 @@
+{
+  "ignorePatterns": [
+    "node_modules/",
+    "dist/",
+    "src/generated/"
+  ],
+  "extends": [
+    "prettier"
+  ],
+  "plugins": [
+    "prettier",
+    "import"
+  ]
+}

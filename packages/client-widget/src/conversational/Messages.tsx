@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSettings } from "./SettingsProvider";
-import { useSession } from "gabber-client-react";
+import { useRealtimeSessionEngine } from "gabber-client-react";
 
 export function Messages() {
   const { settings } = useSettings();
-  const {messages, transcription} = useSession();
+  const { messages, transcription } = useRealtimeSessionEngine();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
@@ -21,7 +21,8 @@ export function Messages() {
 
   const handleScroll = () => {
     if (messagesContainerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
+      const { scrollTop, scrollHeight, clientHeight } =
+        messagesContainerRef.current;
       const isScrolledToBottom = scrollHeight - scrollTop - clientHeight < 1;
       setShouldAutoScroll(isScrolledToBottom);
     }

@@ -1,4 +1,4 @@
-import { useSession } from "gabber-client-react";
+import { useRealtimeSessionEngine } from "gabber-client-react";
 import React, { useState } from "react";
 import { useSettings } from "./SettingsProvider";
 import { useConnectionOpts } from "../providers/ConnectionOptsProvider";
@@ -11,8 +11,8 @@ export function BottomBar() {
     connectionState,
     sendChatMessage,
     microphoneEnabled,
-    userVolumeBands
-  } = useSession();
+    userVolumeBands,
+  } = useRealtimeSessionEngine();
 
   const { connect } = useConnectionOpts();
 
@@ -34,7 +34,7 @@ export function BottomBar() {
 
   const [inputMessage, setInputMessage] = useState("");
 
-  if(connectionState !== "connected") {
+  if (connectionState !== "connected") {
     return (
       <button
         className="w-full h-full font-semibold"

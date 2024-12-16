@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { useSession } from "gabber-client-react";
+import { useRealtimeSessionEngine } from "gabber-client-react";
 import { useSettings } from "./SettingsProvider";
 import { MicrophoneOff } from "../components/icons/MicrophoneOff";
 import { MicrophoneOn } from "../components/icons/MicrophoneOn";
@@ -8,40 +8,49 @@ import { BarAudioVisualizer } from "./BarAudioVisualizer";
 import { Send } from "../components/icons/Send";
 
 type Props = {
-    heightPixels: number
-}
+  heightPixels: number;
+};
 
-export function Input({heightPixels}: Props) {
+export function Input({ heightPixels }: Props) {
   const [value, setValue] = useState("");
   const {
     sendChatMessage,
     microphoneEnabled,
     setMicrophoneEnabled,
-    userVolumeBands
-  } = useSession();
+    userVolumeBands,
+  } = useRealtimeSessionEngine();
   const { settings } = useSettings();
   const [mode, setMode] = useState<"chat" | "voice">("chat");
   const { mic, chat, visualizer } = useMemo(() => {
     const halfHeight = Math.floor(heightPixels / 2);
-    const mic = {left: 0, bottom: 0, top: "calc(50%)", right: `calc(100% - ${halfHeight}px)`}
+    const mic = {
+      left: 0,
+      bottom: 0,
+      top: "calc(50%)",
+      right: `calc(100% - ${halfHeight}px)`,
+    };
     const chat = {
-      backgroundColor:mode === "chat" ? settings.baseColorContent : "transparent",
+      backgroundColor:
+        mode === "chat" ? settings.baseColorContent : "transparent",
       overflow: mode === "chat" ? "hidden" : "",
-      left: mode === "chat" ? `calc(${halfHeight}px + 4px` : `calc(100% - ${halfHeight}px)`,
+      left:
+        mode === "chat"
+          ? `calc(${halfHeight}px + 4px`
+          : `calc(100% - ${halfHeight}px)`,
       bottom: 0,
       top: mode === "chat" ? `calc(${halfHeight}px)` : `calc(${halfHeight}px)`,
-      right: 0
-    }
+      right: 0,
+    };
     const visualizer = {
-      top: '25%',
-      bottom: '0%',
-      left: mode === "voice" ? `25%`: `50%`,
+      top: "25%",
+      bottom: "0%",
+      left: mode === "voice" ? `25%` : `50%`,
       right: mode === "voice" ? `25%` : `50%`,
-      opacity: mode === "voice" ? "100%": "0%"
-    }
+      opacity: mode === "voice" ? "100%" : "0%",
+    };
 
-    return {mic, chat, visualizer}
-  }, [mode]);
+    return { mic, chat, visualizer };
+  }, [heightPixels, mode, settings.baseColorContent]);
 
   const micComponent = useMemo(() => {
     const style = {
@@ -58,7 +67,7 @@ export function Input({heightPixels}: Props) {
     ) : (
       <MicrophoneOff style={style} />
     );
-  }, [mode, settings.baseColor, microphoneEnabled]);
+  }, [settings.baseColorContent, mode, microphoneEnabled]);
 
   const micClicked = useCallback(() => {
     if (mode === "chat") {
@@ -68,7 +77,7 @@ export function Input({heightPixels}: Props) {
     }
 
     setMicrophoneEnabled(!microphoneEnabled);
-  }, [mode, microphoneEnabled]);
+  }, [mode, setMicrophoneEnabled, microphoneEnabled]);
 
   return (
     <div className="relative h-full w-full">

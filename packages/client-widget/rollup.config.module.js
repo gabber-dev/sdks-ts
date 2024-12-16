@@ -1,8 +1,6 @@
 const typescript = require("@rollup/plugin-typescript");
-const terser = require('@rollup/plugin-terser');
-const node_resolve = require('@rollup/plugin-node-resolve');
-const common_resolve = require("@rollup/plugin-commonjs");
-const postcss = require("rollup-plugin-postcss")
+const terser = require("@rollup/plugin-terser");
+const postcss = require("rollup-plugin-postcss");
 const { default: replace } = require("@rollup/plugin-replace");
 
 module.exports = {

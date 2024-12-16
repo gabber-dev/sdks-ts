@@ -1,14 +1,12 @@
 import React, { createContext } from "react";
-import {
-  ConversationalWidgetSettings,
-} from "../ConversationalWidget";
+import { ConversationalWidgetSettings } from "../ConversationalWidget";
 
 type SettingsContextData = {
   settings: ConversationalWidgetSettings;
 };
 
 const SettingsContext = createContext<SettingsContextData | undefined>(
-  undefined
+  undefined,
 );
 
 type Props = {
@@ -31,7 +29,7 @@ export function SettingsProvider({ settings, children }: Props) {
 export function useSettings() {
   const context = React.useContext(SettingsContext);
   if (!context) {
-    throw "useSettings must be used within a SettingsProvider";
+    throw new Error("useSettings must be used within a SettingsProvider");
   }
   return context;
 }

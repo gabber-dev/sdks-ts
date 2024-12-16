@@ -5,9 +5,7 @@ import { VoiceItem } from "./VoiceItem";
 import { useUsage } from "../providers/UsageProvider";
 import { useVoice } from "../providers/VoiceProvider";
 
-type Props = {};
-
-export function MainView({  }: Props) {
+export function MainView() {
   const { token } = useToken();
   const { settings } = useSettings();
   const [text, setText] = React.useState<string>("");
@@ -17,7 +15,7 @@ export function MainView({  }: Props) {
   const mp3BufferRef = useRef<ArrayBuffer | null>(null);
   const [pcmBuffer, setPcmBuffer] = useState<AudioBuffer | null>(null);
   const { checkUsage } = useUsage();
-  const {voices} = useVoice();
+  const { voices } = useVoice();
   const audioContext = useRef(new AudioContext());
 
   const playAudioBuffer = useCallback(async (buffer: AudioBuffer) => {
@@ -112,10 +110,10 @@ export function MainView({  }: Props) {
       setGenerating(false);
     }
 
-    if(error) {
+    if (error) {
       const allowed = await checkUsage("voice_synthesis_seconds");
       // This error was unrelated
-      if(allowed) {
+      if (allowed) {
         throw error;
       }
     }
@@ -124,13 +122,15 @@ export function MainView({  }: Props) {
       await playAudioBuffer(audioBuffer);
     }
   }, [
-    voices,
     generating,
-    pcmBuffer,
-    playAudioBuffer,
     playing,
-    selectedVoiceIndex,
+    pcmBuffer,
     text,
+    voices,
+    selectedVoiceIndex,
+    playAudioBuffer,
+    token,
+    checkUsage,
   ]);
 
   return (

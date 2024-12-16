@@ -1,13 +1,9 @@
-import React from 'react'
-import { createRoot } from 'react-dom/client';
-import './index.css';
-import { Root } from './voice_generation/Root';
+import React from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import { Root } from "./voice_generation/Root";
 
-export class InternalVoiceGenerationWidget {
-  public constructor() {}
-}
-
-export class VoiceGenerationWidget extends InternalVoiceGenerationWidget {
+export class VoiceGenerationWidget {
   static create({
     elementID,
     settings,
@@ -29,7 +25,7 @@ export class VoiceGenerationWidget extends InternalVoiceGenerationWidget {
           tokenGenerator={tokenGenerator}
           usageLimitExceededCallback={usageLimitExceededCallback}
         />
-      </React.StrictMode>
+      </React.StrictMode>,
     );
     return w;
   }
@@ -49,9 +45,9 @@ export type VoiceGenerationWidgetSettings = {
   baseColorPlusTwo?: string;
   baseColorContent?: string;
   audioPlaybackFailed?: {
-    descriptionText?: string
-    buttonText?: string
-  }
+    descriptionText?: string;
+    buttonText?: string;
+  };
 };
 
 export type VoiceGenerationWidgetCreateParams = {

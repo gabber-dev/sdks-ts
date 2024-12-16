@@ -1,36 +1,35 @@
 import React, { useState, useEffect } from "react";
 import { useSettings } from "./SettingsProvider";
-import { useSession } from "gabber-client-react";
+import { useRealtimeSessionEngine } from "gabber-client-react";
 import { useUsage } from "../providers/UsageProvider";
 import { BottomBar } from "./BottomBar";
 import { Messages } from "./Messages";
 import { ConnectionSettings } from "./ConnectionSettings";
 import { AgentVisualizer } from "./AgentVisualizer";
 import { useConnectionOpts } from "../providers/ConnectionOptsProvider";
-import {toast} from 'react-toastify';
+import { toast } from "react-toastify";
 
 export function LiveView() {
   const { settings } = useSettings();
-  const { connectionState, lastError } = useSession();
+  const { connectionState, lastError } = useRealtimeSessionEngine();
   const { checkUsage } = useUsage();
-  const [activeTab, setActiveTab] = useState<"messages" | "connection">("connection");
+  const [activeTab, setActiveTab] = useState<"messages" | "connection">(
+    "connection",
+  );
   const { dirty, restart } = useConnectionOpts();
 
   useEffect(() => {
     console.log("New Error", lastError);
-    if(lastError) {
+    if (lastError) {
       toast.error(lastError.message);
-      
     }
-  }, [
-    lastError
-  ]);
+  }, [lastError]);
 
   useEffect(() => {
-    if(connectionState !== 'connected') {
-      checkUsage("conversational_seconds")
+    if (connectionState !== "connected") {
+      checkUsage("conversational_seconds");
     }
-  }, [connectionState]);
+  }, [checkUsage, connectionState]);
 
   return (
     <div
@@ -103,8 +102,14 @@ export function LiveView() {
               activeTab === "connection" ? "border-b-2" : ""
             }`}
             style={{
-              borderColor: activeTab === "connection" ? settings.primaryColor : "transparent",
-              color: activeTab === "connection" ? settings.primaryColor : settings.baseColorContent,
+              borderColor:
+                activeTab === "connection"
+                  ? settings.primaryColor
+                  : "transparent",
+              color:
+                activeTab === "connection"
+                  ? settings.primaryColor
+                  : settings.baseColorContent,
             }}
             onClick={() => setActiveTab("connection")}
           >
@@ -115,8 +120,14 @@ export function LiveView() {
               activeTab === "messages" ? "border-b-2" : ""
             }`}
             style={{
-              borderColor: activeTab === "messages" ? settings.primaryColor : "transparent",
-              color: activeTab === "messages" ? settings.primaryColor : settings.baseColorContent,
+              borderColor:
+                activeTab === "messages"
+                  ? settings.primaryColor
+                  : "transparent",
+              color:
+                activeTab === "messages"
+                  ? settings.primaryColor
+                  : settings.baseColorContent,
             }}
             onClick={() => setActiveTab("messages")}
           >
@@ -124,12 +135,16 @@ export function LiveView() {
           </button>
         </div>
         <div className="flex-grow overflow-hidden">
-          <div className={`h-full ${activeTab === "connection" ? "block" : "hidden"}`}>
+          <div
+            className={`h-full ${activeTab === "connection" ? "block" : "hidden"}`}
+          >
             <div className="h-full overflow-y-auto">
               <ConnectionSettings />
             </div>
           </div>
-          <div className={`h-full ${activeTab === "messages" ? "block" : "hidden"}`}>
+          <div
+            className={`h-full ${activeTab === "messages" ? "block" : "hidden"}`}
+          >
             <Messages />
           </div>
         </div>

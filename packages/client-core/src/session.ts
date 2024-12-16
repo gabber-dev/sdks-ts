@@ -1,4 +1,4 @@
-import { ApiV1SessionStartPostRequest, Configuration, SessionApi } from "./generated";
+import { RealtimeSessionConnectionDetails, SDKAgentState, SDKConnectionState, SDKConnectOptions, SDKSendChatMessageParams, SDKSessionTranscription } from "./generated";
 import {
   Room,
   RemoteParticipant,
@@ -14,17 +14,18 @@ import {
   LocalAudioTrack,
 } from "livekit-client";
 import { TrackVolumeVisualizer } from "./TrackVolumeVisualizer";
+import { Api } from "./api";
 
-export class Session {
+export class RealtimeSessionEngine {
   private livekitRoom: Room;
   private agentParticipant: RemoteParticipant | null = null;
   private agentTrack: RemoteAudioTrack | null = null;
   private _microphoneEnabledState: boolean = false;
-  private messages: SessionMessage[] = [];
+  private transcriptions: SDKSessionTranscription[] = [];
   private agentVolumeVisualizer: TrackVolumeVisualizer;
   private userVolumeVisualizer: TrackVolumeVisualizer;
   private onConnectionStateChanged: ConnectionStateChangedCallback;
-  private onMessagesChanged: OnMessagesChangedCallback;
+  private onMessagesChanged: OnTranscriptionsChangedCallback;
   private onMicrophoneChanged: OnMicrophoneCallback;
   private onAgentVolumeChanged: OnVolumeCallback;
   private onUserVolumeChanged: OnVolumeCallback;
@@ -32,7 +33,7 @@ export class Session {
   private onRemainingSecondsChanged: OnRemainingSecondsChanged;
   private onAgentError: OnAgentErrorCallback;
   private onCanPlayAudioChanged: OnCanPlayAudioChanged;
-  private _agentState: AgentState = "warmup";
+  private _agentState: SDKAgentState = "warmup";
   private _remainingSeconds: number | null = null;
   private divElement: HTMLDivElement;
   public id: string | null = null;
@@ -99,14 +100,13 @@ export class Session {
     });
   }
 
-  async connect(opts: ConnectOptions) {
-    let connectionDetails: ConnectionDetails | null = null;
-    if ('connectionDetails' in opts) {
-      connectionDetails = opts.connectionDetails;
-    } else if ('token' in opts && 'sessionConnectOptions' in opts) {
-      const config = new Configuration({ accessToken: opts.token });
-      const api = new SessionApi(config);
-      const res = await api.apiV1SessionStartPost(opts.sessionConnectOptions);
+  async connect(opts: SDKConnectOptions) {
+    let connectionDetails: RealtimeSessionConnectionDetails | undefined = undefined;
+    if ('connection_details' in opts) {
+      connectionDetails = opts.connection_details;
+    } else if ('token' in opts && 'config' in opts) {
+      const api = new Api(opts.token);
+      const res = await api.realtime.startRealtimeSession(opts);
       connectionDetails = {
         url: res.data.connection_details.url!,
         token: res.data.connection_details.token!,
@@ -143,7 +143,7 @@ export class Session {
     await this.livekitRoom.localParticipant.setMicrophoneEnabled(enabled);
   }
 
-  async sendChatMessage({ text }: SendChatMessageParams) {
+  async sendChatMessage({ text }: SDKSendChatMessageParams) {
     const te = new TextEncoder();
     const encoded = te.encode(JSON.stringify({ text }));
     await this.livekitRoom.localParticipant.publishData(encoded, {
@@ -151,7 +151,7 @@ export class Session {
     });
   }
 
-  private set agentState(value: AgentState) {
+  private set agentState(value: SDKAgentState) {
     if (value == this._agentState) {
       return;
     }
@@ -320,17 +320,17 @@ export class Session {
     const decoded = new TextDecoder().decode(data);
     console.log("Data received", decoded, participant, topic);
     if (topic === "message") {
-      const message = JSON.parse(decoded) as SessionMessage;
-      for (let i = 0; i < this.messages.length; i++) {
-        if (this.messages[i].id === message.id && this.messages[i].agent == message.agent) {
-          this.messages[i] = message;
-          this.onMessagesChanged(this.messages);
+      const message = JSON.parse(decoded) as SDKSessionTranscription;
+      for (let i = 0; i < this.transcriptions.length; i++) {
+        if (this.transcriptions[i].id === message.id && this.transcriptions[i].agent == message.agent) {
+          this.transcriptions[i] = message;
+          this.onMessagesChanged(this.transcriptions);
           return;
         }
       }
 
-      this.messages.push(message);
-      this.onMessagesChanged(this.messages);
+      this.transcriptions.push(message);
+      this.onMessagesChanged(this.transcriptions);
     } else if (topic === "error") {
       const payload = JSON.parse(decoded);
       this.onAgentError(payload.message);
@@ -367,36 +367,18 @@ export class Session {
   }
 }
 
-export type ConnectionState =
-  | "not_connected"
-  | "connecting"
-  | "waiting_for_agent"
-  | "connected";
-
-export type AgentState =
-  | "warmup"
-  | "listening"
-  | "thinking"
-  | "speaking"
-  | "time_limit_exceeded";
-
-type ConnectionStateChangedCallback = (state: ConnectionState) => void;
-type OnMessagesChangedCallback = (messages: SessionMessage[]) => void;
+type ConnectionStateChangedCallback = (state: SDKConnectionState) => void;
+type OnTranscriptionsChangedCallback = (transcriptions: SDKSessionTranscription[]) => void;
 type OnMicrophoneCallback = (enabled: boolean) => void;
 type OnVolumeCallback = (values: number[], volume: number) => void;
-type OnAgentStateChanged = (state: AgentState) => void;
+type OnAgentStateChanged = (state: SDKAgentState) => void;
 type OnRemainingSecondsChanged = (seconds: number) => void;
 type OnAgentErrorCallback = (msg: string) => void;
 type OnCanPlayAudioChanged = (allowed: boolean) => void;
 
-export type ConnectionDetails = {
-  url: string;
-  token: string;
-};
-
 export type SessionEngineParams = {
   onConnectionStateChanged: ConnectionStateChangedCallback;
-  onMessagesChanged: OnMessagesChangedCallback;
+  onMessagesChanged: OnTranscriptionsChangedCallback;
   onMicrophoneChanged: OnMicrophoneCallback;
   onAgentStateChanged: OnAgentStateChanged;
   onRemainingSecondsChanged: OnRemainingSecondsChanged;
@@ -405,26 +387,3 @@ export type SessionEngineParams = {
   onAgentError: OnAgentErrorCallback;
   onCanPlayAudioChanged: OnCanPlayAudioChanged;
 };
-
-export type SendChatMessageParams = {
-  text: string;
-};
-
-export type SessionMessage = {
-  id: number;
-  agent: boolean;
-  final: boolean;
-  created_at: Date;
-  speaking_ended_at: Date;
-  deleted_at?: Date;
-  session: string;
-  text: string;
-};
-
-export type SessionConnectOptions = ApiV1SessionStartPostRequest;
-export type ConnectOptions =
-  | { connectionDetails: ConnectionDetails }
-  | {
-    token: string;
-    sessionConnectOptions: SessionConnectOptions;
-  };

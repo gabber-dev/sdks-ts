@@ -9,18 +9,22 @@
   ],
   "scripts": {
     "build": "tsup",
-    "lint": "eslint -f unix \"src/**/*.{ts,tsx}\"",
-    "generate": "rm -rf src/generated/* && openapi-generator-cli generate -i https://app.gabber.dev/openapi.yaml -g typescript-axios -o src/generated"
+    "lint": "eslint --fix",
+    "generate": "rm -rf src/generated/* && openapi-generator-cli generate -i \"~/web-monorepo/apps/gabber_dev/public/openapi.yaml\" -g typescript-axios -o src/generated --additional-properties=withSeparateModelsAndApi=true,apiPackage=api,modelPackage=model",
+    "tsc": "tsc"
   },
   "devDependencies": {
     "@openapitools/openapi-generator-cli": "^2.13.12",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-prettier": "^5.2.1",
     "tsup": "^8.0.2",
     "typescript": "^5.0.0"
   },
   "dependencies": {
     "axios": "^1.7.7",
-    "livekit-client": "^2.1.5",
-    "whatwg-fetch": "^3.6.20"
+    "livekit-client": "^2.1.5"
   },
   "publishConfig": {
     "access": "public"
