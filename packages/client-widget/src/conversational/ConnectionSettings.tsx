@@ -114,20 +114,23 @@ export function ConnectionSettings() {
   }, [voices, settings.initialVoice, setSelectedVoiceIdx]);
 
   const handlePersonaSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const sortedIdx = Number(e.target.value);
-    setSelectedPersonaIdx(personaIndexMap[sortedIdx]);
+    const selectedId = e.target.value;
+    const newIdx = personas.findIndex(p => p.id === selectedId);
+    setSelectedPersonaIdx(newIdx);
     setIsFreeform(false);
   };
 
   const handleScenarioSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const sortedIdx = Number(e.target.value);
-    setSelectedScenarioIdx(scenarioIndexMap[sortedIdx]);
+    const selectedId = e.target.value;
+    const newIdx = scenarios.findIndex(s => s.id === selectedId);
+    setSelectedScenarioIdx(newIdx);
     setIsFreeform(false);
   };
 
   const handleVoiceSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const sortedIdx = Number(e.target.value);
-    setSelectedVoiceIdx(voiceIndexMap[sortedIdx]);
+    const selectedId = e.target.value;
+    const newIdx = voices.findIndex(v => v.id === selectedId);
+    setSelectedVoiceIdx(newIdx);
   };
 
   return (
@@ -146,7 +149,7 @@ export function ConnectionSettings() {
             Persona
           </label>
           <select
-            value={isFreeform ? "freeform" : personaIndexMap[selectedPersonaIdx]}
+            value={isFreeform ? "freeform" : personas[selectedPersonaIdx]?.id}
             onChange={handlePersonaSelect}
             className="w-full p-2 border border-gray-300 rounded"
             style={{
@@ -154,8 +157,8 @@ export function ConnectionSettings() {
               color: settings.primaryColor,
             }}
           >
-            {sortedPersonas.map((persona, idx) => (
-              <option key={persona.id} value={idx}>
+            {sortedPersonas.map((persona) => (
+              <option key={persona.id} value={persona.id}>
                 {persona.name}
               </option>
             ))}
@@ -169,7 +172,7 @@ export function ConnectionSettings() {
             Scenario
           </label>
           <select
-            value={isFreeform ? "freeform" : scenarioIndexMap[selectedScenarioIdx]}
+            value={isFreeform ? "freeform" : scenarios[selectedScenarioIdx]?.id}
             onChange={handleScenarioSelect}
             className="w-full p-2 border border-gray-300 rounded"
             style={{
@@ -177,8 +180,8 @@ export function ConnectionSettings() {
               color: settings.primaryColor,
             }}
           >
-            {sortedScenarios.map((scenario, idx) => (
-              <option key={scenario.id} value={idx}>
+            {sortedScenarios.map((scenario) => (
+              <option key={scenario.id} value={scenario.id}>
                 {scenario.name}
               </option>
             ))}
@@ -192,7 +195,7 @@ export function ConnectionSettings() {
             Voice
           </label>
           <select
-            value={voiceIndexMap[selectedVoiceIdx]}
+            value={voices[selectedVoiceIdx]?.id}
             onChange={handleVoiceSelect}
             className="w-full p-2 border border-gray-300 rounded"
             style={{
@@ -202,16 +205,16 @@ export function ConnectionSettings() {
           >
             {customVoices.length > 0 && (
               <optgroup label="Custom Voices">
-                {customVoices.map((voice, idx) => (
-                  <option key={voice.id} value={idx}>
+                {customVoices.map((voice) => (
+                  <option key={voice.id} value={voice.id}>
                     {voice.name}
                   </option>
                 ))}
               </optgroup>
             )}
             <optgroup label="Standard Voices">
-              {standardVoices.map((voice, idx) => (
-                <option key={voice.id} value={idx + customVoices.length}>
+              {standardVoices.map((voice) => (
+                <option key={voice.id} value={voice.id}>
                   {voice.name}
                 </option>
               ))}
