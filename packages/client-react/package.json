@@ -14,15 +14,15 @@
   "dependencies": {
     "eslint-config-react-app": "^7.0.1",
     "gabber-client-core": "workspace:^",
-    "react": "^18"
+    "react": "^18.3.1"
   },
   "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "eslint": "^8",
-    "eslint-plugin-react": "^7.37.1",
-    "tsup": "^8.0.2"
+    "@types/node": "^20.17.10",
+    "@types/react": "^18.3.17",
+    "@types/react-dom": "^18.3.5",
+    "eslint": "^8.57.1",
+    "eslint-plugin-react": "^7.37.2",
+    "tsup": "^8.3.5"
   },
   "publishConfig": {
     "access": "public"
