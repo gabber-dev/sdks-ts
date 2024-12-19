@@ -17,9 +17,9 @@ export function ConnectionSettings() {
   const { customVoices, standardVoices } = useMemo(() => {
     // Create a Map to track unique voices by ID
     const uniqueVoices = new Map();
-    
+
     // First pass - add all voices to the Map, preferring custom voices
-    voices.forEach(voice => {
+    voices.forEach((voice) => {
       const existingVoice = uniqueVoices.get(voice.id);
       // Only add if not exists, or if this is a custom voice replacing a standard one
       if (!existingVoice || (!existingVoice.project && voice.project)) {
@@ -30,8 +30,8 @@ export function ConnectionSettings() {
     // Separate into custom and standard voices
     const custom: Voice[] = [];
     const standard: Voice[] = [];
-    
-    uniqueVoices.forEach(voice => {
+
+    uniqueVoices.forEach((voice) => {
       if (voice.project != null) {
         custom.push(voice);
       } else {
@@ -42,7 +42,7 @@ export function ConnectionSettings() {
     // Sort both arrays
     custom.sort((a, b) => a.name.localeCompare(b.name));
     standard.sort((a, b) => a.name.localeCompare(b.name));
-    
+
     return { customVoices: custom, standardVoices: standard };
   }, [voices]);
 
@@ -54,35 +54,6 @@ export function ConnectionSettings() {
   const sortedScenarios = useMemo(() => {
     return [...scenarios].sort((a, b) => a.name.localeCompare(b.name));
   }, [scenarios]);
-
-  // Map original indices
-  const personaIndexMap = useMemo(() => {
-    const map: Record<number, number> = {};
-    sortedPersonas.forEach((persona, sortedIdx) => {
-      const originalIdx = personas.findIndex(p => p.id === persona.id);
-      map[sortedIdx] = originalIdx;
-    });
-    return map;
-  }, [personas, sortedPersonas]);
-
-  const scenarioIndexMap = useMemo(() => {
-    const map: Record<number, number> = {};
-    sortedScenarios.forEach((scenario, sortedIdx) => {
-      const originalIdx = scenarios.findIndex(s => s.id === scenario.id);
-      map[sortedIdx] = originalIdx;
-    });
-    return map;
-  }, [scenarios, sortedScenarios]);
-
-  const voiceIndexMap = useMemo(() => {
-    const map: Record<number, number> = {};
-    const sortedVoices = [...customVoices, ...standardVoices];
-    sortedVoices.forEach((voice, sortedIdx) => {
-      const originalIdx = voices.findIndex(v => v.id === voice.id);
-      map[sortedIdx] = originalIdx;
-    });
-    return map;
-  }, [voices, customVoices, standardVoices]);
 
   useEffect(() => {
     if (settings.initialPersona) {
@@ -115,21 +86,21 @@ export function ConnectionSettings() {
 
   const handlePersonaSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedId = e.target.value;
-    const newIdx = personas.findIndex(p => p.id === selectedId);
+    const newIdx = personas.findIndex((p) => p.id === selectedId);
     setSelectedPersonaIdx(newIdx);
     setIsFreeform(false);
   };
 
   const handleScenarioSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedId = e.target.value;
-    const newIdx = scenarios.findIndex(s => s.id === selectedId);
+    const newIdx = scenarios.findIndex((s) => s.id === selectedId);
     setSelectedScenarioIdx(newIdx);
     setIsFreeform(false);
   };
 
   const handleVoiceSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedId = e.target.value;
-    const newIdx = voices.findIndex(v => v.id === selectedId);
+    const newIdx = voices.findIndex((v) => v.id === selectedId);
     setSelectedVoiceIdx(newIdx);
   };
 
