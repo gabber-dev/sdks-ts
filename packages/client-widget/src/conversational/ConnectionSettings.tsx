@@ -175,7 +175,7 @@ export function ConnectionSettings() {
             }}
           >
             {customVoices.length > 0 && (
-              <optgroup label="Custom Voices">
+              <optgroup label="Select a voice">
                 {customVoices.map((voice) => (
                   <option key={voice.id} value={voice.id}>
                     {voice.name}
@@ -183,13 +183,13 @@ export function ConnectionSettings() {
                 ))}
               </optgroup>
             )}
-            <optgroup label="Standard Voices">
+            {/* <optgroup label="Standard Voices">
               {standardVoices.map((voice) => (
                 <option key={voice.id} value={voice.id}>
                   {voice.name}
                 </option>
               ))}
-            </optgroup>
+            </optgroup> */}
           </select>
         </div>
       </div>
