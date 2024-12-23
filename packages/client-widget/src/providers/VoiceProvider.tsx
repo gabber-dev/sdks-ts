@@ -36,7 +36,10 @@ export function VoiceProvider({ children }: Props) {
       return;
     }
     const voices = await api.voice.listVoices();
-    setVoices(voices.data.values);
+    const filteredVoices = voices.data.values.filter((voice) =>
+      Boolean(voice.project),
+    );
+    setVoices(filteredVoices);
   }, [api]);
 
   useEffect(() => {
