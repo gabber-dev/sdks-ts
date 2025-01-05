@@ -22,7 +22,7 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import type { CloneVoice200Response } from '../model';
+import type { BadRequest } from '../model';
 // @ts-ignore
 import type { DeleteVoice200Response } from '../model';
 // @ts-ignore
@@ -56,7 +56,7 @@ export const VoiceApiAxiosParamCreator = function (configuration?: Configuration
             assertParamExists('cloneVoice', 'language', language)
             // verify required parameter 'file' is not null or undefined
             assertParamExists('cloneVoice', 'file', file)
-            const localVarPath = `/api/v1/voice/clone`;
+            const localVarPath = `/v1/voice/clone`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -116,7 +116,7 @@ export const VoiceApiAxiosParamCreator = function (configuration?: Configuration
         deleteVoice: async (voiceId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'voiceId' is not null or undefined
             assertParamExists('deleteVoice', 'voiceId', voiceId)
-            const localVarPath = `/api/v1/voice/{voice_id}`
+            const localVarPath = `/v1/voice/{voice_id}`
                 .replace(`{${"voice_id"}}`, encodeURIComponent(String(voiceId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -158,7 +158,7 @@ export const VoiceApiAxiosParamCreator = function (configuration?: Configuration
         generateVoice: async (generateVoiceRequest: GenerateVoiceRequest, xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'generateVoiceRequest' is not null or undefined
             assertParamExists('generateVoice', 'generateVoiceRequest', generateVoiceRequest)
-            const localVarPath = `/api/v1/voice/generate`;
+            const localVarPath = `/v1/voice/generate`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -205,7 +205,7 @@ export const VoiceApiAxiosParamCreator = function (configuration?: Configuration
         getVoice: async (voiceId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'voiceId' is not null or undefined
             assertParamExists('getVoice', 'voiceId', voiceId)
-            const localVarPath = `/api/v1/voice/{voice_id}`
+            const localVarPath = `/v1/voice/{voice_id}`
                 .replace(`{${"voice_id"}}`, encodeURIComponent(String(voiceId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -244,7 +244,7 @@ export const VoiceApiAxiosParamCreator = function (configuration?: Configuration
          * @throws {RequiredError}
          */
         listVoices: async (xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/voice/list`;
+            const localVarPath = `/v1/voice/list`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -291,7 +291,7 @@ export const VoiceApiAxiosParamCreator = function (configuration?: Configuration
             assertParamExists('updateVoice', 'voiceId', voiceId)
             // verify required parameter 'updateVoiceRequest' is not null or undefined
             assertParamExists('updateVoice', 'updateVoiceRequest', updateVoiceRequest)
-            const localVarPath = `/api/v1/voice/{voice_id}`
+            const localVarPath = `/v1/voice/{voice_id}`
                 .replace(`{${"voice_id"}}`, encodeURIComponent(String(voiceId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -345,7 +345,7 @@ export const VoiceApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async cloneVoice(name: string, language: string, file: File, xHumanId?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CloneVoice200Response>> {
+        async cloneVoice(name: string, language: string, file: File, xHumanId?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Voice>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.cloneVoice(name, language, file, xHumanId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['VoiceApi.cloneVoice']?.[localVarOperationServerIndex]?.url;
@@ -438,7 +438,7 @@ export const VoiceApiFactory = function (configuration?: Configuration, basePath
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        cloneVoice(name: string, language: string, file: File, xHumanId?: string, options?: RawAxiosRequestConfig): AxiosPromise<CloneVoice200Response> {
+        cloneVoice(name: string, language: string, file: File, xHumanId?: string, options?: RawAxiosRequestConfig): AxiosPromise<Voice> {
             return localVarFp.cloneVoice(name, language, file, xHumanId, options).then((request) => request(axios, basePath));
         },
         /**

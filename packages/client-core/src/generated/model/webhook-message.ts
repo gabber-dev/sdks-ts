@@ -15,15 +15,18 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { WebhookMessageUsageTracked } from './webhook-message-usage-tracked';
+import type { WebhookMessageRealtimeSessionStateChanged } from './webhook-message-realtime-session-state-changed';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { WebhookMessageUsageTrackedPayload } from './webhook-message-usage-tracked-payload';
+import type { WebhookMessageRealtimeSessionStateChangedPayload } from './webhook-message-realtime-session-state-changed-payload';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { WebhookMessageUsageTracked } from './webhook-message-usage-tracked';
 
 /**
  * @type WebhookMessage
  * @export
  */
-export type WebhookMessage = WebhookMessageUsageTracked;
+export type WebhookMessage = WebhookMessageRealtimeSessionStateChanged | WebhookMessageUsageTracked;
 
 

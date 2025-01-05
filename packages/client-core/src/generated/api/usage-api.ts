@@ -22,6 +22,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import type { BadRequest } from '../model';
+// @ts-ignore
 import type { CreateUsageToken200Response } from '../model';
 // @ts-ignore
 import type { UpdateUsageLimitsRequest } from '../model';
@@ -46,7 +48,7 @@ export const UsageApiAxiosParamCreator = function (configuration?: Configuration
         createUsageToken: async (usageTokenRequest: UsageTokenRequest, xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'usageTokenRequest' is not null or undefined
             assertParamExists('createUsageToken', 'usageTokenRequest', usageTokenRequest)
-            const localVarPath = `/api/v1/usage/token`;
+            const localVarPath = `/v1/usage/token`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -87,7 +89,7 @@ export const UsageApiAxiosParamCreator = function (configuration?: Configuration
          * @throws {RequiredError}
          */
         getUsageLimits: async (xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/usage/limits`;
+            const localVarPath = `/v1/usage/limits`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -131,7 +133,7 @@ export const UsageApiAxiosParamCreator = function (configuration?: Configuration
         updateUsageToken: async (updateUsageLimitsRequest: UpdateUsageLimitsRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'updateUsageLimitsRequest' is not null or undefined
             assertParamExists('updateUsageToken', 'updateUsageLimitsRequest', updateUsageLimitsRequest)
-            const localVarPath = `/api/v1/usage/token`;
+            const localVarPath = `/v1/usage/token`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;

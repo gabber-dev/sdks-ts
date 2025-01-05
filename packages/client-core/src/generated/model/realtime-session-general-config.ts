@@ -31,6 +31,6 @@ export interface RealtimeSessionGeneralConfig {
      * @type {boolean}
      * @memberof RealtimeSessionGeneralConfig
      */
-    'save_messages'?: boolean;
+    'save_messages': boolean;
 }
 

@@ -17,14 +17,20 @@
 /**
  * 
  * @export
- * @interface ChatCompletionStreamResponseGabberMessageDataInnerData
+ * @interface ChatCompletionResponseMessageGabberVoice
  */
-export interface ChatCompletionStreamResponseGabberMessageDataInnerData {
+export interface ChatCompletionResponseMessageGabberVoice {
     /**
-     * 
+     * This will be the URL to the audio file
      * @type {string}
-     * @memberof ChatCompletionStreamResponseGabberMessageDataInnerData
+     * @memberof ChatCompletionResponseMessageGabberVoice
      */
-    'transcript': string;
+    'audio_url': string;
+    /**
+     * The Unix timestamp (in seconds) when the audio file expires
+     * @type {number}
+     * @memberof ChatCompletionResponseMessageGabberVoice
+     */
+    'expires_at': number;
 }
 

@@ -50,5 +50,11 @@ export interface Scenario {
      * @memberof Scenario
      */
     'prompt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Scenario
+     */
+    'human'?: string;
 }
 

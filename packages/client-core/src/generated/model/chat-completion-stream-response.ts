@@ -15,10 +15,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { ChatCompletionStreamResponseChoicesInner } from './chat-completion-stream-response-choices-inner';
+import type { ChatCompletionResponseGabber } from './chat-completion-response-gabber';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { ChatCompletionStreamResponseGabber } from './chat-completion-stream-response-gabber';
+import type { ChatCompletionStreamResponseChoice } from './chat-completion-stream-response-choice';
 
 /**
  * Represents a streamed chunk of a chat completion response returned by model, based on the provided input.
@@ -34,10 +34,10 @@ export interface ChatCompletionStreamResponse {
     'id': string;
     /**
      * A list of chat completion choices. Can contain more than one elements if `n` is greater than 1. Can also be empty for the last chunk if you set `stream_options: {\"include_usage\": true}`. 
-     * @type {Array<ChatCompletionStreamResponseChoicesInner>}
+     * @type {Array<ChatCompletionStreamResponseChoice>}
      * @memberof ChatCompletionStreamResponse
      */
-    'choices': Array<ChatCompletionStreamResponseChoicesInner>;
+    'choices': Array<ChatCompletionStreamResponseChoice>;
     /**
      * The Unix timestamp (in seconds) of when the chat completion was created. Each chunk has the same timestamp.
      * @type {number}
@@ -58,10 +58,10 @@ export interface ChatCompletionStreamResponse {
     'object': ChatCompletionStreamResponseObjectEnum;
     /**
      * 
-     * @type {ChatCompletionStreamResponseGabber}
+     * @type {ChatCompletionResponseGabber}
      * @memberof ChatCompletionStreamResponse
      */
-    'gabber'?: ChatCompletionStreamResponseGabber;
+    'gabber'?: ChatCompletionResponseGabber;
 }
 
 export const ChatCompletionStreamResponseObjectEnum = {

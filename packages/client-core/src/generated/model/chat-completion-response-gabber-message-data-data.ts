@@ -14,13 +14,17 @@
 
 
 
-export * from './api/credit-api';
-export * from './api/dummy-api';
-export * from './api/inference-api';
-export * from './api/llmapi';
-export * from './api/persona-api';
-export * from './api/realtime-api';
-export * from './api/scenario-api';
-export * from './api/usage-api';
-export * from './api/voice-api';
+/**
+ * 
+ * @export
+ * @interface ChatCompletionResponseGabberMessageDataData
+ */
+export interface ChatCompletionResponseGabberMessageDataData {
+    /**
+     * 
+     * @type {string}
+     * @memberof ChatCompletionResponseGabberMessageDataData
+     */
+    'transcript': string;
+}
 

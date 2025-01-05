@@ -53,6 +53,12 @@ export interface Usage {
      * @memberof Usage
      */
     'project': string;
+    /**
+     * 
+     * @type {object}
+     * @memberof Usage
+     */
+    'metadata'?: object;
 }
 
 

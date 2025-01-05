@@ -22,6 +22,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import type { BadRequest } from '../model';
+// @ts-ignore
 import type { GetRealtimeSessionMessages200Response } from '../model';
 // @ts-ignore
 import type { GetRealtimeSessionTimeline200Response } from '../model';
@@ -52,7 +54,7 @@ export const RealtimeApiAxiosParamCreator = function (configuration?: Configurat
         endRealtimeSession: async (session: string, xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'session' is not null or undefined
             assertParamExists('endRealtimeSession', 'session', session)
-            const localVarPath = `/api/v1/realtime/{session}/end`
+            const localVarPath = `/v1/realtime/{session}/end`
                 .replace(`{${"session"}}`, encodeURIComponent(String(session)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -98,7 +100,7 @@ export const RealtimeApiAxiosParamCreator = function (configuration?: Configurat
         getRealtimeSession: async (session: string, xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'session' is not null or undefined
             assertParamExists('getRealtimeSession', 'session', session)
-            const localVarPath = `/api/v1/realtime/{session}`
+            const localVarPath = `/v1/realtime/{session}`
                 .replace(`{${"session"}}`, encodeURIComponent(String(session)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -144,7 +146,7 @@ export const RealtimeApiAxiosParamCreator = function (configuration?: Configurat
         getRealtimeSessionMessages: async (session: string, xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'session' is not null or undefined
             assertParamExists('getRealtimeSessionMessages', 'session', session)
-            const localVarPath = `/api/v1/realtime/{session}/messages`
+            const localVarPath = `/v1/realtime/{session}/messages`
                 .replace(`{${"session"}}`, encodeURIComponent(String(session)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -190,7 +192,7 @@ export const RealtimeApiAxiosParamCreator = function (configuration?: Configurat
         getRealtimeSessionTimeline: async (session: string, xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'session' is not null or undefined
             assertParamExists('getRealtimeSessionTimeline', 'session', session)
-            const localVarPath = `/api/v1/realtime/{session}/timeline`
+            const localVarPath = `/v1/realtime/{session}/timeline`
                 .replace(`{${"session"}}`, encodeURIComponent(String(session)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -233,7 +235,7 @@ export const RealtimeApiAxiosParamCreator = function (configuration?: Configurat
          * @throws {RequiredError}
          */
         listRealtimeSessions: async (xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/realtime/list`;
+            const localVarPath = `/v1/realtime/list`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -278,7 +280,7 @@ export const RealtimeApiAxiosParamCreator = function (configuration?: Configurat
         startRealtimeSession: async (startRealtimeSessionRequest: StartRealtimeSessionRequest, xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'startRealtimeSessionRequest' is not null or undefined
             assertParamExists('startRealtimeSession', 'startRealtimeSessionRequest', startRealtimeSessionRequest)
-            const localVarPath = `/api/v1/realtime/start`;
+            const localVarPath = `/v1/realtime/start`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -329,7 +331,7 @@ export const RealtimeApiAxiosParamCreator = function (configuration?: Configurat
             assertParamExists('updateRealtimeSession', 'session', session)
             // verify required parameter 'realtimeSessionConfigUpdate' is not null or undefined
             assertParamExists('updateRealtimeSession', 'realtimeSessionConfigUpdate', realtimeSessionConfigUpdate)
-            const localVarPath = `/api/v1/realtime/{session}/update`
+            const localVarPath = `/v1/realtime/{session}/update`
                 .replace(`{${"session"}}`, encodeURIComponent(String(session)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);

@@ -33,7 +33,7 @@ export interface ChatCompletionRequest {
      */
     'messages': Array<ChatCompletionRequestMessage>;
     /**
-     * 
+     * Gabber llm_id
      * @type {string}
      * @memberof ChatCompletionRequest
      */

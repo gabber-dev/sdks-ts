@@ -22,6 +22,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import type { BadRequest } from '../model';
+// @ts-ignore
 import type { CreateScenarioRequest } from '../model';
 // @ts-ignore
 import type { DeleteScenario200Response } from '../model';
@@ -47,7 +49,7 @@ export const ScenarioApiAxiosParamCreator = function (configuration?: Configurat
         createScenario: async (createScenarioRequest: CreateScenarioRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'createScenarioRequest' is not null or undefined
             assertParamExists('createScenario', 'createScenarioRequest', createScenarioRequest)
-            const localVarPath = `/api/v1/scenario`;
+            const localVarPath = `/v1/scenario`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -91,7 +93,7 @@ export const ScenarioApiAxiosParamCreator = function (configuration?: Configurat
         deleteScenario: async (scenarioId: string, xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'scenarioId' is not null or undefined
             assertParamExists('deleteScenario', 'scenarioId', scenarioId)
-            const localVarPath = `/api/v1/scenario/{scenario_id}`
+            const localVarPath = `/v1/scenario/{scenario_id}`
                 .replace(`{${"scenario_id"}}`, encodeURIComponent(String(scenarioId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -137,7 +139,7 @@ export const ScenarioApiAxiosParamCreator = function (configuration?: Configurat
         getScenario: async (scenarioId: string, xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'scenarioId' is not null or undefined
             assertParamExists('getScenario', 'scenarioId', scenarioId)
-            const localVarPath = `/api/v1/scenario/{scenario_id}`
+            const localVarPath = `/v1/scenario/{scenario_id}`
                 .replace(`{${"scenario_id"}}`, encodeURIComponent(String(scenarioId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -180,7 +182,7 @@ export const ScenarioApiAxiosParamCreator = function (configuration?: Configurat
          * @throws {RequiredError}
          */
         listScenarios: async (xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/scenario/list`;
+            const localVarPath = `/v1/scenario/list`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -228,7 +230,7 @@ export const ScenarioApiAxiosParamCreator = function (configuration?: Configurat
             assertParamExists('updateScenario', 'scenarioId', scenarioId)
             // verify required parameter 'updateScenarioRequest' is not null or undefined
             assertParamExists('updateScenario', 'updateScenarioRequest', updateScenarioRequest)
-            const localVarPath = `/api/v1/scenario/{scenario_id}`
+            const localVarPath = `/v1/scenario/{scenario_id}`
                 .replace(`{${"scenario_id"}}`, encodeURIComponent(String(scenarioId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);

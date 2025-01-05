@@ -22,6 +22,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import type { BadRequest } from '../model';
+// @ts-ignore
 import type { ChatCompletionRequest } from '../model';
 // @ts-ignore
 import type { ChatCompletionResponse } from '../model';
@@ -44,7 +46,7 @@ export const InferenceApiAxiosParamCreator = function (configuration?: Configura
         chatCompletions: async (chatCompletionRequest: ChatCompletionRequest, xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'chatCompletionRequest' is not null or undefined
             assertParamExists('chatCompletions', 'chatCompletionRequest', chatCompletionRequest)
-            const localVarPath = `/api/v1/chat/completions`;
+            const localVarPath = `/v1/chat/completions`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;

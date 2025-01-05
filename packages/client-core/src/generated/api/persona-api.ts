@@ -22,6 +22,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import type { BadRequest } from '../model';
+// @ts-ignore
 import type { CreatePersonaRequest } from '../model';
 // @ts-ignore
 import type { DeletePersona200Response } from '../model';
@@ -39,7 +41,7 @@ export const PersonaApiAxiosParamCreator = function (configuration?: Configurati
     return {
         /**
          * 
-         * @summary Get a persona
+         * @summary Create a persona
          * @param {CreatePersonaRequest} createPersonaRequest 
          * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
          * @param {*} [options] Override http request option.
@@ -48,7 +50,7 @@ export const PersonaApiAxiosParamCreator = function (configuration?: Configurati
         createPersona: async (createPersonaRequest: CreatePersonaRequest, xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'createPersonaRequest' is not null or undefined
             assertParamExists('createPersona', 'createPersonaRequest', createPersonaRequest)
-            const localVarPath = `/api/v1/persona`;
+            const localVarPath = `/v1/persona`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -96,7 +98,7 @@ export const PersonaApiAxiosParamCreator = function (configuration?: Configurati
         deletePersona: async (personaId: string, xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'personaId' is not null or undefined
             assertParamExists('deletePersona', 'personaId', personaId)
-            const localVarPath = `/api/v1/persona/{persona_id}`
+            const localVarPath = `/v1/persona/{persona_id}`
                 .replace(`{${"persona_id"}}`, encodeURIComponent(String(personaId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -142,7 +144,7 @@ export const PersonaApiAxiosParamCreator = function (configuration?: Configurati
         getPersona: async (personaId: string, xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'personaId' is not null or undefined
             assertParamExists('getPersona', 'personaId', personaId)
-            const localVarPath = `/api/v1/persona/{persona_id}`
+            const localVarPath = `/v1/persona/{persona_id}`
                 .replace(`{${"persona_id"}}`, encodeURIComponent(String(personaId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -185,7 +187,7 @@ export const PersonaApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         listPersonas: async (xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/persona/list`;
+            const localVarPath = `/v1/persona/list`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -233,7 +235,7 @@ export const PersonaApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('updatePersona', 'personaId', personaId)
             // verify required parameter 'updatePersonaRequest' is not null or undefined
             assertParamExists('updatePersona', 'updatePersonaRequest', updatePersonaRequest)
-            const localVarPath = `/api/v1/persona/{persona_id}`
+            const localVarPath = `/v1/persona/{persona_id}`
                 .replace(`{${"persona_id"}}`, encodeURIComponent(String(personaId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -283,7 +285,7 @@ export const PersonaApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @summary Get a persona
+         * @summary Create a persona
          * @param {CreatePersonaRequest} createPersonaRequest 
          * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
          * @param {*} [options] Override http request option.
@@ -363,7 +365,7 @@ export const PersonaApiFactory = function (configuration?: Configuration, basePa
     return {
         /**
          * 
-         * @summary Get a persona
+         * @summary Create a persona
          * @param {CreatePersonaRequest} createPersonaRequest 
          * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
          * @param {*} [options] Override http request option.
@@ -428,7 +430,7 @@ export const PersonaApiFactory = function (configuration?: Configuration, basePa
 export class PersonaApi extends BaseAPI {
     /**
      * 
-     * @summary Get a persona
+     * @summary Create a persona
      * @param {CreatePersonaRequest} createPersonaRequest 
      * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
      * @param {*} [options] Override http request option.

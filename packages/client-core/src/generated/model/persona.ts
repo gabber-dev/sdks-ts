@@ -64,6 +64,12 @@ export interface Persona {
      * @type {string}
      * @memberof Persona
      */
+    'human'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Persona
+     */
     'gender'?: PersonaGenderEnum;
     /**
      * 

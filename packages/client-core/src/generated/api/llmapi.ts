@@ -22,6 +22,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import type { BadRequest } from '../model';
+// @ts-ignore
 import type { Context } from '../model';
 // @ts-ignore
 import type { ContextCreateRequest } from '../model';
@@ -52,7 +54,7 @@ export const LLMApiAxiosParamCreator = function (configuration?: Configuration) 
         createContext: async (contextCreateRequest: ContextCreateRequest, xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'contextCreateRequest' is not null or undefined
             assertParamExists('createContext', 'contextCreateRequest', contextCreateRequest)
-            const localVarPath = `/api/v1/llm/context`;
+            const localVarPath = `/v1/llm/context`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -103,7 +105,7 @@ export const LLMApiAxiosParamCreator = function (configuration?: Configuration) 
             assertParamExists('createContextMessage', 'context', context)
             // verify required parameter 'contextMessageCreateParams' is not null or undefined
             assertParamExists('createContextMessage', 'contextMessageCreateParams', contextMessageCreateParams)
-            const localVarPath = `/api/v1/llm/context/{context}/message`
+            const localVarPath = `/v1/llm/context/{context}/message`
                 .replace(`{${"context"}}`, encodeURIComponent(String(context)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -152,7 +154,7 @@ export const LLMApiAxiosParamCreator = function (configuration?: Configuration) 
         getContext: async (context: string, xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'context' is not null or undefined
             assertParamExists('getContext', 'context', context)
-            const localVarPath = `/api/v1/llm/context/{context}`
+            const localVarPath = `/v1/llm/context/{context}`
                 .replace(`{${"context"}}`, encodeURIComponent(String(context)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -201,7 +203,7 @@ export const LLMApiAxiosParamCreator = function (configuration?: Configuration) 
             assertParamExists('getContextMessage', 'context', context)
             // verify required parameter 'message' is not null or undefined
             assertParamExists('getContextMessage', 'message', message)
-            const localVarPath = `/api/v1/llm/context/{context}/message/{message}`
+            const localVarPath = `/v1/llm/context/{context}/message/{message}`
                 .replace(`{${"context"}}`, encodeURIComponent(String(context)))
                 .replace(`{${"message"}}`, encodeURIComponent(String(message)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -248,7 +250,7 @@ export const LLMApiAxiosParamCreator = function (configuration?: Configuration) 
         getLLM: async (llm: string, xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'llm' is not null or undefined
             assertParamExists('getLLM', 'llm', llm)
-            const localVarPath = `/api/v1/llm/{llm}`
+            const localVarPath = `/v1/llm/{llm}`
                 .replace(`{${"llm"}}`, encodeURIComponent(String(llm)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -294,7 +296,7 @@ export const LLMApiAxiosParamCreator = function (configuration?: Configuration) 
         listContextMessages: async (context: string, xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'context' is not null or undefined
             assertParamExists('listContextMessages', 'context', context)
-            const localVarPath = `/api/v1/llm/context/{context}/message/list`
+            const localVarPath = `/v1/llm/context/{context}/message/list`
                 .replace(`{${"context"}}`, encodeURIComponent(String(context)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -337,7 +339,7 @@ export const LLMApiAxiosParamCreator = function (configuration?: Configuration) 
          * @throws {RequiredError}
          */
         listLLMs: async (xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/llm/list`;
+            const localVarPath = `/v1/llm/list`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;

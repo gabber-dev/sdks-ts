@@ -2,7 +2,6 @@ import {
   Configuration,
   RealtimeApi,
   PersonaApi,
-  SessionApi,
   VoiceApi,
   ScenarioApi,
   LLMApi,
@@ -15,7 +14,6 @@ export class Api {
 
   public realtime: RealtimeApi;
   public persona: PersonaApi;
-  public session: SessionApi;
   public voice: VoiceApi;
   public scenario: ScenarioApi;
   public llm: LLMApi;
@@ -25,7 +23,6 @@ export class Api {
     const config = new Configuration({ accessToken: token });
     this.realtime = new RealtimeApi(config);
     this.persona = new PersonaApi(config);
-    this.session = new SessionApi(config);
     this.voice = new VoiceApi(config);
     this.scenario = new ScenarioApi(config);
     this.llm = new LLMApi(config);

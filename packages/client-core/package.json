@@ -1,6 +1,6 @@
 {
   "name": "gabber-client-core",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -10,7 +10,7 @@
   "scripts": {
     "build": "tsup",
     "lint": "eslint --fix",
-    "generate": "rm -rf src/generated/* && openapi-generator-cli generate -i \"~/web-monorepo/apps/gabber_dev/public/openapi.yaml\" -g typescript-axios -o src/generated --additional-properties=withSeparateModelsAndApi=true,apiPackage=api,modelPackage=model",
+    "generate": "rm -rf src/generated/* && openapi-generator-cli generate -i \"https://api.gabber.dev/openapi.yaml\" -g typescript-axios -o src/generated --additional-properties=withSeparateModelsAndApi=true,apiPackage=api,modelPackage=model",
     "tsc": "tsc"
   },
   "devDependencies": {

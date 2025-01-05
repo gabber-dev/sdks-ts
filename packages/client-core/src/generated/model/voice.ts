@@ -100,9 +100,9 @@ export interface Voice {
     'preview_url'?: string;
     /**
      * Extra configuration for the voice. Usually this is for internal purposes.
-     * @type {{ [key: string]: any; }}
+     * @type {object}
      * @memberof Voice
      */
-    '_extra'?: { [key: string]: any; };
+    '_extra'?: object;
 }
 

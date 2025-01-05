@@ -67,9 +67,9 @@ export interface RealtimeSessionGenerativeConfig {
     'context': Context;
     /**
      * Extra configuration for the generative AI. Usually this is for internal purposes.
-     * @type {{ [key: string]: any; }}
+     * @type {object}
      * @memberof RealtimeSessionGenerativeConfig
      */
-    '_extra'?: { [key: string]: any; };
+    '_extra'?: object;
 }
 

@@ -13,18 +13,21 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { WebhookMessage } from './webhook-message';
 
 /**
  * 
  * @export
- * @interface ChatCompletionResponseGabberMessageDataInnerData
+ * @interface DummyGet200Response
  */
-export interface ChatCompletionResponseGabberMessageDataInnerData {
+export interface DummyGet200Response {
     /**
      * 
-     * @type {string}
-     * @memberof ChatCompletionResponseGabberMessageDataInnerData
+     * @type {WebhookMessage}
+     * @memberof DummyGet200Response
      */
-    'transcript'?: string;
+    'webhook_message'?: WebhookMessage;
 }
 

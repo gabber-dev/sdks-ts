@@ -49,7 +49,7 @@ export interface SessionMessage {
      * @type {string}
      * @memberof SessionMessage
      */
-    'import_id': string | null;
+    'import_id': string;
     /**
      * 
      * @type {string}

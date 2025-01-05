@@ -22,6 +22,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import type { BadRequest } from '../model';
+// @ts-ignore
 import type { CreateCreditLedgerEntryRequest } from '../model';
 // @ts-ignore
 import type { CreateCreditRequest } from '../model';
@@ -48,7 +50,7 @@ export const CreditApiAxiosParamCreator = function (configuration?: Configuratio
         createCredit: async (createCreditRequest: CreateCreditRequest, xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'createCreditRequest' is not null or undefined
             assertParamExists('createCredit', 'createCreditRequest', createCreditRequest)
-            const localVarPath = `/api/v1/credit`;
+            const localVarPath = `/v1/credit`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -95,7 +97,7 @@ export const CreditApiAxiosParamCreator = function (configuration?: Configuratio
             assertParamExists('createCreditLedgerEntry', 'credit', credit)
             // verify required parameter 'createCreditLedgerEntryRequest' is not null or undefined
             assertParamExists('createCreditLedgerEntry', 'createCreditLedgerEntryRequest', createCreditLedgerEntryRequest)
-            const localVarPath = `/api/v1/credit/{credit}/ledger`
+            const localVarPath = `/v1/credit/{credit}/ledger`
                 .replace(`{${"credit"}}`, encodeURIComponent(String(credit)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -140,7 +142,7 @@ export const CreditApiAxiosParamCreator = function (configuration?: Configuratio
         getCredit: async (credit: string, xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'credit' is not null or undefined
             assertParamExists('getCredit', 'credit', credit)
-            const localVarPath = `/api/v1/credit/{credit}`
+            const localVarPath = `/v1/credit/{credit}`
                 .replace(`{${"credit"}}`, encodeURIComponent(String(credit)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -186,7 +188,7 @@ export const CreditApiAxiosParamCreator = function (configuration?: Configuratio
         getLatestCreditLedgerEntry: async (credit: string, xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'credit' is not null or undefined
             assertParamExists('getLatestCreditLedgerEntry', 'credit', credit)
-            const localVarPath = `/api/v1/credit/{credit}/ledger/latest`
+            const localVarPath = `/v1/credit/{credit}/ledger/latest`
                 .replace(`{${"credit"}}`, encodeURIComponent(String(credit)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -229,7 +231,7 @@ export const CreditApiAxiosParamCreator = function (configuration?: Configuratio
          * @throws {RequiredError}
          */
         listCredits: async (xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/credit/list`;
+            const localVarPath = `/v1/credit/list`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
