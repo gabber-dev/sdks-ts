@@ -28,7 +28,9 @@ jobs:
 
       - name: Publish to npm
         run: |
-          npm install
+          rm package.json
+          rm package-lock.json
           cd packages/${{inputs.package}}
+          npm install
           npm run build
           npm publish --access public
