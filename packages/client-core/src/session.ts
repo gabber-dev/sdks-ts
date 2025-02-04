@@ -355,7 +355,8 @@ export class RealtimeSessionEngine {
         agent_state != "listening" &&
         agent_state != "thinking" &&
         agent_state != "warmup" &&
-        agent_state != "time_limit_exceeded"
+        agent_state != "time_limit_exceeded" &&
+        agent_state != "usage_limit_exceeded"
       ) {
         console.error("Unrecognized agent_state", agent_state);
         return;
