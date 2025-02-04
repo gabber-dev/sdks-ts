@@ -28,6 +28,6 @@ jobs:
 
       - name: Publish to npm
         run: |
-          npm run build
           cd packages/${{inputs.package}}
+          npm run build
           npm publish --access public
