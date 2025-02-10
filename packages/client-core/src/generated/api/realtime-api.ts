@@ -22,6 +22,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import type { AttachHumanRequest } from '../model';
+// @ts-ignore
 import type { BadRequest } from '../model';
 // @ts-ignore
 import type { GetRealtimeSessionMessages200Response } from '../model';
@@ -34,7 +36,11 @@ import type { RealtimeSession } from '../model';
 // @ts-ignore
 import type { RealtimeSessionConfigUpdate } from '../model';
 // @ts-ignore
+import type { RealtimeSessionInitiateOutboundCallRequest } from '../model';
+// @ts-ignore
 import type { RealtimeSessionStartResponse } from '../model';
+// @ts-ignore
+import type { SpeakRequest } from '../model';
 // @ts-ignore
 import type { StartRealtimeSessionRequest } from '../model';
 /**
@@ -43,6 +49,49 @@ import type { StartRealtimeSessionRequest } from '../model';
  */
 export const RealtimeApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * Attaches a human to a RealtimeSession. This is useful for previously anonymous sessions, for example sessions created via a phone call.
+         * @summary Attach a human to a RealtimeSession
+         * @param {string} session The unique identifier of the RealtimeSession.
+         * @param {AttachHumanRequest} attachHumanRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        attachHuman: async (session: string, attachHumanRequest: AttachHumanRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'session' is not null or undefined
+            assertParamExists('attachHuman', 'session', session)
+            // verify required parameter 'attachHumanRequest' is not null or undefined
+            assertParamExists('attachHuman', 'attachHumanRequest', attachHumanRequest)
+            const localVarPath = `/v1/realtime/session/{session}/attach_human`
+                .replace(`{${"session"}}`, encodeURIComponent(String(session)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication ApiKeyAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "x-api-key", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(attachHumanRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * End the RealtimeSession with the given identifier. 
          * @summary End a RealtimeSession.
@@ -228,6 +277,53 @@ export const RealtimeApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * Initiate an outbound call from a RealtimeSession. 
+         * @summary Initiate an outbound call.
+         * @param {string} session The unique identifier of the RealtimeSession.
+         * @param {RealtimeSessionInitiateOutboundCallRequest} realtimeSessionInitiateOutboundCallRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        initiateOutboundCall: async (session: string, realtimeSessionInitiateOutboundCallRequest: RealtimeSessionInitiateOutboundCallRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'session' is not null or undefined
+            assertParamExists('initiateOutboundCall', 'session', session)
+            // verify required parameter 'realtimeSessionInitiateOutboundCallRequest' is not null or undefined
+            assertParamExists('initiateOutboundCall', 'realtimeSessionInitiateOutboundCallRequest', realtimeSessionInitiateOutboundCallRequest)
+            const localVarPath = `/v1/realtime/{session}/outbound_call`
+                .replace(`{${"session"}}`, encodeURIComponent(String(session)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication ApiKeyAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "x-api-key", configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(realtimeSessionInitiateOutboundCallRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * List all Realtime Sessions. 
          * @summary List Realtime Sessions.
          * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
@@ -263,6 +359,49 @@ export const RealtimeApiAxiosParamCreator = function (configuration?: Configurat
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * For a live session, force the agent to speak a given text.
+         * @summary Speak
+         * @param {string} session The unique identifier of the RealtimeSession.
+         * @param {SpeakRequest} speakRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        speak: async (session: string, speakRequest: SpeakRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'session' is not null or undefined
+            assertParamExists('speak', 'session', session)
+            // verify required parameter 'speakRequest' is not null or undefined
+            assertParamExists('speak', 'speakRequest', speakRequest)
+            const localVarPath = `/v1/realtime/{session}/speak`
+                .replace(`{${"session"}}`, encodeURIComponent(String(session)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication ApiKeyAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "x-api-key", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(speakRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -380,6 +519,20 @@ export const RealtimeApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = RealtimeApiAxiosParamCreator(configuration)
     return {
         /**
+         * Attaches a human to a RealtimeSession. This is useful for previously anonymous sessions, for example sessions created via a phone call.
+         * @summary Attach a human to a RealtimeSession
+         * @param {string} session The unique identifier of the RealtimeSession.
+         * @param {AttachHumanRequest} attachHumanRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async attachHuman(session: string, attachHumanRequest: AttachHumanRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RealtimeSession>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.attachHuman(session, attachHumanRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RealtimeApi.attachHuman']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * End the RealtimeSession with the given identifier. 
          * @summary End a RealtimeSession.
          * @param {string} session The unique identifier of the RealtimeSession.
@@ -436,6 +589,20 @@ export const RealtimeApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Initiate an outbound call from a RealtimeSession. 
+         * @summary Initiate an outbound call.
+         * @param {string} session The unique identifier of the RealtimeSession.
+         * @param {RealtimeSessionInitiateOutboundCallRequest} realtimeSessionInitiateOutboundCallRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async initiateOutboundCall(session: string, realtimeSessionInitiateOutboundCallRequest: RealtimeSessionInitiateOutboundCallRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RealtimeSession>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.initiateOutboundCall(session, realtimeSessionInitiateOutboundCallRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RealtimeApi.initiateOutboundCall']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * List all Realtime Sessions. 
          * @summary List Realtime Sessions.
          * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
@@ -446,6 +613,20 @@ export const RealtimeApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listRealtimeSessions(xHumanId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['RealtimeApi.listRealtimeSessions']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * For a live session, force the agent to speak a given text.
+         * @summary Speak
+         * @param {string} session The unique identifier of the RealtimeSession.
+         * @param {SpeakRequest} speakRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async speak(session: string, speakRequest: SpeakRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RealtimeSession>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.speak(session, speakRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RealtimeApi.speak']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -487,6 +668,17 @@ export const RealtimeApiFp = function(configuration?: Configuration) {
 export const RealtimeApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = RealtimeApiFp(configuration)
     return {
+        /**
+         * Attaches a human to a RealtimeSession. This is useful for previously anonymous sessions, for example sessions created via a phone call.
+         * @summary Attach a human to a RealtimeSession
+         * @param {string} session The unique identifier of the RealtimeSession.
+         * @param {AttachHumanRequest} attachHumanRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        attachHuman(session: string, attachHumanRequest: AttachHumanRequest, options?: RawAxiosRequestConfig): AxiosPromise<RealtimeSession> {
+            return localVarFp.attachHuman(session, attachHumanRequest, options).then((request) => request(axios, basePath));
+        },
         /**
          * End the RealtimeSession with the given identifier. 
          * @summary End a RealtimeSession.
@@ -532,6 +724,17 @@ export const RealtimeApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.getRealtimeSessionTimeline(session, xHumanId, options).then((request) => request(axios, basePath));
         },
         /**
+         * Initiate an outbound call from a RealtimeSession. 
+         * @summary Initiate an outbound call.
+         * @param {string} session The unique identifier of the RealtimeSession.
+         * @param {RealtimeSessionInitiateOutboundCallRequest} realtimeSessionInitiateOutboundCallRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        initiateOutboundCall(session: string, realtimeSessionInitiateOutboundCallRequest: RealtimeSessionInitiateOutboundCallRequest, options?: RawAxiosRequestConfig): AxiosPromise<RealtimeSession> {
+            return localVarFp.initiateOutboundCall(session, realtimeSessionInitiateOutboundCallRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * List all Realtime Sessions. 
          * @summary List Realtime Sessions.
          * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
@@ -540,6 +743,17 @@ export const RealtimeApiFactory = function (configuration?: Configuration, baseP
          */
         listRealtimeSessions(xHumanId?: string, options?: RawAxiosRequestConfig): AxiosPromise<ListRealtimeSessions200Response> {
             return localVarFp.listRealtimeSessions(xHumanId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * For a live session, force the agent to speak a given text.
+         * @summary Speak
+         * @param {string} session The unique identifier of the RealtimeSession.
+         * @param {SpeakRequest} speakRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        speak(session: string, speakRequest: SpeakRequest, options?: RawAxiosRequestConfig): AxiosPromise<RealtimeSession> {
+            return localVarFp.speak(session, speakRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Start a new RealtimeSession with the given configuration. 
@@ -574,6 +788,19 @@ export const RealtimeApiFactory = function (configuration?: Configuration, baseP
  * @extends {BaseAPI}
  */
 export class RealtimeApi extends BaseAPI {
+    /**
+     * Attaches a human to a RealtimeSession. This is useful for previously anonymous sessions, for example sessions created via a phone call.
+     * @summary Attach a human to a RealtimeSession
+     * @param {string} session The unique identifier of the RealtimeSession.
+     * @param {AttachHumanRequest} attachHumanRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RealtimeApi
+     */
+    public attachHuman(session: string, attachHumanRequest: AttachHumanRequest, options?: RawAxiosRequestConfig) {
+        return RealtimeApiFp(this.configuration).attachHuman(session, attachHumanRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * End the RealtimeSession with the given identifier. 
      * @summary End a RealtimeSession.
@@ -627,6 +854,19 @@ export class RealtimeApi extends BaseAPI {
     }
 
     /**
+     * Initiate an outbound call from a RealtimeSession. 
+     * @summary Initiate an outbound call.
+     * @param {string} session The unique identifier of the RealtimeSession.
+     * @param {RealtimeSessionInitiateOutboundCallRequest} realtimeSessionInitiateOutboundCallRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RealtimeApi
+     */
+    public initiateOutboundCall(session: string, realtimeSessionInitiateOutboundCallRequest: RealtimeSessionInitiateOutboundCallRequest, options?: RawAxiosRequestConfig) {
+        return RealtimeApiFp(this.configuration).initiateOutboundCall(session, realtimeSessionInitiateOutboundCallRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * List all Realtime Sessions. 
      * @summary List Realtime Sessions.
      * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
@@ -636,6 +876,19 @@ export class RealtimeApi extends BaseAPI {
      */
     public listRealtimeSessions(xHumanId?: string, options?: RawAxiosRequestConfig) {
         return RealtimeApiFp(this.configuration).listRealtimeSessions(xHumanId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * For a live session, force the agent to speak a given text.
+     * @summary Speak
+     * @param {string} session The unique identifier of the RealtimeSession.
+     * @param {SpeakRequest} speakRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RealtimeApi
+     */
+    public speak(session: string, speakRequest: SpeakRequest, options?: RawAxiosRequestConfig) {
+        return RealtimeApiFp(this.configuration).speak(session, speakRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

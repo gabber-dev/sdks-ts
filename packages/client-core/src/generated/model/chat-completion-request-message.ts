@@ -15,34 +15,27 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { ChatCompletionRequestMessageContent } from './chat-completion-request-message-content';
+import type { ChatCompletionMessageToolCall } from './chat-completion-message-tool-call';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { ChatCompletionRequestAssistantMessage } from './chat-completion-request-assistant-message';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { ChatCompletionRequestSystemMessage } from './chat-completion-request-system-message';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { ChatCompletionRequestSystemMessageContent } from './chat-completion-request-system-message-content';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { ChatCompletionRequestToolMessage } from './chat-completion-request-tool-message';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { ChatCompletionRequestUserMessage } from './chat-completion-request-user-message';
 
 /**
- * 
+ * @type ChatCompletionRequestMessage
  * @export
- * @interface ChatCompletionRequestMessage
  */
-export interface ChatCompletionRequestMessage {
-    /**
-     * 
-     * @type {ChatCompletionRequestMessageContent}
-     * @memberof ChatCompletionRequestMessage
-     */
-    'content': ChatCompletionRequestMessageContent;
-    /**
-     * The role of the messages author.
-     * @type {string}
-     * @memberof ChatCompletionRequestMessage
-     */
-    'role': ChatCompletionRequestMessageRoleEnum;
-}
-
-export const ChatCompletionRequestMessageRoleEnum = {
-    User: 'user',
-    Assistant: 'assistant',
-    System: 'system'
-} as const;
-
-export type ChatCompletionRequestMessageRoleEnum = typeof ChatCompletionRequestMessageRoleEnum[keyof typeof ChatCompletionRequestMessageRoleEnum];
+export type ChatCompletionRequestMessage = ChatCompletionRequestAssistantMessage | ChatCompletionRequestSystemMessage | ChatCompletionRequestToolMessage | ChatCompletionRequestUserMessage;
 
 

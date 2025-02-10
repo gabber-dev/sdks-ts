@@ -15,10 +15,19 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import type { WebhookMessageRealtimeSessionMessageCommitted } from './webhook-message-realtime-session-message-committed';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { WebhookMessageRealtimeSessionStateChanged } from './webhook-message-realtime-session-state-changed';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { WebhookMessageRealtimeSessionStateChangedPayload } from './webhook-message-realtime-session-state-changed-payload';
+import type { WebhookMessageToolCallsFinished } from './webhook-message-tool-calls-finished';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { WebhookMessageToolCallsFinishedPayload } from './webhook-message-tool-calls-finished-payload';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { WebhookMessageToolCallsStarted } from './webhook-message-tool-calls-started';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { WebhookMessageUsageTracked } from './webhook-message-usage-tracked';
@@ -27,6 +36,6 @@ import type { WebhookMessageUsageTracked } from './webhook-message-usage-tracked
  * @type WebhookMessage
  * @export
  */
-export type WebhookMessage = WebhookMessageRealtimeSessionStateChanged | WebhookMessageUsageTracked;
+export type WebhookMessage = WebhookMessageRealtimeSessionMessageCommitted | WebhookMessageRealtimeSessionStateChanged | WebhookMessageToolCallsFinished | WebhookMessageToolCallsStarted | WebhookMessageUsageTracked;
 
 

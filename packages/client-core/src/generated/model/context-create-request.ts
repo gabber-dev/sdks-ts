@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { ContextCreateRequestMessagesInner } from './context-create-request-messages-inner';
+import type { ContextMessageCreateParams } from './context-message-create-params';
 
 /**
  * 
@@ -37,9 +37,9 @@ export interface ContextCreateRequest {
     'scenario'?: string;
     /**
      * 
-     * @type {Array<ContextCreateRequestMessagesInner>}
+     * @type {Array<ContextMessageCreateParams>}
      * @memberof ContextCreateRequest
      */
-    'messages'?: Array<ContextCreateRequestMessagesInner>;
+    'messages'?: Array<ContextMessageCreateParams>;
 }
 

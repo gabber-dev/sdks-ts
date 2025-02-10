@@ -19,6 +19,12 @@ import type { ChatCompletionRequestGabber } from './chat-completion-request-gabb
 // May contain unused imports in some cases
 // @ts-ignore
 import type { ChatCompletionRequestMessage } from './chat-completion-request-message';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { ChatCompletionTool } from './chat-completion-tool';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { ChatCompletionToolChoiceOption } from './chat-completion-tool-choice-option';
 
 /**
  * 
@@ -68,5 +74,23 @@ export interface ChatCompletionRequest {
      * @memberof ChatCompletionRequest
      */
     'max_tokens'?: number;
+    /**
+     * List of tools to call during the completion. Each tool will be called in the order they are listed. 
+     * @type {Array<ChatCompletionTool>}
+     * @memberof ChatCompletionRequest
+     */
+    'tools'?: Array<ChatCompletionTool>;
+    /**
+     * 
+     * @type {ChatCompletionToolChoiceOption}
+     * @memberof ChatCompletionRequest
+     */
+    'tool_choice'?: ChatCompletionToolChoiceOption;
+    /**
+     * Whether to enable parallel function calling
+     * @type {boolean}
+     * @memberof ChatCompletionRequest
+     */
+    'parallel_tool_calls'?: boolean;
 }
 

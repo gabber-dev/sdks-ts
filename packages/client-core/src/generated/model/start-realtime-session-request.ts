@@ -35,5 +35,11 @@ export interface StartRealtimeSessionRequest {
      * @memberof StartRealtimeSessionRequest
      */
     'config': RealtimeSessionConfigCreate;
+    /**
+     * Extra data for certain Gabber partner integrations.
+     * @type {{ [key: string]: any; }}
+     * @memberof StartRealtimeSessionRequest
+     */
+    '_extra'?: { [key: string]: any; };
 }
 

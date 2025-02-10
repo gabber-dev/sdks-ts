@@ -13,6 +13,9 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { ContextMessageToolCall } from './context-message-tool-call';
 
 /**
  * 
@@ -44,12 +47,19 @@ export interface ContextMessageCreateParams {
      * @memberof ContextMessageCreateParams
      */
     'content': string;
+    /**
+     * 
+     * @type {Array<ContextMessageToolCall>}
+     * @memberof ContextMessageCreateParams
+     */
+    'tool_calls'?: Array<ContextMessageToolCall>;
 }
 
 export const ContextMessageCreateParamsRoleEnum = {
     Assistant: 'assistant',
     System: 'system',
-    User: 'user'
+    User: 'user',
+    Tool: 'tool'
 } as const;
 
 export type ContextMessageCreateParamsRoleEnum = typeof ContextMessageCreateParamsRoleEnum[keyof typeof ContextMessageCreateParamsRoleEnum];

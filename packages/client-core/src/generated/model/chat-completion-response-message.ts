@@ -15,6 +15,9 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import type { ChatCompletionMessageToolCall } from './chat-completion-message-tool-call';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { ChatCompletionResponseMessageGabber } from './chat-completion-response-message-gabber';
 
 /**
@@ -41,6 +44,12 @@ export interface ChatCompletionResponseMessage {
      * @memberof ChatCompletionResponseMessage
      */
     'role': ChatCompletionResponseMessageRoleEnum;
+    /**
+     * 
+     * @type {Array<ChatCompletionMessageToolCall>}
+     * @memberof ChatCompletionResponseMessage
+     */
+    'tool_calls'?: Array<ChatCompletionMessageToolCall>;
     /**
      * 
      * @type {ChatCompletionResponseMessageGabber}

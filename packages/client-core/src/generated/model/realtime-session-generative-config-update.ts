@@ -51,6 +51,12 @@ export interface RealtimeSessionGenerativeConfigUpdate {
      */
     'context'?: string;
     /**
+     * The tool definitions to use for the generative AI.
+     * @type {Array<string>}
+     * @memberof RealtimeSessionGenerativeConfigUpdate
+     */
+    'tool_definitions'?: Array<string>;
+    /**
      * Extra configuration for the generative AI. Usually this is for internal purposes.
      * @type {object}
      * @memberof RealtimeSessionGenerativeConfigUpdate

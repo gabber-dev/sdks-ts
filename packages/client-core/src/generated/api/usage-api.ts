@@ -39,7 +39,7 @@ export const UsageApiAxiosParamCreator = function (configuration?: Configuration
     return {
         /**
          * Requests a token for a human
-         * @summary Request new human token
+         * @summary Create a new usage token
          * @param {UsageTokenRequest} usageTokenRequest 
          * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
          * @param {*} [options] Override http request option.
@@ -174,7 +174,7 @@ export const UsageApiFp = function(configuration?: Configuration) {
     return {
         /**
          * Requests a token for a human
-         * @summary Request new human token
+         * @summary Create a new usage token
          * @param {UsageTokenRequest} usageTokenRequest 
          * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
          * @param {*} [options] Override http request option.
@@ -224,7 +224,7 @@ export const UsageApiFactory = function (configuration?: Configuration, basePath
     return {
         /**
          * Requests a token for a human
-         * @summary Request new human token
+         * @summary Create a new usage token
          * @param {UsageTokenRequest} usageTokenRequest 
          * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
          * @param {*} [options] Override http request option.
@@ -265,7 +265,7 @@ export const UsageApiFactory = function (configuration?: Configuration, basePath
 export class UsageApi extends BaseAPI {
     /**
      * Requests a token for a human
-     * @summary Request new human token
+     * @summary Create a new usage token
      * @param {UsageTokenRequest} usageTokenRequest 
      * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
      * @param {*} [options] Override http request option.

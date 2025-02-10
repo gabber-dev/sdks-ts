@@ -21,6 +21,7 @@ export * from './api/llmapi';
 export * from './api/persona-api';
 export * from './api/realtime-api';
 export * from './api/scenario-api';
+export * from './api/tool-api';
 export * from './api/usage-api';
 export * from './api/voice-api';
 

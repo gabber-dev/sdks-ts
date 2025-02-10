@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { WebhookMessageRealtimeSessionStateChangedPayloadPreviousRealtimeSession } from './webhook-message-realtime-session-state-changed-payload-previous-realtime-session';
+import type { WebhookMessageRealtimeSessionStateChangedpayloadSession } from './webhook-message-realtime-session-state-changedpayload-session';
 
 /**
  * 
@@ -25,15 +25,15 @@ import type { WebhookMessageRealtimeSessionStateChangedPayloadPreviousRealtimeSe
 export interface WebhookMessageRealtimeSessionStateChangedPayload {
     /**
      * 
-     * @type {WebhookMessageRealtimeSessionStateChangedPayloadPreviousRealtimeSession}
+     * @type {WebhookMessageRealtimeSessionStateChangedpayloadSession}
      * @memberof WebhookMessageRealtimeSessionStateChangedPayload
      */
-    'previous_realtime_session'?: WebhookMessageRealtimeSessionStateChangedPayloadPreviousRealtimeSession;
+    'previous_realtime_session'?: WebhookMessageRealtimeSessionStateChangedpayloadSession;
     /**
      * 
-     * @type {WebhookMessageRealtimeSessionStateChangedPayloadPreviousRealtimeSession}
+     * @type {WebhookMessageRealtimeSessionStateChangedpayloadSession}
      * @memberof WebhookMessageRealtimeSessionStateChangedPayload
      */
-    'current_realtime_session'?: WebhookMessageRealtimeSessionStateChangedPayloadPreviousRealtimeSession;
+    'current_realtime_session': WebhookMessageRealtimeSessionStateChangedpayloadSession;
 }
 

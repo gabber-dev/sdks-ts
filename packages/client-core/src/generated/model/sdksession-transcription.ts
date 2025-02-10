@@ -13,6 +13,9 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { ContextMessageToolCall } from './context-message-tool-call';
 
 /**
  * 
@@ -56,5 +59,11 @@ export interface SDKSessionTranscription {
      * @memberof SDKSessionTranscription
      */
     'text': string;
+    /**
+     * 
+     * @type {Array<ContextMessageToolCall>}
+     * @memberof SDKSessionTranscription
+     */
+    'tool_calls'?: Array<ContextMessageToolCall>;
 }
 

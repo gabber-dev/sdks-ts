@@ -21,7 +21,7 @@
  */
 export interface RealtimeSessionOutputConfig {
     /**
-     * Whether to stream AI spoken transcript or send full transcript when it\'s available all at once.
+     * Whether to stream agent spoken transcript or send full transcript when it\'s available all at once.
      * @type {boolean}
      * @memberof RealtimeSessionOutputConfig
      */
@@ -32,5 +32,11 @@ export interface RealtimeSessionOutputConfig {
      * @memberof RealtimeSessionOutputConfig
      */
     'speech_synthesis_enabled': boolean;
+    /**
+     * The message for the agent to speak first when the human joins. If exluded the agent will not speak first.
+     * @type {string}
+     * @memberof RealtimeSessionOutputConfig
+     */
+    'answer_message'?: string;
 }
 

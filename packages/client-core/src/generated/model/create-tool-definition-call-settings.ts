@@ -15,13 +15,19 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { ChatCompletionRequestUserMessageContentPart } from './chat-completion-request-user-message-content-part';
+import type { CreateToolDefinitionCallSettingsDestination } from './create-tool-definition-call-settings-destination';
 
 /**
- * @type ChatCompletionRequestMessageContent
- * The contents of the message.
+ * 
  * @export
+ * @interface CreateToolDefinitionCallSettings
  */
-export type ChatCompletionRequestMessageContent = Array<ChatCompletionRequestUserMessageContentPart> | string;
-
+export interface CreateToolDefinitionCallSettings {
+    /**
+     * 
+     * @type {CreateToolDefinitionCallSettingsDestination}
+     * @memberof CreateToolDefinitionCallSettings
+     */
+    'destination': CreateToolDefinitionCallSettingsDestination;
+}
 

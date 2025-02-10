@@ -15,12 +15,68 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { ContextMessageCreateParams } from './context-message-create-params';
+import type { ContextMessageContent } from './context-message-content';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { ContextMessageToolCall } from './context-message-tool-call';
 
 /**
- * @type ContextMessage
+ * 
  * @export
+ * @interface ContextMessage
  */
-export type ContextMessage = ContextMessageCreateParams;
+export interface ContextMessage {
+    /**
+     * 
+     * @type {string}
+     * @memberof ContextMessage
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ContextMessage
+     */
+    'speaking_ended_at'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ContextMessage
+     */
+    'speaking_started_at'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ContextMessage
+     */
+    'created_at': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ContextMessage
+     */
+    'role': ContextMessageRoleEnum;
+    /**
+     * 
+     * @type {Array<ContextMessageContent>}
+     * @memberof ContextMessage
+     */
+    'content': Array<ContextMessageContent>;
+    /**
+     * 
+     * @type {Array<ContextMessageToolCall>}
+     * @memberof ContextMessage
+     */
+    'tool_calls'?: Array<ContextMessageToolCall>;
+}
+
+export const ContextMessageRoleEnum = {
+    Assistant: 'assistant',
+    System: 'system',
+    User: 'user',
+    Tool: 'tool'
+} as const;
+
+export type ContextMessageRoleEnum = typeof ContextMessageRoleEnum[keyof typeof ContextMessageRoleEnum];
 
 

@@ -27,6 +27,9 @@ import type { Persona } from './persona';
 import type { Scenario } from './scenario';
 // May contain unused imports in some cases
 // @ts-ignore
+import type { ToolDefinition } from './tool-definition';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { Voice } from './voice';
 
 /**
@@ -65,6 +68,12 @@ export interface RealtimeSessionGenerativeConfig {
      * @memberof RealtimeSessionGenerativeConfig
      */
     'context': Context;
+    /**
+     * The tool definitions to use for the generative AI.
+     * @type {Array<ToolDefinition>}
+     * @memberof RealtimeSessionGenerativeConfig
+     */
+    'tool_definitions': Array<ToolDefinition>;
     /**
      * Extra configuration for the generative AI. Usually this is for internal purposes.
      * @type {object}

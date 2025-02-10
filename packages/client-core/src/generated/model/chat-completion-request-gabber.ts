@@ -26,5 +26,11 @@ export interface ChatCompletionRequestGabber {
      * @memberof ChatCompletionRequestGabber
      */
     'voice'?: string;
+    /**
+     * Gabber memory context id
+     * @type {string}
+     * @memberof ChatCompletionRequestGabber
+     */
+    'context'?: string;
 }
 
