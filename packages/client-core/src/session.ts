@@ -125,7 +125,7 @@ export class RealtimeSessionEngine {
         }
       );
     } catch (e) {
-      this.onError(new ConnectError("Error connecting to room"));
+      this.onError(new RealtimeSessionErrorConnect("Error connecting to room"));
     }
 
     this.onCanPlayAudioChanged(this.livekitRoom.canPlaybackAudio);
@@ -337,7 +337,7 @@ export class RealtimeSessionEngine {
       this.onMessagesChanged(this.transcriptions);
     } else if (topic === "error") {
       const payload = JSON.parse(decoded);
-      this.onError(new UnknownError(payload.message));
+      this.onError(new RealtimeSessionErrorUnknown(payload.message));
     }
   }
 
