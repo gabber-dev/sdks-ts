@@ -115,14 +115,18 @@ export class RealtimeSessionEngine {
     if (!connectionDetails) {
       throw new Error("No connection details provided");
     }
-    await this.livekitRoom.connect(
-      connectionDetails.url,
-      connectionDetails.token,
-      {
-        autoSubscribe: true,
-      }
-    );
 
+    try {
+      await this.livekitRoom.connect(
+        connectionDetails.url,
+        connectionDetails.token,
+        {
+          autoSubscribe: true,
+        }
+      );
+    } catch (e) {
+      this.onAgentError("Error connecting to room");
+    }
 
     this.onCanPlayAudioChanged(this.livekitRoom.canPlaybackAudio);
   }
