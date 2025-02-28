@@ -121,7 +121,7 @@ export function RealtimeSessionEngineProvider({ connectionOpts, children }: Prop
         onRemainingSecondsChanged: onRemainingSecondsChanged.current,
         onUserVolumeChanged: onUserVolumeChanged.current,
         onAgentVolumeChanged: onAgentVolumeChanged.current,
-        onConnectionStateChanged: onConnectionStateChanged.current,
+        OnErrorCallback: onConnectionStateChanged.current,
         onMessagesChanged: onMessagesChanged.current,
         onMicrophoneChanged: onMicrophoneChanged.current,
         onCanPlayAudioChanged: onCanPlayAudio.current,

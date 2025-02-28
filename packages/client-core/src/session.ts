@@ -31,7 +31,7 @@ export class RealtimeSessionEngine {
   private onUserVolumeChanged: OnVolumeCallback;
   private onAgentStateChanged: OnAgentStateChanged;
   private onRemainingSecondsChanged: OnRemainingSecondsChanged;
-  private onAgentError: OnAgentErrorCallback;
+  private onError: OnErrorCallback;
   private onCanPlayAudioChanged: OnCanPlayAudioChanged;
   private _agentState: SDKAgentState = "warmup";
   private _remainingSeconds: number | null = null;
@@ -46,7 +46,7 @@ export class RealtimeSessionEngine {
     onUserVolumeChanged,
     onAgentStateChanged,
     onRemainingSecondsChanged: onRemainingSecondsChanged,
-    onAgentError,
+    onError,
     onCanPlayAudioChanged,
   }: SessionEngineParams) {
     this.livekitRoom = new Room();
@@ -86,7 +86,7 @@ export class RealtimeSessionEngine {
     this.onUserVolumeChanged = onUserVolumeChanged;
     this.onAgentStateChanged = onAgentStateChanged;
     this.onRemainingSecondsChanged = onRemainingSecondsChanged;
-    this.onAgentError = onAgentError;
+    this.onError = onError;
     this.onCanPlayAudioChanged = onCanPlayAudioChanged;
 
     this.agentVolumeVisualizer = new TrackVolumeVisualizer({
@@ -125,7 +125,7 @@ export class RealtimeSessionEngine {
         }
       );
     } catch (e) {
-      this.onAgentError("Error connecting to room");
+      this.onError(new ConnectError("Error connecting to room"));
     }
 
     this.onCanPlayAudioChanged(this.livekitRoom.canPlaybackAudio);
@@ -337,7 +337,7 @@ export class RealtimeSessionEngine {
       this.onMessagesChanged(this.transcriptions);
     } else if (topic === "error") {
       const payload = JSON.parse(decoded);
-      this.onAgentError(payload.message);
+      this.onError(new UnknownError(payload.message));
     }
   }
 
@@ -378,8 +378,24 @@ type OnMicrophoneCallback = (enabled: boolean) => void;
 type OnVolumeCallback = (values: number[], volume: number) => void;
 type OnAgentStateChanged = (state: SDKAgentState) => void;
 type OnRemainingSecondsChanged = (seconds: number) => void;
-type OnAgentErrorCallback = (msg: string) => void;
+type OnErrorCallback = (error: RealtimeSessionError) => void;
 type OnCanPlayAudioChanged = (allowed: boolean) => void;
+
+class ConnectError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ConnectError";
+  }
+}
+
+class UnknownError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "UnknownError";
+  }
+}
+
+type RealtimeSessionError = ConnectError | UnknownError;
 
 export type SessionEngineParams = {
   onConnectionStateChanged: ConnectionStateChangedCallback;
@@ -389,6 +405,6 @@ export type SessionEngineParams = {
   onRemainingSecondsChanged: OnRemainingSecondsChanged;
   onAgentVolumeChanged: OnVolumeCallback;
   onUserVolumeChanged: OnVolumeCallback;
-  onAgentError: OnAgentErrorCallback;
+  onError: OnErrorCallback;
   onCanPlayAudioChanged: OnCanPlayAudioChanged;
 };
