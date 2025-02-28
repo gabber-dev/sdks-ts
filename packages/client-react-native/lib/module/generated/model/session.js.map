@@ -1,0 +1,1 @@
+{"version":3,"names":["SessionStateEnum","Ended","InProgress","NotStarted"],"sourceRoot":"../../../../src","sources":["generated/model/session.ts"],"mappings":";;AAAA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;;AAIA;AACA;AACA;AACA;AACA;;AA4EA,OAAO,MAAMA,gBAAgB,GAAG;EAC5BC,KAAK,EAAE,OAAO;EACdC,UAAU,EAAE,aAAa;EACzBC,UAAU,EAAE;AAChB,CAAU","ignoreList":[]}

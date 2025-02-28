@@ -1,0 +1,1 @@
+{"version":3,"names":["ChatCompletionNamedToolChoiceTypeEnum","Function"],"sourceRoot":"../../../../src","sources":["generated/model/chat-completion-named-tool-choice.ts"],"mappings":";;AAAA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;;AAGA;AACA;;AAGA;AACA;AACA;AACA;AACA;;AAgBA,OAAO,MAAMA,qCAAqC,GAAG;EACjDC,QAAQ,EAAE;AACd,CAAU","ignoreList":[]}

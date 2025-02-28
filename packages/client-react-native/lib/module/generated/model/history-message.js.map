@@ -1,0 +1,1 @@
+{"version":3,"names":["HistoryMessageRoleEnum","Assistant","System","User"],"sourceRoot":"../../../../src","sources":["generated/model/history-message.ts"],"mappings":";;AAAA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;;AAIA;AACA;AACA;AACA;AACA;;AAsBA,OAAO,MAAMA,sBAAsB,GAAG;EAClCC,SAAS,EAAE,WAAW;EACtBC,MAAM,EAAE,QAAQ;EAChBC,IAAI,EAAE;AACV,CAAU","ignoreList":[]}

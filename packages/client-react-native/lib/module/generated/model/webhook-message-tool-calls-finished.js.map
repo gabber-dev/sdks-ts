@@ -1,0 +1,1 @@
+{"version":3,"names":["WebhookMessageToolCallsFinishedTypeEnum","ToolCallsFinished"],"sourceRoot":"../../../../src","sources":["generated/model/webhook-message-tool-calls-finished.ts"],"mappings":";;AAAA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;;AAGA;AACA;;AAGA;AACA;AACA;AACA;AACA;;AAgBA,OAAO,MAAMA,uCAAuC,GAAG;EACnDC,iBAAiB,EAAE;AACvB,CAAU","ignoreList":[]}
