@@ -1,6 +1,7 @@
 import { createContext, useRef, useEffect, useState, useMemo } from "react";
 import {
   RealtimeSessionEngine,
+  RealtimeSessionError,
   SDKAgentState,
   SDKConnectionState,
   SDKConnectOptions,
@@ -47,7 +48,7 @@ export function RealtimeSessionEngineProvider({ connectionOpts, children }: Prop
   const [userVolume, setUserVolume] = useState<number>(0);
   const [agentState, setAgentState] = useState<SDKAgentState>("listening");
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
-  const [lastError, setLastError] = useState<{message: string} | null>(null);
+  const [lastError, setLastError] = useState<RealtimeSessionError | null>(null);
   const [canPlayAudio, setCanPlayAudio] = useState(true);
   const createOnce = useRef(false);
   const [transcription, setTranscription] = useState({
@@ -99,8 +100,8 @@ export function RealtimeSessionEngineProvider({ connectionOpts, children }: Prop
     setRemainingSeconds(seconds);
   });
 
-  const onAgentError = useRef((error: string) => {
-    setLastError({message});
+  const onError = useRef((error: RealtimeSessionError) => {
+    setLastError(error);
   });
 
   const onCanPlayAudio = useRef((allowed: boolean) => {
@@ -116,7 +117,7 @@ export function RealtimeSessionEngineProvider({ connectionOpts, children }: Prop
       }
       createOnce.current = true;
       return new RealtimeSessionEngine({
-        onAgentError: onAgentError.current,
+        onError: onError.current,
         onAgentStateChanged: onAgentStateChanged.current,
         onRemainingSecondsChanged: onRemainingSecondsChanged.current,
         onUserVolumeChanged: onUserVolumeChanged.current,
