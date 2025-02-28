@@ -381,21 +381,21 @@ type OnRemainingSecondsChanged = (seconds: number) => void;
 type OnErrorCallback = (error: RealtimeSessionError) => void;
 type OnCanPlayAudioChanged = (allowed: boolean) => void;
 
-class ConnectError extends Error {
+export class RealtimeSessionErrorConnect extends Error {
   constructor(message: string) {
     super(message);
     this.name = "ConnectError";
   }
 }
 
-class UnknownError extends Error {
+export class RealtimeSessionErrorUnknown extends Error {
   constructor(message: string) {
     super(message);
     this.name = "UnknownError";
   }
 }
 
-type RealtimeSessionError = ConnectError | UnknownError;
+export type RealtimeSessionError = RealtimeSessionErrorConnect | RealtimeSessionErrorUnknown;
 
 export type SessionEngineParams = {
   onConnectionStateChanged: ConnectionStateChangedCallback;

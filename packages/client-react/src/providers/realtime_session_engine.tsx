@@ -99,7 +99,7 @@ export function RealtimeSessionEngineProvider({ connectionOpts, children }: Prop
     setRemainingSeconds(seconds);
   });
 
-  const onAgentError = useRef((message: string) => {
+  const onAgentError = useRef((error: string) => {
     setLastError({message});
   });
 
@@ -121,7 +121,7 @@ export function RealtimeSessionEngineProvider({ connectionOpts, children }: Prop
         onRemainingSecondsChanged: onRemainingSecondsChanged.current,
         onUserVolumeChanged: onUserVolumeChanged.current,
         onAgentVolumeChanged: onAgentVolumeChanged.current,
-        OnErrorCallback: onConnectionStateChanged.current,
+        onConnectionStateChanged: onConnectionStateChanged.current,
         onMessagesChanged: onMessagesChanged.current,
         onMicrophoneChanged: onMicrophoneChanged.current,
         onCanPlayAudioChanged: onCanPlayAudio.current,
