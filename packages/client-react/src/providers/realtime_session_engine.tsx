@@ -1,3 +1,4 @@
+"use client"
 import { createContext, useRef, useEffect, useState, useMemo } from "react";
 import {
   RealtimeSessionEngine,
@@ -14,7 +15,7 @@ type RealtimeSessionEngineContextData = {
   id: string | null;
   connectionState: SDKConnectionState;
   messages: SDKSessionTranscription[];
-  lastError: {message: string} | null;
+  lastError: { message: string } | null;
   microphoneEnabled: boolean;
   agentVolumeBands: number[];
   agentVolume: number;
