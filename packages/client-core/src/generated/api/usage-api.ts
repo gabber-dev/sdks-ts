@@ -28,7 +28,7 @@ import type { CreateUsageToken200Response } from '../model';
 // @ts-ignore
 import type { UpdateUsageLimitsRequest } from '../model';
 // @ts-ignore
-import type { UsageLimitsInner } from '../model';
+import type { UsageLimit } from '../model';
 // @ts-ignore
 import type { UsageTokenRequest } from '../model';
 /**
@@ -193,7 +193,7 @@ export const UsageApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getUsageLimits(xHumanId?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<UsageLimitsInner>>> {
+        async getUsageLimits(xHumanId?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<UsageLimit>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getUsageLimits(xHumanId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['UsageApi.getUsageLimits']?.[localVarOperationServerIndex]?.url;
@@ -240,7 +240,7 @@ export const UsageApiFactory = function (configuration?: Configuration, basePath
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getUsageLimits(xHumanId?: string, options?: RawAxiosRequestConfig): AxiosPromise<Array<UsageLimitsInner>> {
+        getUsageLimits(xHumanId?: string, options?: RawAxiosRequestConfig): AxiosPromise<Array<UsageLimit>> {
             return localVarFp.getUsageLimits(xHumanId, options).then((request) => request(axios, basePath));
         },
         /**

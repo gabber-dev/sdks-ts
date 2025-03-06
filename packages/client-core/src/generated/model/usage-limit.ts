@@ -20,19 +20,19 @@ import type { UsageType } from './usage-type';
 /**
  * 
  * @export
- * @interface UsageLimitsInner
+ * @interface UsageLimit
  */
-export interface UsageLimitsInner {
+export interface UsageLimit {
     /**
      * 
      * @type {UsageType}
-     * @memberof UsageLimitsInner
+     * @memberof UsageLimit
      */
     'type': UsageType;
     /**
      * 
      * @type {number}
-     * @memberof UsageLimitsInner
+     * @memberof UsageLimit
      */
     'value': number;
 }

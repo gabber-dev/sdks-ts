@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { UsageLimitsInner } from './usage-limits-inner';
+import type { UsageLimit } from './usage-limit';
 
 /**
  * 
@@ -25,10 +25,10 @@ import type { UsageLimitsInner } from './usage-limits-inner';
 export interface UsageTokenRequest {
     /**
      * 
-     * @type {Array<UsageLimitsInner>}
+     * @type {Array<UsageLimit>}
      * @memberof UsageTokenRequest
      */
-    'limits': Array<UsageLimitsInner>;
+    'limits': Array<UsageLimit>;
     /**
      * The ID of the human that the token is for. (this is typically your user id from your system)
      * @type {string}

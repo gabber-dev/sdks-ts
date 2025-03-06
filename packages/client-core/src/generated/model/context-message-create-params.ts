@@ -59,7 +59,8 @@ export const ContextMessageCreateParamsRoleEnum = {
     Assistant: 'assistant',
     System: 'system',
     User: 'user',
-    Tool: 'tool'
+    Tool: 'tool',
+    Custom: 'custom'
 } as const;
 
 export type ContextMessageCreateParamsRoleEnum = typeof ContextMessageCreateParamsRoleEnum[keyof typeof ContextMessageCreateParamsRoleEnum];

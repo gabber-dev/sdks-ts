@@ -5,7 +5,8 @@ import {
   VoiceApi,
   ScenarioApi,
   LLMApi,
-  UsageApi
+  UsageApi,
+  ToolApi
 } from "./generated";
 
 export * from "./generated/model";
@@ -18,6 +19,7 @@ export class Api {
   public scenario: ScenarioApi;
   public llm: LLMApi;
   public usage: UsageApi;
+  public tool: ToolApi;
 
   constructor(token: string) {
     const config = new Configuration({ accessToken: token });
@@ -27,5 +29,6 @@ export class Api {
     this.scenario = new ScenarioApi(config);
     this.llm = new LLMApi(config);
     this.usage = new UsageApi(config);
+    this.tool = new ToolApi(config);
   }
 }

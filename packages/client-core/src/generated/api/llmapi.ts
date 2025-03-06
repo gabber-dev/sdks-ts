@@ -290,10 +290,11 @@ export const LLMApiAxiosParamCreator = function (configuration?: Configuration) 
          * @summary List ContextMessages.
          * @param {string} context The unique identifier of the Context.
          * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
+         * @param {Array<string>} [messageIds] A comma-separated list of message IDs to fetch.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listContextMessages: async (context: string, xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listContextMessages: async (context: string, xHumanId?: string, messageIds?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'context' is not null or undefined
             assertParamExists('listContextMessages', 'context', context)
             const localVarPath = `/v1/llm/context/{context}/message/list`
@@ -315,6 +316,10 @@ export const LLMApiAxiosParamCreator = function (configuration?: Configuration) 
             // authentication BearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (messageIds) {
+                localVarQueryParameter['message_ids'] = messageIds;
+            }
 
             if (xHumanId != null) {
                 localVarHeaderParameter['x-human-id'] = String(xHumanId);
@@ -460,11 +465,12 @@ export const LLMApiFp = function(configuration?: Configuration) {
          * @summary List ContextMessages.
          * @param {string} context The unique identifier of the Context.
          * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
+         * @param {Array<string>} [messageIds] A comma-separated list of message IDs to fetch.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listContextMessages(context: string, xHumanId?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListContextMessages200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listContextMessages(context, xHumanId, options);
+        async listContextMessages(context: string, xHumanId?: string, messageIds?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListContextMessages200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listContextMessages(context, xHumanId, messageIds, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['LLMApi.listContextMessages']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -554,11 +560,12 @@ export const LLMApiFactory = function (configuration?: Configuration, basePath?:
          * @summary List ContextMessages.
          * @param {string} context The unique identifier of the Context.
          * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
+         * @param {Array<string>} [messageIds] A comma-separated list of message IDs to fetch.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listContextMessages(context: string, xHumanId?: string, options?: RawAxiosRequestConfig): AxiosPromise<ListContextMessages200Response> {
-            return localVarFp.listContextMessages(context, xHumanId, options).then((request) => request(axios, basePath));
+        listContextMessages(context: string, xHumanId?: string, messageIds?: Array<string>, options?: RawAxiosRequestConfig): AxiosPromise<ListContextMessages200Response> {
+            return localVarFp.listContextMessages(context, xHumanId, messageIds, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -652,12 +659,13 @@ export class LLMApi extends BaseAPI {
      * @summary List ContextMessages.
      * @param {string} context The unique identifier of the Context.
      * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
+     * @param {Array<string>} [messageIds] A comma-separated list of message IDs to fetch.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof LLMApi
      */
-    public listContextMessages(context: string, xHumanId?: string, options?: RawAxiosRequestConfig) {
-        return LLMApiFp(this.configuration).listContextMessages(context, xHumanId, options).then((request) => request(this.axios, this.basePath));
+    public listContextMessages(context: string, xHumanId?: string, messageIds?: Array<string>, options?: RawAxiosRequestConfig) {
+        return LLMApiFp(this.configuration).listContextMessages(context, xHumanId, messageIds, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -58,6 +58,12 @@ export interface ContextMessage {
     'role': ContextMessageRoleEnum;
     /**
      * 
+     * @type {string}
+     * @memberof ContextMessage
+     */
+    'realtime_session'?: string;
+    /**
+     * 
      * @type {Array<ContextMessageContent>}
      * @memberof ContextMessage
      */

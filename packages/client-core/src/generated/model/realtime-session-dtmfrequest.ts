@@ -15,25 +15,19 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { UsageLimit } from './usage-limit';
+import type { RealtimeSessionDTMFDigit } from './realtime-session-dtmfdigit';
 
 /**
  * 
  * @export
- * @interface UpdateUsageLimitsRequest
+ * @interface RealtimeSessionDTMFRequest
  */
-export interface UpdateUsageLimitsRequest {
+export interface RealtimeSessionDTMFRequest {
     /**
      * 
-     * @type {Array<UsageLimit>}
-     * @memberof UpdateUsageLimitsRequest
+     * @type {Array<RealtimeSessionDTMFDigit>}
+     * @memberof RealtimeSessionDTMFRequest
      */
-    'limits': Array<UsageLimit>;
-    /**
-     * The ID of the human that the token is for. (this is typically your user id from your system)
-     * @type {string}
-     * @memberof UpdateUsageLimitsRequest
-     */
-    'human_id': string;
+    'digits': Array<RealtimeSessionDTMFDigit>;
 }
 

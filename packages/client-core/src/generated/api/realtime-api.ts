@@ -36,6 +36,8 @@ import type { RealtimeSession } from '../model';
 // @ts-ignore
 import type { RealtimeSessionConfigUpdate } from '../model';
 // @ts-ignore
+import type { RealtimeSessionDTMFRequest } from '../model';
+// @ts-ignore
 import type { RealtimeSessionInitiateOutboundCallRequest } from '../model';
 // @ts-ignore
 import type { RealtimeSessionStartResponse } from '../model';
@@ -86,6 +88,49 @@ export const RealtimeApiAxiosParamCreator = function (configuration?: Configurat
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(attachHumanRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * For a live session, force agent to send DTMF tones
+         * @summary DTMF
+         * @param {string} session The unique identifier of the RealtimeSession.
+         * @param {RealtimeSessionDTMFRequest} realtimeSessionDTMFRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dtmf: async (session: string, realtimeSessionDTMFRequest: RealtimeSessionDTMFRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'session' is not null or undefined
+            assertParamExists('dtmf', 'session', session)
+            // verify required parameter 'realtimeSessionDTMFRequest' is not null or undefined
+            assertParamExists('dtmf', 'realtimeSessionDTMFRequest', realtimeSessionDTMFRequest)
+            const localVarPath = `/v1/realtime/{session}/dtmf`
+                .replace(`{${"session"}}`, encodeURIComponent(String(session)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication ApiKeyAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "x-api-key", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(realtimeSessionDTMFRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -533,6 +578,20 @@ export const RealtimeApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * For a live session, force agent to send DTMF tones
+         * @summary DTMF
+         * @param {string} session The unique identifier of the RealtimeSession.
+         * @param {RealtimeSessionDTMFRequest} realtimeSessionDTMFRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dtmf(session: string, realtimeSessionDTMFRequest: RealtimeSessionDTMFRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dtmf(session, realtimeSessionDTMFRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RealtimeApi.dtmf']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * End the RealtimeSession with the given identifier. 
          * @summary End a RealtimeSession.
          * @param {string} session The unique identifier of the RealtimeSession.
@@ -680,6 +739,17 @@ export const RealtimeApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.attachHuman(session, attachHumanRequest, options).then((request) => request(axios, basePath));
         },
         /**
+         * For a live session, force agent to send DTMF tones
+         * @summary DTMF
+         * @param {string} session The unique identifier of the RealtimeSession.
+         * @param {RealtimeSessionDTMFRequest} realtimeSessionDTMFRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dtmf(session: string, realtimeSessionDTMFRequest: RealtimeSessionDTMFRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.dtmf(session, realtimeSessionDTMFRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * End the RealtimeSession with the given identifier. 
          * @summary End a RealtimeSession.
          * @param {string} session The unique identifier of the RealtimeSession.
@@ -799,6 +869,19 @@ export class RealtimeApi extends BaseAPI {
      */
     public attachHuman(session: string, attachHumanRequest: AttachHumanRequest, options?: RawAxiosRequestConfig) {
         return RealtimeApiFp(this.configuration).attachHuman(session, attachHumanRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * For a live session, force agent to send DTMF tones
+     * @summary DTMF
+     * @param {string} session The unique identifier of the RealtimeSession.
+     * @param {RealtimeSessionDTMFRequest} realtimeSessionDTMFRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RealtimeApi
+     */
+    public dtmf(session: string, realtimeSessionDTMFRequest: RealtimeSessionDTMFRequest, options?: RawAxiosRequestConfig) {
+        return RealtimeApiFp(this.configuration).dtmf(session, realtimeSessionDTMFRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

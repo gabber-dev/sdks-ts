@@ -38,6 +38,8 @@ model/chat-completion-request-user-message-content.ts
 model/chat-completion-request-user-message.ts
 model/chat-completion-request.ts
 model/chat-completion-response-choices-inner.ts
+model/chat-completion-response-gabber-advanced-memory-thread.ts
+model/chat-completion-response-gabber-advanced-memory.ts
 model/chat-completion-response-gabber-message-data-data.ts
 model/chat-completion-response-gabber-message-data.ts
 model/chat-completion-response-gabber.ts
@@ -99,6 +101,8 @@ model/realtime-session-config.ts
 model/realtime-session-connection-details.ts
 model/realtime-session-data-type.ts
 model/realtime-session-data.ts
+model/realtime-session-dtmfdigit.ts
+model/realtime-session-dtmfrequest.ts
 model/realtime-session-general-config.ts
 model/realtime-session-generative-config-create.ts
 model/realtime-session-generative-config-update.ts
@@ -140,7 +144,7 @@ model/update-scenario-request.ts
 model/update-session-request.ts
 model/update-usage-limits-request.ts
 model/update-voice-request.ts
-model/usage-limits-inner.ts
+model/usage-limit.ts
 model/usage-token-request.ts
 model/usage-type.ts
 model/usage.ts

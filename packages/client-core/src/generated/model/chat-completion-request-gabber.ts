@@ -32,5 +32,11 @@ export interface ChatCompletionRequestGabber {
      * @memberof ChatCompletionRequestGabber
      */
     'context'?: string;
+    /**
+     * When set to true, gabber will use it\'s advanced memory system to generate responses. A context must be set to enable this feature.
+     * @type {boolean}
+     * @memberof ChatCompletionRequestGabber
+     */
+    'advanced_memory'?: boolean;
 }
 
