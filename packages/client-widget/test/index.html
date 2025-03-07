@@ -16,7 +16,6 @@
             width: 100vw;
             height: 100vh;
         }
-
     </style>
 </head>
 
@@ -58,34 +57,34 @@
             return token;
         });
     }
-     Gabber.ConversationalWidget.create({
-          elementID: "gabber",
-          tokenGenerator,
-          usageLimitExceededCallback: function(type) {
-              console.log("Usage exceeded: ", type)
-          },
-          settings: {
-              liveTitleText: "Test1",
-              createTitleText: "Test2",
-              initialPersona: "",
-              initialScenario: "1e6156b9-1248-4a93-be1b-3e8c542fb96b",
-              initialVoice: "",
-              connectButtonText: "connect buton",
-              primaryColor: "#FFD700",         // Gold
-              primaryColorContent: "#000000",  // Black text on gold
-              secondaryColor: "#B22234",       // Soft/muted red
-              secondaryColorContent: "#FFFFFF", // White text on red
-              baseColor: "#000000",            // Black background
-              baseColorPlusOne: "#1A1A1A",     // Slightly lighter black
-              baseColorPlusTwo: "#333333",     // Even lighter black
-              baseColorContent: "#FFFFFF",     // White text on black
-              accentColor: "#3C3B6E",          // Soft/muted blue
-              audioPlaybackFailed: {
-                  descriptionText: "AP Failed",
-                  buttonText: "Start"
-              }
-          }
-      })
+    Gabber.ConversationalWidget.create({
+        elementID: "gabber",
+        tokenGenerator,
+        usageLimitExceededCallback: function (type) {
+            console.log("Usage exceeded: ", type)
+        },
+        settings: {
+            liveTitleText: "Test1",
+            createTitleText: "Test2",
+            initialPersona: "",
+            initialScenario: "1e6156b9-1248-4a93-be1b-3e8c542fb96b",
+            initialVoice: "",
+            connectButtonText: "connect buton",
+            primaryColor: "#FFD700",         // Gold
+            primaryColorContent: "#000000",  // Black text on gold
+            secondaryColor: "#B22234",       // Soft/muted red
+            secondaryColorContent: "#FFFFFF", // White text on red
+            baseColor: "#000000",            // Black background
+            baseColorPlusOne: "#1A1A1A",     // Slightly lighter black
+            baseColorPlusTwo: "#333333",     // Even lighter black
+            baseColorContent: "#FFFFFF",     // White text on black
+            accentColor: "#3C3B6E",          // Soft/muted blue
+            audioPlaybackFailed: {
+                descriptionText: "AP Failed",
+                buttonText: "Start"
+            }
+        }
+    })
     //Gabber.VoiceGenerationWidget.create({
     //    elementID: "gabber",
     //    tokenGenerator,
