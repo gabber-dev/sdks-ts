@@ -11,7 +11,13 @@ export function Messages() {
 
   useEffect(() => {
     const scrollToBottom = () => {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      if (messagesContainerRef.current) {
+        const { scrollHeight, clientHeight } = messagesContainerRef.current;
+        messagesContainerRef.current.scrollTo({
+          top: scrollHeight - clientHeight,
+          behavior: "smooth",
+        });
+      }
     };
 
     if (shouldAutoScroll) {
@@ -29,7 +35,7 @@ export function Messages() {
   };
 
   return (
-    <div className="h-full w-full flex flex-col overflow-hidden h-full relative">
+    <div className="h-full w-full flex flex-col overflow-hidden relative">
       {/* Messages view */}
       <h4
         className="font-semibold mb-1 text-sm"

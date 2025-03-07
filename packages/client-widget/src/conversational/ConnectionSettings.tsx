@@ -3,7 +3,7 @@ import { useSettings } from "./SettingsProvider";
 import { useVoice } from "../providers/VoiceProvider";
 import { usePersona } from "../providers/PersonaProvider";
 import { useScenario } from "../providers/ScenarioProvider";
-import { Voice } from "../../node_modules/gabber-client-core/src/generated/model/voice";
+import { Voice } from "gabber-client-core";
 
 export function ConnectionSettings() {
   const { settings } = useSettings();
@@ -14,7 +14,7 @@ export function ConnectionSettings() {
   const [isFreeform, setIsFreeform] = useState(false);
 
   // Separate and sort voices
-  const { customVoices, standardVoices } = useMemo(() => {
+  const { customVoices } = useMemo(() => {
     // Create a Map to track unique voices by ID
     const uniqueVoices = new Map();
 
