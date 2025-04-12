@@ -24,7 +24,7 @@ import type { RealtimeSession } from './realtime-session';
  */
 export interface ListRealtimeSessions200Response {
     /**
-     * The URL to the next page of items.
+     * The token for the next page of results, or null if there are no more pages.
      * @type {string}
      * @memberof ListRealtimeSessions200Response
      */

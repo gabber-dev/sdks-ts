@@ -15,28 +15,28 @@
 
 
 /**
- * 
+ * Pricing details for a voice
  * @export
- * @interface UpdateVoiceRequest
+ * @interface VoicePricing
  */
-export interface UpdateVoiceRequest {
+export interface VoicePricing {
     /**
-     * 
+     * Price per second for using this voice
      * @type {string}
-     * @memberof UpdateVoiceRequest
+     * @memberof VoicePricing
      */
-    'name': string;
+    'price_per_second': string;
     /**
-     * The language of the voice
+     * Currency for the price (e.g., USD)
      * @type {string}
-     * @memberof UpdateVoiceRequest
+     * @memberof VoicePricing
      */
-    'language': string;
+    'currency': string;
     /**
-     * Tags to associate with this voice
-     * @type {Array<string>}
-     * @memberof UpdateVoiceRequest
+     * Name of the product in Stripe
+     * @type {string}
+     * @memberof VoicePricing
      */
-    'tags'?: Array<string>;
+    'product_name': string;
 }
 

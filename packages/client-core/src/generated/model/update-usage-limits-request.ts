@@ -33,7 +33,14 @@ export interface UpdateUsageLimitsRequest {
      * The ID of the human that the token is for. (this is typically your user id from your system)
      * @type {string}
      * @memberof UpdateUsageLimitsRequest
+     * @deprecated
      */
-    'human_id': string;
+    'human_id'?: string;
+    /**
+     * The human that the token is for. (this is typically your user id from your system)
+     * @type {string}
+     * @memberof UpdateUsageLimitsRequest
+     */
+    'human': string;
 }
 

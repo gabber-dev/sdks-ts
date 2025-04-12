@@ -53,6 +53,12 @@ export interface ContextMessageCreateParams {
      * @memberof ContextMessageCreateParams
      */
     'tool_calls'?: Array<ContextMessageToolCall>;
+    /**
+     * When set to true, gabber will use it\'s advanced memory system to generate responses.
+     * @type {boolean}
+     * @memberof ContextMessageCreateParams
+     */
+    'advanced_memory'?: boolean;
 }
 
 export const ContextMessageCreateParamsRoleEnum = {

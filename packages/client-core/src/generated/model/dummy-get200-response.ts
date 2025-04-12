@@ -15,6 +15,12 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import type { TTSWebsocketRequestMessage } from './ttswebsocket-request-message';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { TTSWebsocketResponseMessage } from './ttswebsocket-response-message';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { WebhookMessage } from './webhook-message';
 
 /**
@@ -29,5 +35,17 @@ export interface DummyGet200Response {
      * @memberof DummyGet200Response
      */
     'webhook_message'?: WebhookMessage;
+    /**
+     * 
+     * @type {TTSWebsocketRequestMessage}
+     * @memberof DummyGet200Response
+     */
+    'tts_websocket_request_message'?: TTSWebsocketRequestMessage;
+    /**
+     * 
+     * @type {TTSWebsocketResponseMessage}
+     * @memberof DummyGet200Response
+     */
+    'tts_websocket_response_message'?: TTSWebsocketResponseMessage;
 }
 

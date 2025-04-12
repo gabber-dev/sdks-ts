@@ -17,17 +17,20 @@
 /**
  * 
  * @export
- * @enum {string}
+ * @interface VoiceTag
  */
-
-export const UsageType = {
-    ConversationalSeconds: 'conversational_seconds',
-    VoiceSynthesisSeconds: 'voice_synthesis_seconds',
-    TokenCnt: 'token_cnt',
-    MemoryMessageCnt: 'memory_message_cnt'
-} as const;
-
-export type UsageType = typeof UsageType[keyof typeof UsageType];
-
-
+export interface VoiceTag {
+    /**
+     * Machine-readable tag name
+     * @type {string}
+     * @memberof VoiceTag
+     */
+    'name': string;
+    /**
+     * Human-readable tag name for display
+     * @type {string}
+     * @memberof VoiceTag
+     */
+    'human_name': string;
+}
 

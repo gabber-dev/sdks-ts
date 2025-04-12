@@ -240,10 +240,11 @@ export const VoiceApiAxiosParamCreator = function (configuration?: Configuration
          * 
          * @summary Get a list of voices
          * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
+         * @param {Array<string>} [tags] Filter voices by tag names
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listVoices: async (xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listVoices: async (xHumanId?: string, tags?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/v1/voice/list`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -262,6 +263,10 @@ export const VoiceApiAxiosParamCreator = function (configuration?: Configuration
             // authentication BearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (tags) {
+                localVarQueryParameter['tags'] = tags;
+            }
 
             if (xHumanId != null) {
                 localVarHeaderParameter['x-human-id'] = String(xHumanId);
@@ -395,11 +400,12 @@ export const VoiceApiFp = function(configuration?: Configuration) {
          * 
          * @summary Get a list of voices
          * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
+         * @param {Array<string>} [tags] Filter voices by tag names
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listVoices(xHumanId?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListVoices200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listVoices(xHumanId, options);
+        async listVoices(xHumanId?: string, tags?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListVoices200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listVoices(xHumanId, tags, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['VoiceApi.listVoices']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -476,11 +482,12 @@ export const VoiceApiFactory = function (configuration?: Configuration, basePath
          * 
          * @summary Get a list of voices
          * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
+         * @param {Array<string>} [tags] Filter voices by tag names
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listVoices(xHumanId?: string, options?: RawAxiosRequestConfig): AxiosPromise<ListVoices200Response> {
-            return localVarFp.listVoices(xHumanId, options).then((request) => request(axios, basePath));
+        listVoices(xHumanId?: string, tags?: Array<string>, options?: RawAxiosRequestConfig): AxiosPromise<ListVoices200Response> {
+            return localVarFp.listVoices(xHumanId, tags, options).then((request) => request(axios, basePath));
         },
         /**
          * Updates a voice based on the input request data
@@ -559,12 +566,13 @@ export class VoiceApi extends BaseAPI {
      * 
      * @summary Get a list of voices
      * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
+     * @param {Array<string>} [tags] Filter voices by tag names
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof VoiceApi
      */
-    public listVoices(xHumanId?: string, options?: RawAxiosRequestConfig) {
-        return VoiceApiFp(this.configuration).listVoices(xHumanId, options).then((request) => request(this.axios, this.basePath));
+    public listVoices(xHumanId?: string, tags?: Array<string>, options?: RawAxiosRequestConfig) {
+        return VoiceApiFp(this.configuration).listVoices(xHumanId, tags, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

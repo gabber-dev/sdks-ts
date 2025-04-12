@@ -13,6 +13,12 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { RealtimeSessionConfig } from './realtime-session-config';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { RealtimeSessionData } from './realtime-session-data';
 
 /**
  * 
@@ -21,23 +27,71 @@
  */
 export interface WebhookMessageRealtimeSessionStateChangedpayloadSession {
     /**
-     * 
+     * The unique identifier of the RealtimeSession.
      * @type {string}
      * @memberof WebhookMessageRealtimeSessionStateChangedpayloadSession
      */
     'id': string;
     /**
-     * 
+     * The current state of the RealtimeSession.
      * @type {string}
      * @memberof WebhookMessageRealtimeSessionStateChangedpayloadSession
      */
     'state': WebhookMessageRealtimeSessionStateChangedpayloadSessionStateEnum;
+    /**
+     * The time the RealtimeSession was created.
+     * @type {string}
+     * @memberof WebhookMessageRealtimeSessionStateChangedpayloadSession
+     */
+    'created_at': string;
+    /**
+     * The time the RealtimeSession ended.
+     * @type {string}
+     * @memberof WebhookMessageRealtimeSessionStateChangedpayloadSession
+     */
+    'ended_at'?: string;
+    /**
+     * The project identifier.
+     * @type {string}
+     * @memberof WebhookMessageRealtimeSessionStateChangedpayloadSession
+     */
+    'project': string;
+    /**
+     * The human identifier.
+     * @type {string}
+     * @memberof WebhookMessageRealtimeSessionStateChangedpayloadSession
+     */
+    'human'?: string;
+    /**
+     * Whether the session is simulated or not.
+     * @type {boolean}
+     * @memberof WebhookMessageRealtimeSessionStateChangedpayloadSession
+     */
+    'simulated': boolean;
+    /**
+     * 
+     * @type {RealtimeSessionConfig}
+     * @memberof WebhookMessageRealtimeSessionStateChangedpayloadSession
+     */
+    'config': RealtimeSessionConfig;
+    /**
+     * 
+     * @type {Array<RealtimeSessionData>}
+     * @memberof WebhookMessageRealtimeSessionStateChangedpayloadSession
+     */
+    'data': Array<RealtimeSessionData>;
+    /**
+     * Extra configuration for the RealtimeSession. Usually this is for internal purposes.
+     * @type {object}
+     * @memberof WebhookMessageRealtimeSessionStateChangedpayloadSession
+     */
+    '_extra'?: object;
 }
 
 export const WebhookMessageRealtimeSessionStateChangedpayloadSessionStateEnum = {
-    NotStarted: 'not_started',
+    Ended: 'ended',
     InProgress: 'in_progress',
-    Ended: 'ended'
+    NotStarted: 'not_started'
 } as const;
 
 export type WebhookMessageRealtimeSessionStateChangedpayloadSessionStateEnum = typeof WebhookMessageRealtimeSessionStateChangedpayloadSessionStateEnum[keyof typeof WebhookMessageRealtimeSessionStateChangedpayloadSessionStateEnum];

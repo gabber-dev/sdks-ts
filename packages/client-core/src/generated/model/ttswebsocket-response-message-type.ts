@@ -20,14 +20,13 @@
  * @enum {string}
  */
 
-export const UsageType = {
-    ConversationalSeconds: 'conversational_seconds',
-    VoiceSynthesisSeconds: 'voice_synthesis_seconds',
-    TokenCnt: 'token_cnt',
-    MemoryMessageCnt: 'memory_message_cnt'
+export const TTSWebsocketResponseMessageType = {
+    Audio: 'audio',
+    Final: 'final',
+    Error: 'error'
 } as const;
 
-export type UsageType = typeof UsageType[keyof typeof UsageType];
+export type TTSWebsocketResponseMessageType = typeof TTSWebsocketResponseMessageType[keyof typeof TTSWebsocketResponseMessageType];
 
 
 

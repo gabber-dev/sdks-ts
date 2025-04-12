@@ -21,10 +21,13 @@ import type { WebhookMessageRealtimeSessionMessageCommitted } from './webhook-me
 import type { WebhookMessageRealtimeSessionStateChanged } from './webhook-message-realtime-session-state-changed';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { WebhookMessageToolCallsFinished } from './webhook-message-tool-calls-finished';
+import type { WebhookMessageRealtimeSessionTimeLimitExceeded } from './webhook-message-realtime-session-time-limit-exceeded';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { WebhookMessageToolCallsFinishedPayload } from './webhook-message-tool-calls-finished-payload';
+import type { WebhookMessageRealtimeSessionTimeLimitExceededPayload } from './webhook-message-realtime-session-time-limit-exceeded-payload';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { WebhookMessageToolCallsFinished } from './webhook-message-tool-calls-finished';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { WebhookMessageToolCallsStarted } from './webhook-message-tool-calls-started';
@@ -36,6 +39,6 @@ import type { WebhookMessageUsageTracked } from './webhook-message-usage-tracked
  * @type WebhookMessage
  * @export
  */
-export type WebhookMessage = WebhookMessageRealtimeSessionMessageCommitted | WebhookMessageRealtimeSessionStateChanged | WebhookMessageToolCallsFinished | WebhookMessageToolCallsStarted | WebhookMessageUsageTracked;
+export type WebhookMessage = WebhookMessageRealtimeSessionMessageCommitted | WebhookMessageRealtimeSessionStateChanged | WebhookMessageRealtimeSessionTimeLimitExceeded | WebhookMessageToolCallsFinished | WebhookMessageToolCallsStarted | WebhookMessageUsageTracked;
 
 

@@ -15,28 +15,31 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { UsageType } from './usage-type';
+import type { Context } from './context';
 
 /**
  * 
  * @export
- * @interface UsageLimit
+ * @interface ListContexts200Response
  */
-export interface UsageLimit {
+export interface ListContexts200Response {
     /**
-     * 
-     * @type {UsageType}
-     * @memberof UsageLimit
-     * @deprecated
+     * The URL to the next page of items.
+     * @type {string}
+     * @memberof ListContexts200Response
      */
-    'type': UsageType;
+    'next_page'?: string;
     /**
-     * 
+     * The total number of items.
      * @type {number}
-     * @memberof UsageLimit
+     * @memberof ListContexts200Response
      */
-    'value': number;
+    'total_count': number;
+    /**
+     * The list of items.
+     * @type {Array<Context>}
+     * @memberof ListContexts200Response
+     */
+    'values': Array<Context>;
 }
-
-
 

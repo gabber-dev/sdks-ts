@@ -13,6 +13,12 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { VoicePricing } from './voice-pricing';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { VoiceTag } from './voice-tag';
 
 /**
  * 
@@ -98,6 +104,18 @@ export interface Voice {
      * @memberof Voice
      */
     'preview_url'?: string;
+    /**
+     * Pricing details for this voice
+     * @type {VoicePricing}
+     * @memberof Voice
+     */
+    'pricing': VoicePricing;
+    /**
+     * Tags associated with this voice
+     * @type {Array<VoiceTag>}
+     * @memberof Voice
+     */
+    'tags': Array<VoiceTag>;
     /**
      * Extra configuration for the voice. Usually this is for internal purposes.
      * @type {object}

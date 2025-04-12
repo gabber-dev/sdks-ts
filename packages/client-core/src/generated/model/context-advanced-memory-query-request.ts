@@ -15,16 +15,16 @@
 
 
 /**
- * Message thread details
+ * 
  * @export
- * @interface ChatCompletionResponseGabberAdvancedMemoryThread
+ * @interface ContextAdvancedMemoryQueryRequest
  */
-export interface ChatCompletionResponseGabberAdvancedMemoryThread {
+export interface ContextAdvancedMemoryQueryRequest {
     /**
      * 
-     * @type {Array<string>}
-     * @memberof ChatCompletionResponseGabberAdvancedMemoryThread
+     * @type {string}
+     * @memberof ContextAdvancedMemoryQueryRequest
      */
-    'context_message_ids': Array<string>;
+    'new_user_message': string;
 }
 

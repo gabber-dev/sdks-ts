@@ -13,45 +13,42 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import type { ContextMessage } from './context-message';
 
 /**
  * 
  * @export
- * @interface Context
+ * @interface ContextAdvancedMemoryNode
  */
-export interface Context {
+export interface ContextAdvancedMemoryNode {
     /**
      * 
      * @type {string}
-     * @memberof Context
+     * @memberof ContextAdvancedMemoryNode
      */
     'id': string;
     /**
      * 
      * @type {string}
-     * @memberof Context
+     * @memberof ContextAdvancedMemoryNode
      */
     'created_at': string;
     /**
      * 
      * @type {string}
-     * @memberof Context
+     * @memberof ContextAdvancedMemoryNode
      */
-    'project': string;
+    'updated_at': string;
     /**
      * 
      * @type {string}
-     * @memberof Context
+     * @memberof ContextAdvancedMemoryNode
      */
-    'human'?: string;
+    'name': string;
     /**
      * 
-     * @type {Array<ContextMessage>}
-     * @memberof Context
+     * @type {string}
+     * @memberof ContextAdvancedMemoryNode
      */
-    'latest_messages': Array<ContextMessage>;
+    'summary': string;
 }
 

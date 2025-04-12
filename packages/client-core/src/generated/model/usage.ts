@@ -33,6 +33,7 @@ export interface Usage {
      * 
      * @type {UsageType}
      * @memberof Usage
+     * @deprecated
      */
     'type': UsageType;
     /**

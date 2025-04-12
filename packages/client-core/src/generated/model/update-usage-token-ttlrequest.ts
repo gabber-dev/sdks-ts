@@ -17,17 +17,20 @@
 /**
  * 
  * @export
- * @enum {string}
+ * @interface UpdateUsageTokenTTLRequest
  */
-
-export const UsageType = {
-    ConversationalSeconds: 'conversational_seconds',
-    VoiceSynthesisSeconds: 'voice_synthesis_seconds',
-    TokenCnt: 'token_cnt',
-    MemoryMessageCnt: 'memory_message_cnt'
-} as const;
-
-export type UsageType = typeof UsageType[keyof typeof UsageType];
-
-
+export interface UpdateUsageTokenTTLRequest {
+    /**
+     * The human ID to update the TTL for
+     * @type {string}
+     * @memberof UpdateUsageTokenTTLRequest
+     */
+    'human': string;
+    /**
+     * The new TTL in seconds
+     * @type {number}
+     * @memberof UpdateUsageTokenTTLRequest
+     */
+    'ttl_seconds': number;
+}
 

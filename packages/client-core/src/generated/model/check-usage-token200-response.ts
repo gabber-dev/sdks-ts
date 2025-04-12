@@ -17,17 +17,14 @@
 /**
  * 
  * @export
- * @enum {string}
+ * @interface CheckUsageToken200Response
  */
-
-export const UsageType = {
-    ConversationalSeconds: 'conversational_seconds',
-    VoiceSynthesisSeconds: 'voice_synthesis_seconds',
-    TokenCnt: 'token_cnt',
-    MemoryMessageCnt: 'memory_message_cnt'
-} as const;
-
-export type UsageType = typeof UsageType[keyof typeof UsageType];
-
-
+export interface CheckUsageToken200Response {
+    /**
+     * The TTL of the token in seconds
+     * @type {number}
+     * @memberof CheckUsageToken200Response
+     */
+    'ttl_seconds': number;
+}
 

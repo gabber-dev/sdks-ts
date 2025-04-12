@@ -372,10 +372,11 @@ export const RealtimeApiAxiosParamCreator = function (configuration?: Configurat
          * List all Realtime Sessions. 
          * @summary List Realtime Sessions.
          * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
+         * @param {string} [page] Page token for pagination
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listRealtimeSessions: async (xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listRealtimeSessions: async (xHumanId?: string, page?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/v1/realtime/list`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -394,6 +395,10 @@ export const RealtimeApiAxiosParamCreator = function (configuration?: Configurat
             // authentication BearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
 
             if (xHumanId != null) {
                 localVarHeaderParameter['x-human-id'] = String(xHumanId);
@@ -665,11 +670,12 @@ export const RealtimeApiFp = function(configuration?: Configuration) {
          * List all Realtime Sessions. 
          * @summary List Realtime Sessions.
          * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
+         * @param {string} [page] Page token for pagination
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listRealtimeSessions(xHumanId?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListRealtimeSessions200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listRealtimeSessions(xHumanId, options);
+        async listRealtimeSessions(xHumanId?: string, page?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListRealtimeSessions200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listRealtimeSessions(xHumanId, page, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['RealtimeApi.listRealtimeSessions']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -808,11 +814,12 @@ export const RealtimeApiFactory = function (configuration?: Configuration, baseP
          * List all Realtime Sessions. 
          * @summary List Realtime Sessions.
          * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
+         * @param {string} [page] Page token for pagination
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listRealtimeSessions(xHumanId?: string, options?: RawAxiosRequestConfig): AxiosPromise<ListRealtimeSessions200Response> {
-            return localVarFp.listRealtimeSessions(xHumanId, options).then((request) => request(axios, basePath));
+        listRealtimeSessions(xHumanId?: string, page?: string, options?: RawAxiosRequestConfig): AxiosPromise<ListRealtimeSessions200Response> {
+            return localVarFp.listRealtimeSessions(xHumanId, page, options).then((request) => request(axios, basePath));
         },
         /**
          * For a live session, force the agent to speak a given text.
@@ -953,12 +960,13 @@ export class RealtimeApi extends BaseAPI {
      * List all Realtime Sessions. 
      * @summary List Realtime Sessions.
      * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
+     * @param {string} [page] Page token for pagination
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RealtimeApi
      */
-    public listRealtimeSessions(xHumanId?: string, options?: RawAxiosRequestConfig) {
-        return RealtimeApiFp(this.configuration).listRealtimeSessions(xHumanId, options).then((request) => request(this.axios, this.basePath));
+    public listRealtimeSessions(xHumanId?: string, page?: string, options?: RawAxiosRequestConfig) {
+        return RealtimeApiFp(this.configuration).listRealtimeSessions(xHumanId, page, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

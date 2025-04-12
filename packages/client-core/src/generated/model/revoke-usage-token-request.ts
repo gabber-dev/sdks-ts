@@ -17,17 +17,14 @@
 /**
  * 
  * @export
- * @enum {string}
+ * @interface RevokeUsageTokenRequest
  */
-
-export const UsageType = {
-    ConversationalSeconds: 'conversational_seconds',
-    VoiceSynthesisSeconds: 'voice_synthesis_seconds',
-    TokenCnt: 'token_cnt',
-    MemoryMessageCnt: 'memory_message_cnt'
-} as const;
-
-export type UsageType = typeof UsageType[keyof typeof UsageType];
-
-
+export interface RevokeUsageTokenRequest {
+    /**
+     * The human ID to revoke the token for
+     * @type {string}
+     * @memberof RevokeUsageTokenRequest
+     */
+    'human': string;
+}
 

@@ -26,6 +26,10 @@ import type { BadRequest } from '../model';
 // @ts-ignore
 import type { Context } from '../model';
 // @ts-ignore
+import type { ContextAdvancedMemoryQueryRequest } from '../model';
+// @ts-ignore
+import type { ContextAdvancedMemoryQueryResult } from '../model';
+// @ts-ignore
 import type { ContextCreateRequest } from '../model';
 // @ts-ignore
 import type { ContextMessage } from '../model';
@@ -35,6 +39,8 @@ import type { ContextMessageCreateParams } from '../model';
 import type { LLM } from '../model';
 // @ts-ignore
 import type { ListContextMessages200Response } from '../model';
+// @ts-ignore
+import type { ListContexts200Response } from '../model';
 // @ts-ignore
 import type { ListLLMs200Response } from '../model';
 /**
@@ -337,6 +343,55 @@ export const LLMApiAxiosParamCreator = function (configuration?: Configuration) 
             };
         },
         /**
+         * List all Contexts associated with the given human. 
+         * @summary List Contexts.
+         * @param {Array<string>} contextIds A comma-separated list of context IDs to fetch.
+         * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listContexts: async (contextIds: Array<string>, xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'contextIds' is not null or undefined
+            assertParamExists('listContexts', 'contextIds', contextIds)
+            const localVarPath = `/v1/llm/context/list`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication ApiKeyAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "x-api-key", configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (contextIds) {
+                localVarQueryParameter['context_ids'] = contextIds;
+            }
+
+            if (xHumanId != null) {
+                localVarHeaderParameter['x-human-id'] = String(xHumanId);
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary Get a list of llms
          * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
@@ -372,6 +427,58 @@ export const LLMApiAxiosParamCreator = function (configuration?: Configuration) 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Retrieve the ContextMemory with the given identifier. 
+         * @summary Query the advanced context memory
+         * @param {string} context The unique identifier of the Context.
+         * @param {ContextAdvancedMemoryQueryRequest} contextAdvancedMemoryQueryRequest 
+         * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        queryAdvancedContextMemory: async (context: string, contextAdvancedMemoryQueryRequest: ContextAdvancedMemoryQueryRequest, xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'context' is not null or undefined
+            assertParamExists('queryAdvancedContextMemory', 'context', context)
+            // verify required parameter 'contextAdvancedMemoryQueryRequest' is not null or undefined
+            assertParamExists('queryAdvancedContextMemory', 'contextAdvancedMemoryQueryRequest', contextAdvancedMemoryQueryRequest)
+            const localVarPath = `/v1/llm/context/{context}/advanced_memory/query`
+                .replace(`{${"context"}}`, encodeURIComponent(String(context)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication ApiKeyAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "x-api-key", configuration)
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (xHumanId != null) {
+                localVarHeaderParameter['x-human-id'] = String(xHumanId);
+            }
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(contextAdvancedMemoryQueryRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -476,6 +583,20 @@ export const LLMApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * List all Contexts associated with the given human. 
+         * @summary List Contexts.
+         * @param {Array<string>} contextIds A comma-separated list of context IDs to fetch.
+         * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listContexts(contextIds: Array<string>, xHumanId?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListContexts200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listContexts(contextIds, xHumanId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['LLMApi.listContexts']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary Get a list of llms
          * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
@@ -486,6 +607,21 @@ export const LLMApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listLLMs(xHumanId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['LLMApi.listLLMs']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Retrieve the ContextMemory with the given identifier. 
+         * @summary Query the advanced context memory
+         * @param {string} context The unique identifier of the Context.
+         * @param {ContextAdvancedMemoryQueryRequest} contextAdvancedMemoryQueryRequest 
+         * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async queryAdvancedContextMemory(context: string, contextAdvancedMemoryQueryRequest: ContextAdvancedMemoryQueryRequest, xHumanId?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ContextAdvancedMemoryQueryResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.queryAdvancedContextMemory(context, contextAdvancedMemoryQueryRequest, xHumanId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['LLMApi.queryAdvancedContextMemory']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -568,6 +704,17 @@ export const LLMApiFactory = function (configuration?: Configuration, basePath?:
             return localVarFp.listContextMessages(context, xHumanId, messageIds, options).then((request) => request(axios, basePath));
         },
         /**
+         * List all Contexts associated with the given human. 
+         * @summary List Contexts.
+         * @param {Array<string>} contextIds A comma-separated list of context IDs to fetch.
+         * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listContexts(contextIds: Array<string>, xHumanId?: string, options?: RawAxiosRequestConfig): AxiosPromise<ListContexts200Response> {
+            return localVarFp.listContexts(contextIds, xHumanId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary Get a list of llms
          * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
@@ -576,6 +723,18 @@ export const LLMApiFactory = function (configuration?: Configuration, basePath?:
          */
         listLLMs(xHumanId?: string, options?: RawAxiosRequestConfig): AxiosPromise<ListLLMs200Response> {
             return localVarFp.listLLMs(xHumanId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Retrieve the ContextMemory with the given identifier. 
+         * @summary Query the advanced context memory
+         * @param {string} context The unique identifier of the Context.
+         * @param {ContextAdvancedMemoryQueryRequest} contextAdvancedMemoryQueryRequest 
+         * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        queryAdvancedContextMemory(context: string, contextAdvancedMemoryQueryRequest: ContextAdvancedMemoryQueryRequest, xHumanId?: string, options?: RawAxiosRequestConfig): AxiosPromise<ContextAdvancedMemoryQueryResult> {
+            return localVarFp.queryAdvancedContextMemory(context, contextAdvancedMemoryQueryRequest, xHumanId, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -669,6 +828,19 @@ export class LLMApi extends BaseAPI {
     }
 
     /**
+     * List all Contexts associated with the given human. 
+     * @summary List Contexts.
+     * @param {Array<string>} contextIds A comma-separated list of context IDs to fetch.
+     * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof LLMApi
+     */
+    public listContexts(contextIds: Array<string>, xHumanId?: string, options?: RawAxiosRequestConfig) {
+        return LLMApiFp(this.configuration).listContexts(contextIds, xHumanId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary Get a list of llms
      * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
@@ -678,6 +850,20 @@ export class LLMApi extends BaseAPI {
      */
     public listLLMs(xHumanId?: string, options?: RawAxiosRequestConfig) {
         return LLMApiFp(this.configuration).listLLMs(xHumanId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Retrieve the ContextMemory with the given identifier. 
+     * @summary Query the advanced context memory
+     * @param {string} context The unique identifier of the Context.
+     * @param {ContextAdvancedMemoryQueryRequest} contextAdvancedMemoryQueryRequest 
+     * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof LLMApi
+     */
+    public queryAdvancedContextMemory(context: string, contextAdvancedMemoryQueryRequest: ContextAdvancedMemoryQueryRequest, xHumanId?: string, options?: RawAxiosRequestConfig) {
+        return LLMApiFp(this.configuration).queryAdvancedContextMemory(context, contextAdvancedMemoryQueryRequest, xHumanId, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

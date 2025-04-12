@@ -15,10 +15,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { ChatCompletionResponseGabberAdvancedMemory } from './chat-completion-response-gabber-advanced-memory';
+import type { ChatCompletionResponseGabberMessageData } from './chat-completion-response-gabber-message-data';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { ChatCompletionResponseGabberMessageData } from './chat-completion-response-gabber-message-data';
+import type { ContextAdvancedMemoryQueryResult } from './context-advanced-memory-query-result';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { Usage } from './usage';
@@ -43,9 +43,9 @@ export interface ChatCompletionResponseGabber {
     'message_data': Array<ChatCompletionResponseGabberMessageData>;
     /**
      * 
-     * @type {ChatCompletionResponseGabberAdvancedMemory}
+     * @type {ContextAdvancedMemoryQueryResult}
      * @memberof ChatCompletionResponseGabber
      */
-    'advanced_memory'?: ChatCompletionResponseGabberAdvancedMemory;
+    'advanced_memory'?: ContextAdvancedMemoryQueryResult;
 }
 

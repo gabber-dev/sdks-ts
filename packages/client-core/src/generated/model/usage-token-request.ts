@@ -28,12 +28,25 @@ export interface UsageTokenRequest {
      * @type {Array<UsageLimit>}
      * @memberof UsageTokenRequest
      */
-    'limits': Array<UsageLimit>;
+    'limits'?: Array<UsageLimit>;
     /**
-     * The ID of the human that the token is for. (this is typically your user id from your system)
+     * The ID of the human that the token is for. (this is typically your user id from your system). Deprecated. Use `human`` instead.
+     * @type {string}
+     * @memberof UsageTokenRequest
+     * @deprecated
+     */
+    'human_id'?: string;
+    /**
+     * The human that the token is for. (this is typically your user id from your system)
      * @type {string}
      * @memberof UsageTokenRequest
      */
-    'human_id': string;
+    'human': string;
+    /**
+     * The time to live for the token in seconds. Defaults to 3600 (1 hour).
+     * @type {number}
+     * @memberof UsageTokenRequest
+     */
+    'ttl_seconds'?: number;
 }
 

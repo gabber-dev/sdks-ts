@@ -24,9 +24,17 @@ import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError
 // @ts-ignore
 import type { BadRequest } from '../model';
 // @ts-ignore
+import type { CheckUsageToken200Response } from '../model';
+// @ts-ignore
+import type { CheckUsageTokenRequest } from '../model';
+// @ts-ignore
 import type { CreateUsageToken200Response } from '../model';
 // @ts-ignore
+import type { RevokeUsageTokenRequest } from '../model';
+// @ts-ignore
 import type { UpdateUsageLimitsRequest } from '../model';
+// @ts-ignore
+import type { UpdateUsageTokenTTLRequest } from '../model';
 // @ts-ignore
 import type { UsageLimit } from '../model';
 // @ts-ignore
@@ -38,14 +46,52 @@ import type { UsageTokenRequest } from '../model';
 export const UsageApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Requests a token for a human
-         * @summary Create a new usage token
-         * @param {UsageTokenRequest} usageTokenRequest 
-         * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
+         * Checks the validity of a human token
+         * @summary Check a usage token
+         * @param {CheckUsageTokenRequest} checkUsageTokenRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createUsageToken: async (usageTokenRequest: UsageTokenRequest, xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        checkUsageToken: async (checkUsageTokenRequest: CheckUsageTokenRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'checkUsageTokenRequest' is not null or undefined
+            assertParamExists('checkUsageToken', 'checkUsageTokenRequest', checkUsageTokenRequest)
+            const localVarPath = `/v1/usage/token/check`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication ApiKeyAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "x-api-key", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(checkUsageTokenRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Requests a token for a human
+         * @summary Create a new usage token
+         * @param {UsageTokenRequest} usageTokenRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createUsageToken: async (usageTokenRequest: UsageTokenRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'usageTokenRequest' is not null or undefined
             assertParamExists('createUsageToken', 'usageTokenRequest', usageTokenRequest)
             const localVarPath = `/v1/usage/token`;
@@ -62,10 +108,6 @@ export const UsageApiAxiosParamCreator = function (configuration?: Configuration
 
             // authentication ApiKeyAuth required
             await setApiKeyToObject(localVarHeaderParameter, "x-api-key", configuration)
-
-            if (xHumanId != null) {
-                localVarHeaderParameter['x-human-id'] = String(xHumanId);
-            }
 
 
     
@@ -86,6 +128,7 @@ export const UsageApiAxiosParamCreator = function (configuration?: Configuration
          * @summary Get usage limits
          * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         getUsageLimits: async (xHumanId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
@@ -124,10 +167,50 @@ export const UsageApiAxiosParamCreator = function (configuration?: Configuration
             };
         },
         /**
+         * Revokes a human token
+         * @summary Revoke a usage token
+         * @param {RevokeUsageTokenRequest} revokeUsageTokenRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        revokeUsageToken: async (revokeUsageTokenRequest: RevokeUsageTokenRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'revokeUsageTokenRequest' is not null or undefined
+            assertParamExists('revokeUsageToken', 'revokeUsageTokenRequest', revokeUsageTokenRequest)
+            const localVarPath = `/v1/usage/token/revoke`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication ApiKeyAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "x-api-key", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(revokeUsageTokenRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Updates the usage limits of a human
          * @summary Update limits on a usage token
          * @param {UpdateUsageLimitsRequest} updateUsageLimitsRequest 
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         updateUsageToken: async (updateUsageLimitsRequest: UpdateUsageLimitsRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
@@ -162,6 +245,45 @@ export const UsageApiAxiosParamCreator = function (configuration?: Configuration
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Updates the TTL of a human tokan
+         * @summary Update the TTL of a usage token
+         * @param {UpdateUsageTokenTTLRequest} updateUsageTokenTTLRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateUsageTokenTTL: async (updateUsageTokenTTLRequest: UpdateUsageTokenTTLRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'updateUsageTokenTTLRequest' is not null or undefined
+            assertParamExists('updateUsageTokenTTL', 'updateUsageTokenTTLRequest', updateUsageTokenTTLRequest)
+            const localVarPath = `/v1/usage/token/update_ttl`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication ApiKeyAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "x-api-key", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateUsageTokenTTLRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -173,15 +295,27 @@ export const UsageApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = UsageApiAxiosParamCreator(configuration)
     return {
         /**
-         * Requests a token for a human
-         * @summary Create a new usage token
-         * @param {UsageTokenRequest} usageTokenRequest 
-         * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
+         * Checks the validity of a human token
+         * @summary Check a usage token
+         * @param {CheckUsageTokenRequest} checkUsageTokenRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createUsageToken(usageTokenRequest: UsageTokenRequest, xHumanId?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateUsageToken200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createUsageToken(usageTokenRequest, xHumanId, options);
+        async checkUsageToken(checkUsageTokenRequest: CheckUsageTokenRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CheckUsageToken200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.checkUsageToken(checkUsageTokenRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UsageApi.checkUsageToken']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Requests a token for a human
+         * @summary Create a new usage token
+         * @param {UsageTokenRequest} usageTokenRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createUsageToken(usageTokenRequest: UsageTokenRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateUsageToken200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createUsageToken(usageTokenRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['UsageApi.createUsageToken']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -191,6 +325,7 @@ export const UsageApiFp = function(configuration?: Configuration) {
          * @summary Get usage limits
          * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         async getUsageLimits(xHumanId?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<UsageLimit>>> {
@@ -200,16 +335,43 @@ export const UsageApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Revokes a human token
+         * @summary Revoke a usage token
+         * @param {RevokeUsageTokenRequest} revokeUsageTokenRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async revokeUsageToken(revokeUsageTokenRequest: RevokeUsageTokenRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.revokeUsageToken(revokeUsageTokenRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UsageApi.revokeUsageToken']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Updates the usage limits of a human
          * @summary Update limits on a usage token
          * @param {UpdateUsageLimitsRequest} updateUsageLimitsRequest 
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         async updateUsageToken(updateUsageLimitsRequest: UpdateUsageLimitsRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<{ [key: string]: any; }>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.updateUsageToken(updateUsageLimitsRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['UsageApi.updateUsageToken']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Updates the TTL of a human tokan
+         * @summary Update the TTL of a usage token
+         * @param {UpdateUsageTokenTTLRequest} updateUsageTokenTTLRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateUsageTokenTTL(updateUsageTokenTTLRequest: UpdateUsageTokenTTLRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateUsageTokenTTL(updateUsageTokenTTLRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UsageApi.updateUsageTokenTTL']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -223,35 +385,66 @@ export const UsageApiFactory = function (configuration?: Configuration, basePath
     const localVarFp = UsageApiFp(configuration)
     return {
         /**
-         * Requests a token for a human
-         * @summary Create a new usage token
-         * @param {UsageTokenRequest} usageTokenRequest 
-         * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
+         * Checks the validity of a human token
+         * @summary Check a usage token
+         * @param {CheckUsageTokenRequest} checkUsageTokenRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createUsageToken(usageTokenRequest: UsageTokenRequest, xHumanId?: string, options?: RawAxiosRequestConfig): AxiosPromise<CreateUsageToken200Response> {
-            return localVarFp.createUsageToken(usageTokenRequest, xHumanId, options).then((request) => request(axios, basePath));
+        checkUsageToken(checkUsageTokenRequest: CheckUsageTokenRequest, options?: RawAxiosRequestConfig): AxiosPromise<CheckUsageToken200Response> {
+            return localVarFp.checkUsageToken(checkUsageTokenRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Requests a token for a human
+         * @summary Create a new usage token
+         * @param {UsageTokenRequest} usageTokenRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createUsageToken(usageTokenRequest: UsageTokenRequest, options?: RawAxiosRequestConfig): AxiosPromise<CreateUsageToken200Response> {
+            return localVarFp.createUsageToken(usageTokenRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Gets the usage limits of a token
          * @summary Get usage limits
          * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         getUsageLimits(xHumanId?: string, options?: RawAxiosRequestConfig): AxiosPromise<Array<UsageLimit>> {
             return localVarFp.getUsageLimits(xHumanId, options).then((request) => request(axios, basePath));
         },
         /**
+         * Revokes a human token
+         * @summary Revoke a usage token
+         * @param {RevokeUsageTokenRequest} revokeUsageTokenRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        revokeUsageToken(revokeUsageTokenRequest: RevokeUsageTokenRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.revokeUsageToken(revokeUsageTokenRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Updates the usage limits of a human
          * @summary Update limits on a usage token
          * @param {UpdateUsageLimitsRequest} updateUsageLimitsRequest 
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         updateUsageToken(updateUsageLimitsRequest: UpdateUsageLimitsRequest, options?: RawAxiosRequestConfig): AxiosPromise<{ [key: string]: any; }> {
             return localVarFp.updateUsageToken(updateUsageLimitsRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Updates the TTL of a human tokan
+         * @summary Update the TTL of a usage token
+         * @param {UpdateUsageTokenTTLRequest} updateUsageTokenTTLRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateUsageTokenTTL(updateUsageTokenTTLRequest: UpdateUsageTokenTTLRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.updateUsageTokenTTL(updateUsageTokenTTLRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -264,16 +457,27 @@ export const UsageApiFactory = function (configuration?: Configuration, basePath
  */
 export class UsageApi extends BaseAPI {
     /**
-     * Requests a token for a human
-     * @summary Create a new usage token
-     * @param {UsageTokenRequest} usageTokenRequest 
-     * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
+     * Checks the validity of a human token
+     * @summary Check a usage token
+     * @param {CheckUsageTokenRequest} checkUsageTokenRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof UsageApi
      */
-    public createUsageToken(usageTokenRequest: UsageTokenRequest, xHumanId?: string, options?: RawAxiosRequestConfig) {
-        return UsageApiFp(this.configuration).createUsageToken(usageTokenRequest, xHumanId, options).then((request) => request(this.axios, this.basePath));
+    public checkUsageToken(checkUsageTokenRequest: CheckUsageTokenRequest, options?: RawAxiosRequestConfig) {
+        return UsageApiFp(this.configuration).checkUsageToken(checkUsageTokenRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Requests a token for a human
+     * @summary Create a new usage token
+     * @param {UsageTokenRequest} usageTokenRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UsageApi
+     */
+    public createUsageToken(usageTokenRequest: UsageTokenRequest, options?: RawAxiosRequestConfig) {
+        return UsageApiFp(this.configuration).createUsageToken(usageTokenRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -281,6 +485,7 @@ export class UsageApi extends BaseAPI {
      * @summary Get usage limits
      * @param {string} [xHumanId] When using x-api-key authentication, this header is used to scope requests to a specific human.
      * @param {*} [options] Override http request option.
+     * @deprecated
      * @throws {RequiredError}
      * @memberof UsageApi
      */
@@ -289,15 +494,40 @@ export class UsageApi extends BaseAPI {
     }
 
     /**
+     * Revokes a human token
+     * @summary Revoke a usage token
+     * @param {RevokeUsageTokenRequest} revokeUsageTokenRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UsageApi
+     */
+    public revokeUsageToken(revokeUsageTokenRequest: RevokeUsageTokenRequest, options?: RawAxiosRequestConfig) {
+        return UsageApiFp(this.configuration).revokeUsageToken(revokeUsageTokenRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Updates the usage limits of a human
      * @summary Update limits on a usage token
      * @param {UpdateUsageLimitsRequest} updateUsageLimitsRequest 
      * @param {*} [options] Override http request option.
+     * @deprecated
      * @throws {RequiredError}
      * @memberof UsageApi
      */
     public updateUsageToken(updateUsageLimitsRequest: UpdateUsageLimitsRequest, options?: RawAxiosRequestConfig) {
         return UsageApiFp(this.configuration).updateUsageToken(updateUsageLimitsRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Updates the TTL of a human tokan
+     * @summary Update the TTL of a usage token
+     * @param {UpdateUsageTokenTTLRequest} updateUsageTokenTTLRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UsageApi
+     */
+    public updateUsageTokenTTL(updateUsageTokenTTLRequest: UpdateUsageTokenTTLRequest, options?: RawAxiosRequestConfig) {
+        return UsageApiFp(this.configuration).updateUsageTokenTTL(updateUsageTokenTTLRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

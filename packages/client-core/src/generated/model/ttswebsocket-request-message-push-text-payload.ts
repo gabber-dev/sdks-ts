@@ -17,17 +17,14 @@
 /**
  * 
  * @export
- * @enum {string}
+ * @interface TTSWebsocketRequestMessagePushTextPayload
  */
-
-export const UsageType = {
-    ConversationalSeconds: 'conversational_seconds',
-    VoiceSynthesisSeconds: 'voice_synthesis_seconds',
-    TokenCnt: 'token_cnt',
-    MemoryMessageCnt: 'memory_message_cnt'
-} as const;
-
-export type UsageType = typeof UsageType[keyof typeof UsageType];
-
-
+export interface TTSWebsocketRequestMessagePushTextPayload {
+    /**
+     * The text to push to the session.
+     * @type {string}
+     * @memberof TTSWebsocketRequestMessagePushTextPayload
+     */
+    'text': string;
+}
 
