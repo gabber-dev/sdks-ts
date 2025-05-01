@@ -52,6 +52,7 @@ export function RealtimeSessionEngineProvider({ connectionOpts, children }: Prop
   const [lastError, setLastError] = useState<RealtimeSessionError | null>(null);
   const [canPlayAudio, setCanPlayAudio] = useState(true);
   const createOnce = useRef(false);
+  const connecting = useRef(false)
   const [transcription, setTranscription] = useState({
     text: "",
     final: false,
@@ -156,12 +157,19 @@ export function RealtimeSessionEngineProvider({ connectionOpts, children }: Prop
       if (connectionState !== "not_connected") {
         return;
       }
-      sessionEngine.current.connect(connectionOpts);
+      if(connecting.current) {
+        console.warn("Already connecting");
+        return;
+      }
+      connecting.current = true
+      sessionEngine.current.connect(connectionOpts).finally(() => {
+        connecting.current = false
+      });
     } else {
       if (connectionState === "not_connected") {
         return;
       }
-      sessionEngine.current.disconnect();
+      sessionEngine.current.disconnect()
     }
   }, [connectionOpts, connectionState]);
 
