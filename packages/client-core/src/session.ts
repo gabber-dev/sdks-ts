@@ -117,6 +117,7 @@ export class RealtimeSessionEngine {
     }
 
     try {
+      this.onConnectionStateChanged("connecting");
       await this.livekitRoom.connect(
         connectionDetails.url,
         connectionDetails.token,
@@ -125,6 +126,7 @@ export class RealtimeSessionEngine {
         }
       );
     } catch (e) {
+      this.onConnectionStateChanged("not_connected");
       this.onError(new RealtimeSessionErrorConnect("Error connecting to room"));
     }
 
