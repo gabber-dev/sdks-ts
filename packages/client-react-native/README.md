@@ -24,6 +24,6 @@ Add plugins to your `app.json`
 }
 ```
 
-See our [full Expo example](https://github.com/gabber-dev/example-react-native-expo/tree/main) for usage details.
+See our [Full Expo Example](https://github.com/gabber-dev/example-react-native-expo/tree/main) for usage details.
 
 Join our [Discord](https://discord.gg/kHuuscKA) for support, feature requests, and quesions.
