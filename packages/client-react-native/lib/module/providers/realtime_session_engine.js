@@ -2,7 +2,7 @@
 
 import { createContext, useEffect, useState, useMemo, useCallback } from "react";
 import React from "react";
-import { LiveKitRoom, useConnectionState, useDataChannel, useLocalParticipant, useMultibandTrackVolume, useRemoteParticipant, useRoomInfo, useTrackVolume, registerGlobals } from "@livekit/react-native";
+import { LiveKitRoom, useConnectionState, useDataChannel, useLocalParticipant, useMultibandTrackVolume, useRemoteParticipant, useRoomInfo, useTrackVolume, registerGlobals, useParticipantInfo, useTracks } from "@livekit/react-native";
 import { ParticipantKind, ConnectionState, Track } from "livekit-client";
 import { Api } from "../lib/api.js";
 import { jsx as _jsx } from "react/jsx-runtime";
@@ -15,7 +15,6 @@ export function RealtimeSessionEngineProvider({
   const [conDetails, setConDetails] = useState(null);
   const [error, setError] = useState(null);
   useEffect(() => {
-    console.log("NEIL connectionOpts", connectionOpts);
     if (!connectionOpts) {
       return;
     }
@@ -93,15 +92,16 @@ function RealtimeSessionEngineProviderInner({
     }
     const decoded = new TextDecoder().decode(message.payload);
     if (message?.topic === "message") {
-      const message = JSON.parse(decoded);
+      const messageData = JSON.parse(decoded);
       setMessages(prev => {
         const newMessages = [...prev];
-        newMessages.push(message);
+        const existingIndex = newMessages.findIndex(m => m.id === messageData.id && m.agent === messageData.agent);
+        if (existingIndex >= 0) {
+          newMessages[existingIndex] = messageData; // Update existing message
+        } else {
+          newMessages.push(messageData); // Append new message
+        }
         return newMessages;
-      });
-      setTranscription({
-        final: message.final,
-        text: message.text
       });
     } else if (message?.topic === "error") {
       const payload = JSON.parse(decoded);
@@ -132,28 +132,20 @@ function RealtimeSessionEngineProviderInner({
       topic: "chat_input"
     });
   }, [localParticipant]);
-  const agentMicrophoneTrack = useMemo(() => {
-    if (!agentParticipant) {
-      return;
-    }
-    for (const track in agentParticipant.audioTrackPublications) {
-      const pub = agentParticipant.audioTrackPublications.get(track);
-      if (!pub) {
-        continue;
-      }
-      if (pub.source === Track.Source.Microphone) {
-        return pub.track;
-      }
-    }
-    return;
-  }, [agentParticipant]);
+  const agentMicrophoneTrack = useAgentMicrophoneTrack({
+    agentParticipant
+  });
   const agentVolumeBands = useMultibandTrackVolume(agentMicrophoneTrack, {
-    maxFrequency: 2000,
-    minFrequency: 100
+    maxFrequency: 15000,
+    minFrequency: 500,
+    bands: 20,
+    updateInterval: 100
   });
   const userVolumeBands = useMultibandTrackVolume(microphoneTrack?.track, {
-    maxFrequency: 2000,
-    minFrequency: 100
+    maxFrequency: 15000,
+    minFrequency: 500,
+    bands: 20,
+    updateInterval: 100
   });
   const agentVolume = useTrackVolume(agentMicrophoneTrack);
   const userVolume = useTrackVolume(microphoneTrack?.track);
@@ -173,6 +165,11 @@ function RealtimeSessionEngineProviderInner({
     return "connected";
   }, [agentMicrophoneTrack, agentParticipant, roomConnectionState]);
   const {
+    metadata: agentMetadata
+  } = useAgentMetadata({
+    agentParticipant
+  });
+  const {
     agentState,
     remainingSeconds
   } = useMemo(() => {
@@ -182,8 +179,7 @@ function RealtimeSessionEngineProviderInner({
         remainingSeconds: null
       };
     }
-    const mdStr = agentParticipant.metadata;
-    if (!mdStr) {
+    if (!agentMetadata) {
       console.error("Agent metadata is not set");
       return {
         agentState: "warmup",
@@ -192,7 +188,7 @@ function RealtimeSessionEngineProviderInner({
     }
     let remainingSeconds = null;
     let agentState = "warmup";
-    const md = JSON.parse(mdStr);
+    const md = JSON.parse(agentMetadata);
     if (md.remaining_seconds) {
       remainingSeconds = md.remaining_seconds;
     }
@@ -211,7 +207,7 @@ function RealtimeSessionEngineProviderInner({
       agentState,
       remainingSeconds
     };
-  }, [agentParticipant]);
+  }, [agentMetadata, agentParticipant]);
   return /*#__PURE__*/_jsx(RealtimeSessionEngineContext.Provider, {
     value: {
       id,
@@ -231,6 +227,35 @@ function RealtimeSessionEngineProviderInner({
     },
     children: children
   });
+}
+function useAgentMetadata({
+  agentParticipant
+}) {
+  const {
+    metadata
+  } = useParticipantInfo({
+    participant: agentParticipant
+  });
+  return {
+    metadata
+  };
+}
+function useAgentMicrophoneTrack({
+  agentParticipant
+}) {
+  const allTracks = useTracks([Track.Source.Microphone]);
+  const agentMicrophoneTrack = useMemo(() => {
+    if (!agentParticipant) {
+      return;
+    }
+    for (let t of allTracks) {
+      if (t.participant.identity === agentParticipant.identity) {
+        return t.publication.track;
+      }
+    }
+    return;
+  }, [agentParticipant, allTracks]);
+  return agentMicrophoneTrack;
 }
 export function useRealtimeSessionEngine() {
   const context = React.useContext(RealtimeSessionEngineContext);

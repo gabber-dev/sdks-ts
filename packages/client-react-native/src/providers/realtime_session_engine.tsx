@@ -23,6 +23,8 @@ import {
   useRoomInfo,
   useTrackVolume,
   registerGlobals,
+  useParticipantInfo,
+  useTracks,
 } from "@livekit/react-native";
 import {
   ParticipantKind,
@@ -30,6 +32,7 @@ import {
   Track,
   RemoteAudioTrack,
   LocalAudioTrack,
+  RemoteParticipant,
 } from "livekit-client";
 import { Api } from "../lib/api";
 
@@ -70,7 +73,6 @@ export function RealtimeSessionEngineProvider({
   const [error, setError] = useState<{ message: string } | null>(null);
 
   useEffect(() => {
-    console.log("NEIL connectionOpts", connectionOpts);
     if (!connectionOpts) {
       return;
     }
@@ -146,13 +148,19 @@ function RealtimeSessionEngineProviderInner({ error, children }: InnerProps) {
     }
     const decoded = new TextDecoder().decode(message.payload);
     if (message?.topic === "message") {
-      const message = JSON.parse(decoded) as SDKSessionTranscription;
+      const messageData = JSON.parse(decoded) as SDKSessionTranscription;
       setMessages((prev) => {
         const newMessages = [...prev];
-        newMessages.push(message);
+        const existingIndex = newMessages.findIndex(
+          (m) => m.id === messageData.id && m.agent === messageData.agent,
+        );
+        if (existingIndex >= 0) {
+          newMessages[existingIndex] = messageData; // Update existing message
+        } else {
+          newMessages.push(messageData); // Append new message
+        }
         return newMessages;
       });
-      setTranscription({ final: message.final, text: message.text });
     } else if (message?.topic === "error") {
       const payload = JSON.parse(decoded);
       setLastError({ message: payload.message });
@@ -185,29 +193,19 @@ function RealtimeSessionEngineProviderInner({ error, children }: InnerProps) {
     [localParticipant],
   );
 
-  const agentMicrophoneTrack: RemoteAudioTrack | undefined = useMemo(() => {
-    if (!agentParticipant) {
-      return;
-    }
-    for (const track in agentParticipant.audioTrackPublications) {
-      const pub = agentParticipant.audioTrackPublications.get(track);
-      if (!pub) {
-        continue;
-      }
-      if (pub.source === Track.Source.Microphone) {
-        return pub.track as RemoteAudioTrack;
-      }
-    }
-    return;
-  }, [agentParticipant]);
+  const agentMicrophoneTrack = useAgentMicrophoneTrack({
+    agentParticipant,
+  });
 
   const agentVolumeBands = useMultibandTrackVolume(agentMicrophoneTrack, {
-    maxFrequency: 2000,
-    minFrequency: 100,
+    maxFrequency: 15000,
+    minFrequency: 500,
+    bands: 20,
+    updateInterval: 50,
   });
   const userVolumeBands = useMultibandTrackVolume(
     microphoneTrack?.track as LocalAudioTrack | undefined,
-    { maxFrequency: 2000, minFrequency: 100 },
+    { maxFrequency: 15000, minFrequency: 500, bands: 20, updateInterval: 50 },
   );
   const agentVolume = useTrackVolume(agentMicrophoneTrack);
   const userVolume = useTrackVolume(
@@ -236,6 +234,10 @@ function RealtimeSessionEngineProviderInner({ error, children }: InnerProps) {
     return "connected";
   }, [agentMicrophoneTrack, agentParticipant, roomConnectionState]);
 
+  const { metadata: agentMetadata } = useAgentMetadata({
+    agentParticipant,
+  });
+
   const {
     agentState,
     remainingSeconds,
@@ -244,14 +246,13 @@ function RealtimeSessionEngineProviderInner({ error, children }: InnerProps) {
       if (!agentParticipant) {
         return { agentState: "warmup", remainingSeconds: null };
       }
-      const mdStr = agentParticipant.metadata;
-      if (!mdStr) {
+      if (!agentMetadata) {
         console.error("Agent metadata is not set");
         return { agentState: "warmup", remainingSeconds: null };
       }
       let remainingSeconds: number | null = null;
       let agentState: SDKAgentState = "warmup";
-      const md = JSON.parse(mdStr);
+      const md = JSON.parse(agentMetadata);
       if (md.remaining_seconds) {
         remainingSeconds = md.remaining_seconds;
       }
@@ -269,7 +270,7 @@ function RealtimeSessionEngineProviderInner({ error, children }: InnerProps) {
       }
       agentState = agent_state;
       return { agentState, remainingSeconds };
-    }, [agentParticipant]);
+    }, [agentMetadata, agentParticipant]);
 
   return (
     <RealtimeSessionEngineContext.Provider
@@ -293,6 +294,39 @@ function RealtimeSessionEngineProviderInner({ error, children }: InnerProps) {
       {children}
     </RealtimeSessionEngineContext.Provider>
   );
+}
+
+function useAgentMetadata({
+  agentParticipant,
+}: {
+  agentParticipant: RemoteParticipant | undefined;
+}) {
+  const { metadata } = useParticipantInfo({ participant: agentParticipant });
+
+  return { metadata };
+}
+
+function useAgentMicrophoneTrack({
+  agentParticipant,
+}: {
+  agentParticipant: RemoteParticipant | undefined;
+}) {
+  const allTracks = useTracks([Track.Source.Microphone]);
+
+  const agentMicrophoneTrack = useMemo(() => {
+    if (!agentParticipant) {
+      return;
+    }
+    for (let t of allTracks) {
+      if (t.participant.identity === agentParticipant.identity) {
+        return t.publication.track as RemoteAudioTrack;
+      }
+    }
+
+    return;
+  }, [agentParticipant, allTracks]);
+
+  return agentMicrophoneTrack;
 }
 
 export function useRealtimeSessionEngine() {

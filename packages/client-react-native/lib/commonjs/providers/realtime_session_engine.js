@@ -21,7 +21,6 @@ function RealtimeSessionEngineProvider({
   const [conDetails, setConDetails] = (0, _react.useState)(null);
   const [error, setError] = (0, _react.useState)(null);
   (0, _react.useEffect)(() => {
-    console.log("NEIL connectionOpts", connectionOpts);
     if (!connectionOpts) {
       return;
     }
@@ -99,15 +98,16 @@ function RealtimeSessionEngineProviderInner({
     }
     const decoded = new TextDecoder().decode(message.payload);
     if (message?.topic === "message") {
-      const message = JSON.parse(decoded);
+      const messageData = JSON.parse(decoded);
       setMessages(prev => {
         const newMessages = [...prev];
-        newMessages.push(message);
+        const existingIndex = newMessages.findIndex(m => m.id === messageData.id && m.agent === messageData.agent);
+        if (existingIndex >= 0) {
+          newMessages[existingIndex] = messageData; // Update existing message
+        } else {
+          newMessages.push(messageData); // Append new message
+        }
         return newMessages;
-      });
-      setTranscription({
-        final: message.final,
-        text: message.text
       });
     } else if (message?.topic === "error") {
       const payload = JSON.parse(decoded);
@@ -138,28 +138,20 @@ function RealtimeSessionEngineProviderInner({
       topic: "chat_input"
     });
   }, [localParticipant]);
-  const agentMicrophoneTrack = (0, _react.useMemo)(() => {
-    if (!agentParticipant) {
-      return;
-    }
-    for (const track in agentParticipant.audioTrackPublications) {
-      const pub = agentParticipant.audioTrackPublications.get(track);
-      if (!pub) {
-        continue;
-      }
-      if (pub.source === _livekitClient.Track.Source.Microphone) {
-        return pub.track;
-      }
-    }
-    return;
-  }, [agentParticipant]);
+  const agentMicrophoneTrack = useAgentMicrophoneTrack({
+    agentParticipant
+  });
   const agentVolumeBands = (0, _reactNative.useMultibandTrackVolume)(agentMicrophoneTrack, {
-    maxFrequency: 2000,
-    minFrequency: 100
+    maxFrequency: 15000,
+    minFrequency: 500,
+    bands: 20,
+    updateInterval: 100
   });
   const userVolumeBands = (0, _reactNative.useMultibandTrackVolume)(microphoneTrack?.track, {
-    maxFrequency: 2000,
-    minFrequency: 100
+    maxFrequency: 15000,
+    minFrequency: 500,
+    bands: 20,
+    updateInterval: 100
   });
   const agentVolume = (0, _reactNative.useTrackVolume)(agentMicrophoneTrack);
   const userVolume = (0, _reactNative.useTrackVolume)(microphoneTrack?.track);
@@ -179,6 +171,11 @@ function RealtimeSessionEngineProviderInner({
     return "connected";
   }, [agentMicrophoneTrack, agentParticipant, roomConnectionState]);
   const {
+    metadata: agentMetadata
+  } = useAgentMetadata({
+    agentParticipant
+  });
+  const {
     agentState,
     remainingSeconds
   } = (0, _react.useMemo)(() => {
@@ -188,8 +185,7 @@ function RealtimeSessionEngineProviderInner({
         remainingSeconds: null
       };
     }
-    const mdStr = agentParticipant.metadata;
-    if (!mdStr) {
+    if (!agentMetadata) {
       console.error("Agent metadata is not set");
       return {
         agentState: "warmup",
@@ -198,7 +194,7 @@ function RealtimeSessionEngineProviderInner({
     }
     let remainingSeconds = null;
     let agentState = "warmup";
-    const md = JSON.parse(mdStr);
+    const md = JSON.parse(agentMetadata);
     if (md.remaining_seconds) {
       remainingSeconds = md.remaining_seconds;
     }
@@ -217,7 +213,7 @@ function RealtimeSessionEngineProviderInner({
       agentState,
       remainingSeconds
     };
-  }, [agentParticipant]);
+  }, [agentMetadata, agentParticipant]);
   return /*#__PURE__*/(0, _jsxRuntime.jsx)(RealtimeSessionEngineContext.Provider, {
     value: {
       id,
@@ -237,6 +233,35 @@ function RealtimeSessionEngineProviderInner({
     },
     children: children
   });
+}
+function useAgentMetadata({
+  agentParticipant
+}) {
+  const {
+    metadata
+  } = (0, _reactNative.useParticipantInfo)({
+    participant: agentParticipant
+  });
+  return {
+    metadata
+  };
+}
+function useAgentMicrophoneTrack({
+  agentParticipant
+}) {
+  const allTracks = (0, _reactNative.useTracks)([_livekitClient.Track.Source.Microphone]);
+  const agentMicrophoneTrack = (0, _react.useMemo)(() => {
+    if (!agentParticipant) {
+      return;
+    }
+    for (let t of allTracks) {
+      if (t.participant.identity === agentParticipant.identity) {
+        return t.publication.track;
+      }
+    }
+    return;
+  }, [agentParticipant, allTracks]);
+  return agentMicrophoneTrack;
 }
 function useRealtimeSessionEngine() {
   const context = _react.default.useContext(RealtimeSessionEngineContext);
