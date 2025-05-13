@@ -1,8 +1,8 @@
 "use strict";
 
 import { createContext, useMemo } from "react";
-import { Api } from "gabber-client-core";
 import React from "react";
+import { Api } from "../lib/api.js";
 import { jsx as _jsx } from "react/jsx-runtime";
 const ApiContext = /*#__PURE__*/createContext(undefined);
 export function ApiProvider({

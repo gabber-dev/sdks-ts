@@ -1,8 +1,6 @@
 import { createContext, useMemo } from "react";
-import {
-  Api,
-} from "gabber-client-core";
 import React from "react";
+import { Api } from "../lib/api";
 
 type ApiContextData = {
   api: Api;
