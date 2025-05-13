@@ -1,4 +1,4 @@
-name: Publish Client Widget 
+name: Publish Client React Native 
 
 on:
   workflow_dispatch:
