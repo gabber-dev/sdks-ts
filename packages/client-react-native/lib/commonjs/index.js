@@ -33,18 +33,6 @@ Object.defineProperty(exports, "useRealtimeSessionEngine", {
     return _realtime_session_engine.useRealtimeSessionEngine;
   }
 });
-var _session = require("./lib/session.js");
-Object.keys(_session).forEach(function (key) {
-  if (key === "default" || key === "__esModule") return;
-  if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
-  if (key in exports && exports[key] === _session[key]) return;
-  Object.defineProperty(exports, key, {
-    enumerable: true,
-    get: function () {
-      return _session[key];
-    }
-  });
-});
 var _api = require("./lib/api.js");
 Object.keys(_api).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;

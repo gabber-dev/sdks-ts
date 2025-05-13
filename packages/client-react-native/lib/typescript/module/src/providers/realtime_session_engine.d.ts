@@ -19,16 +19,14 @@ type RealtimeSessionEngineContextData = {
         text: string;
         final: boolean;
     };
-    canPlayAudio: boolean;
     setMicrophoneEnabled: (enabled: boolean) => Promise<void>;
     sendChatMessage: (p: SDKSendChatMessageParams) => Promise<void>;
-    startAudio: () => Promise<void>;
 };
 type Props = {
     connectionOpts: SDKConnectOptions | null;
     children: React.ReactNode;
 };
-export declare function RealtimeSessionEngineProvider({ connectionOpts, children }: Props): import("react/jsx-runtime").JSX.Element;
+export declare function RealtimeSessionEngineProvider({ connectionOpts, children, }: Props): import("react/jsx-runtime").JSX.Element;
 export declare function useRealtimeSessionEngine(): RealtimeSessionEngineContextData;
 export {};
 //# sourceMappingURL=realtime_session_engine.d.ts.map

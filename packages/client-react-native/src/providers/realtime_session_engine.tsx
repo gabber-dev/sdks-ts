@@ -22,6 +22,7 @@ import {
   useRemoteParticipant,
   useRoomInfo,
   useTrackVolume,
+  registerGlobals,
 } from "@livekit/react-native";
 import {
   ParticipantKind,
@@ -31,6 +32,8 @@ import {
   LocalAudioTrack,
 } from "livekit-client";
 import { Api } from "../lib/api";
+
+registerGlobals();
 
 type RealtimeSessionEngineContextData = {
   id: string | null;
@@ -67,6 +70,7 @@ export function RealtimeSessionEngineProvider({
   const [error, setError] = useState<{ message: string } | null>(null);
 
   useEffect(() => {
+    console.log("NEIL connectionOpts", connectionOpts);
     if (!connectionOpts) {
       return;
     }

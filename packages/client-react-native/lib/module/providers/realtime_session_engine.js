@@ -1,27 +1,68 @@
 "use strict";
 
-import { createContext, useRef, useEffect, useState, useMemo } from "react";
+import { createContext, useEffect, useState, useMemo, useCallback } from "react";
 import React from "react";
-import { RealtimeSessionEngine } from "../lib/session.js";
+import { LiveKitRoom, useConnectionState, useDataChannel, useLocalParticipant, useMultibandTrackVolume, useRemoteParticipant, useRoomInfo, useTrackVolume, registerGlobals } from "@livekit/react-native";
+import { ParticipantKind, ConnectionState, Track } from "livekit-client";
+import { Api } from "../lib/api.js";
 import { jsx as _jsx } from "react/jsx-runtime";
+registerGlobals();
 const RealtimeSessionEngineContext = /*#__PURE__*/createContext(undefined);
 export function RealtimeSessionEngineProvider({
   connectionOpts,
   children
 }) {
-  const [id, setId] = useState(null);
-  const [connectionState, setConnectionState] = useState("not_connected");
+  const [conDetails, setConDetails] = useState(null);
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    console.log("NEIL connectionOpts", connectionOpts);
+    if (!connectionOpts) {
+      return;
+    }
+    if ("connection_details" in connectionOpts) {
+      setConDetails(connectionOpts.connection_details);
+    } else if ("token" in connectionOpts && "config" in connectionOpts) {
+      const api = new Api(connectionOpts.token);
+      api.realtime.startRealtimeSession(connectionOpts).then(res => {
+        if (res.data.connection_details) {
+          setConDetails(res.data.connection_details);
+        }
+      }).catch(err => {
+        setError(err.message);
+      });
+    }
+  }, [connectionOpts]);
+  return /*#__PURE__*/_jsx(LiveKitRoom, {
+    serverUrl: conDetails?.url,
+    token: conDetails?.token,
+    connect: Boolean(conDetails),
+    children: /*#__PURE__*/_jsx(RealtimeSessionEngineProviderInner, {
+      error: error,
+      children: children
+    })
+  });
+}
+function RealtimeSessionEngineProviderInner({
+  error,
+  children
+}) {
+  const {
+    message
+  } = useDataChannel();
+  const agentParticipant = useRemoteParticipant({
+    kind: ParticipantKind.AGENT
+  });
+  const {
+    localParticipant,
+    microphoneTrack,
+    isMicrophoneEnabled
+  } = useLocalParticipant();
+  const {
+    metadata
+  } = useRoomInfo();
+  const roomConnectionState = useConnectionState();
   const [messages, setMessages] = useState([]);
-  const [microphoneEnabledState, setMicrophoneEnabledState] = useState(false);
-  const [agentVolumeBands, setAgentVolumeBands] = useState([]);
-  const [agentVolume, setAgentVolume] = useState(0);
-  const [userVolumeBands, setUserVolumeBands] = useState([]);
-  const [userVolume, setUserVolume] = useState(0);
-  const [agentState, setAgentState] = useState("listening");
-  const [remainingSeconds, setRemainingSeconds] = useState(null);
-  const [lastError, setLastError] = useState(null);
-  const [canPlayAudio, setCanPlayAudio] = useState(true);
-  const createOnce = useRef(false);
+  const [lastError, setLastError] = useState(error);
   const [transcription, setTranscription] = useState({
     text: "",
     final: false
@@ -34,99 +75,149 @@ export function RealtimeSessionEngineProvider({
     }
     return null;
   }, [messages]);
+  const {
+    id
+  } = useMemo(() => {
+    if (!metadata) {
+      return {
+        id: null
+      };
+    }
+    return {
+      id: JSON.parse(metadata)["session"] || null
+    };
+  }, [metadata]);
+  useEffect(() => {
+    if (!message) {
+      return;
+    }
+    const decoded = new TextDecoder().decode(message.payload);
+    if (message?.topic === "message") {
+      const message = JSON.parse(decoded);
+      setMessages(prev => {
+        const newMessages = [...prev];
+        newMessages.push(message);
+        return newMessages;
+      });
+      setTranscription({
+        final: message.final,
+        text: message.text
+      });
+    } else if (message?.topic === "error") {
+      const payload = JSON.parse(decoded);
+      setLastError({
+        message: payload.message
+      });
+    }
+  }, [message]);
   useEffect(() => {
     setTranscription({
       final: false,
       text: lastUserMessage?.text || ""
     });
   }, [lastUserMessage]);
-  const onConnectionStateChanged = useRef(sessionState => {
-    setConnectionState(sessionState);
-    setId(sessionEngine.current.id);
-  });
-  const onMessagesChanged = useRef(messages => {
-    setMessages([...messages]);
-  });
-  const onMicrophoneChanged = useRef(async enabled => {
-    setMicrophoneEnabledState(enabled);
-  });
-  const onAgentVolumeChanged = useRef((values, volume) => {
-    setAgentVolumeBands(values);
-    setAgentVolume(volume);
-  });
-  const onUserVolumeChanged = useRef((values, volume) => {
-    setUserVolumeBands(values);
-    setUserVolume(volume);
-  });
-  const onAgentStateChanged = useRef(as => {
-    setAgentState(as);
-  });
-  const onRemainingSecondsChanged = useRef(seconds => {
-    setRemainingSeconds(seconds);
-  });
-  const onAgentError = useRef(message => {
-    setLastError({
-      message
-    });
-  });
-  const onCanPlayAudio = useRef(allowed => {
-    setCanPlayAudio(allowed);
-  });
-  const sessionEngine = useRef((() => {
-    // React will always return the first instantiation
-    // even though this function will be called multiple times
-    if (createOnce.current) {
-      return {};
-    }
-    createOnce.current = true;
-    return new RealtimeSessionEngine({
-      onAgentError: onAgentError.current,
-      onAgentStateChanged: onAgentStateChanged.current,
-      onRemainingSecondsChanged: onRemainingSecondsChanged.current,
-      onUserVolumeChanged: onUserVolumeChanged.current,
-      onAgentVolumeChanged: onAgentVolumeChanged.current,
-      onConnectionStateChanged: onConnectionStateChanged.current,
-      onMessagesChanged: onMessagesChanged.current,
-      onMicrophoneChanged: onMicrophoneChanged.current,
-      onCanPlayAudioChanged: onCanPlayAudio.current
-    });
-  })());
-  const setMicrophoneEnabled = useRef(async enabled => {
-    if (!sessionEngine.current) {
-      console.error("Trying to set microphone when there is no session");
+  const setMicrophoneEnabled = useCallback(async enabled => {
+    await localParticipant.setMicrophoneEnabled(enabled);
+  }, [localParticipant]);
+  const sendChatMessage = useCallback(async p => {
+    if (!p.text) {
+      console.error("Trying to send empty chat message");
       return;
     }
-    await sessionEngine.current.setMicrophoneEnabled(enabled);
-  });
-  const sendChatMessage = useRef(async p => {
-    if (!sessionEngine.current) {
-      console.error("Trying to send chat message when there is no session");
+    const te = new TextEncoder();
+    const encoded = te.encode(JSON.stringify({
+      text: p.text
+    }));
+    await localParticipant.publishData(encoded, {
+      topic: "chat_input"
+    });
+  }, [localParticipant]);
+  const agentMicrophoneTrack = useMemo(() => {
+    if (!agentParticipant) {
       return;
     }
-    await sessionEngine.current.sendChatMessage(p);
-  });
-  const startAudio = useRef(async () => {
-    await sessionEngine.current.startAudio();
-  });
-  useEffect(() => {
-    if (connectionOpts) {
-      if (connectionState !== "not_connected") {
-        return;
+    for (const track in agentParticipant.audioTrackPublications) {
+      const pub = agentParticipant.audioTrackPublications.get(track);
+      if (!pub) {
+        continue;
       }
-      sessionEngine.current.connect(connectionOpts);
-    } else {
-      if (connectionState === "not_connected") {
-        return;
+      if (pub.source === Track.Source.Microphone) {
+        return pub.track;
       }
-      sessionEngine.current.disconnect();
     }
-  }, [connectionOpts, connectionState]);
+    return;
+  }, [agentParticipant]);
+  const agentVolumeBands = useMultibandTrackVolume(agentMicrophoneTrack, {
+    maxFrequency: 2000,
+    minFrequency: 100
+  });
+  const userVolumeBands = useMultibandTrackVolume(microphoneTrack?.track, {
+    maxFrequency: 2000,
+    minFrequency: 100
+  });
+  const agentVolume = useTrackVolume(agentMicrophoneTrack);
+  const userVolume = useTrackVolume(microphoneTrack?.track);
+  const connectionState = useMemo(() => {
+    if (roomConnectionState === ConnectionState.Disconnected) {
+      return "not_connected";
+    }
+    if (roomConnectionState === ConnectionState.Connecting || roomConnectionState === ConnectionState.Reconnecting) {
+      return "connecting";
+    }
+    if (!agentParticipant) {
+      return "waiting_for_agent";
+    }
+    if (!agentMicrophoneTrack) {
+      return "waiting_for_agent";
+    }
+    return "connected";
+  }, [agentMicrophoneTrack, agentParticipant, roomConnectionState]);
+  const {
+    agentState,
+    remainingSeconds
+  } = useMemo(() => {
+    if (!agentParticipant) {
+      return {
+        agentState: "warmup",
+        remainingSeconds: null
+      };
+    }
+    const mdStr = agentParticipant.metadata;
+    if (!mdStr) {
+      console.error("Agent metadata is not set");
+      return {
+        agentState: "warmup",
+        remainingSeconds: null
+      };
+    }
+    let remainingSeconds = null;
+    let agentState = "warmup";
+    const md = JSON.parse(mdStr);
+    if (md.remaining_seconds) {
+      remainingSeconds = md.remaining_seconds;
+    }
+    const {
+      agent_state
+    } = md;
+    if (agent_state !== "speaking" && agent_state !== "listening" && agent_state !== "thinking" && agent_state !== "warmup" && agent_state !== "time_limit_exceeded" && agent_state !== "usage_limit_exceeded") {
+      console.error("Unrecognized agent_state", agent_state);
+      return {
+        agentState: "warmup",
+        remainingSeconds
+      };
+    }
+    agentState = agent_state;
+    return {
+      agentState,
+      remainingSeconds
+    };
+  }, [agentParticipant]);
   return /*#__PURE__*/_jsx(RealtimeSessionEngineContext.Provider, {
     value: {
       id,
       messages,
       connectionState: connectionState,
-      microphoneEnabled: microphoneEnabledState,
+      microphoneEnabled: isMicrophoneEnabled,
       agentVolumeBands,
       agentVolume,
       userVolumeBands,
@@ -135,10 +226,8 @@ export function RealtimeSessionEngineProvider({
       remainingSeconds,
       transcription,
       lastError,
-      canPlayAudio,
-      sendChatMessage: sendChatMessage.current,
-      setMicrophoneEnabled: setMicrophoneEnabled.current,
-      startAudio: startAudio.current
+      sendChatMessage,
+      setMicrophoneEnabled
     },
     children: children
   });
