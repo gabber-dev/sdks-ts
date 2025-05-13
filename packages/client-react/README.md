@@ -8,5 +8,5 @@ npm install gabber-client-react
 
 Links:
 - [Docs](https://docs.gabber.dev)
-- [Full NextJS Example](https://github.com/gabber-dev)
+- [Full NextJS Example](https://github.com/gabber-dev/example-next-js)
 - [Discord (Announcements/Support/Feature Requests)](https://discord.gg/kHuuscKA)

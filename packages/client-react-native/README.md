@@ -24,9 +24,7 @@ Add plugins to your `app.json`
 }
 ```
 
-See our [Full Expo Example](https://github.com/gabber-dev/example-react-native-expo/tree/main) for usage details.
-
-Join our [Discord](https://discord.gg/kHuuscKA) for support, feature requests, and quesions.
-
-## Compatibility Note
-This SDK is not yet compatible with Expo SDK 0.53 due to changes in the Expo ecosystem and dependencies. Ensure you are using a compatible version of Expo SDK as specified in the project's documentation or package.json file before proceeding with setup and installation.
+Links:
+- [Docs](https://docs.gabber.dev)
+- [Full Expo Example](https://github.com/gabber-dev/example-react-native-expo)
+- [Discord (Announcements/Support/Feature Requests)](https://discord.gg/kHuuscKA)
