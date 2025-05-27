@@ -25,6 +25,7 @@ type RealtimeSessionEngineContextData = {
   remainingSeconds: number | null;
   transcription: { text: string; final: boolean };
   canPlayAudio: boolean;
+  agentVideoEnabled: boolean;
   setMicrophoneEnabled: (enabled: boolean) => Promise<void>;
   sendChatMessage: (p: SDKSendChatMessageParams) => Promise<void>;
   startAudio: () => Promise<void>;
@@ -34,15 +35,17 @@ const RealtimeSessionEngineContext = createContext<RealtimeSessionEngineContextD
 
 type Props = {
   connectionOpts: SDKConnectOptions | null;
+  videoTrackDestination?: HTMLVideoElement | string;
   children: React.ReactNode;
 };
 
-export function RealtimeSessionEngineProvider({ connectionOpts, children }: Props) {
+export function RealtimeSessionEngineProvider({ connectionOpts, children, videoTrackDestination }: Props) {
   const [id, setId] = useState<string | null>(null);
   const [connectionState, setConnectionState] =
     useState<SDKConnectionState>("not_connected");
   const [messages, setMessages] = useState<SDKSessionTranscription[]>([]);
   const [microphoneEnabledState, setMicrophoneEnabledState] = useState(false);
+  const [agentVideoEnabled, setAgentVideoEnabled] = useState(false);
   const [agentVolumeBands, setAgentVolumeBands] = useState<number[]>([]);
   const [agentVolume, setAgentVolume] = useState<number>(0);
   const [userVolumeBands, setUserVolumeBands] = useState<number[]>([]);
@@ -71,6 +74,10 @@ export function RealtimeSessionEngineProvider({ connectionOpts, children }: Prop
     setTranscription({ final: false, text: lastUserMessage?.text || "" });
   }, [lastUserMessage]);
 
+  useEffect(() => {
+    sessionEngine.current.setVideoTrackDestination({element: videoTrackDestination});
+  }, [videoTrackDestination]);
+
   const onConnectionStateChanged = useRef((sessionState: SDKConnectionState) => {
     setConnectionState(sessionState);
     setId(sessionEngine.current.id);
@@ -83,6 +90,10 @@ export function RealtimeSessionEngineProvider({ connectionOpts, children }: Prop
   const onMicrophoneChanged = useRef(async (enabled: boolean) => {
     setMicrophoneEnabledState(enabled);
   });
+
+  const onAgentVideoChanged = useRef((enabled: boolean) => {
+    setAgentVideoEnabled(enabled);
+  })
 
   const onAgentVolumeChanged = useRef((values: number[], volume: number) => {
     setAgentVolumeBands(values);
@@ -128,6 +139,7 @@ export function RealtimeSessionEngineProvider({ connectionOpts, children }: Prop
         onMessagesChanged: onMessagesChanged.current,
         onMicrophoneChanged: onMicrophoneChanged.current,
         onCanPlayAudioChanged: onCanPlayAudio.current,
+        onAgentVideoChanged: onAgentVideoChanged.current,
       });
     })()
   );
@@ -189,6 +201,7 @@ export function RealtimeSessionEngineProvider({ connectionOpts, children }: Prop
         transcription,
         lastError,
         canPlayAudio,
+        agentVideoEnabled,
         sendChatMessage: sendChatMessage.current,
         setMicrophoneEnabled: setMicrophoneEnabled.current,
         startAudio: startAudio.current,
