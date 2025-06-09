@@ -14,6 +14,8 @@ import {
   LocalAudioTrack,
   RemoteVideoTrack,
   ParticipantKind,
+  LocalVideoTrack,
+  createLocalVideoTrack,
 } from "livekit-client";
 import { TrackVolumeVisualizer } from "./TrackVolumeVisualizer";
 import { Api } from "./api";
@@ -26,6 +28,9 @@ export class RealtimeSessionEngine {
   private _videoTrackDestination: HTMLVideoElement | undefined = undefined;
   private _microphoneEnabledState: boolean = false;
   private _agentVideo: boolean = false;
+  private _webcamState: WebcamState = "off";
+  private _webcamTrackDestination: HTMLVideoElement | undefined = undefined;
+  private _webcamTrack: LocalVideoTrack | undefined = undefined;
   private transcriptions: SDKSessionTranscription[] = [];
   private agentVolumeVisualizer: TrackVolumeVisualizer;
   private userVolumeVisualizer: TrackVolumeVisualizer;
@@ -39,6 +44,7 @@ export class RealtimeSessionEngine {
   private onError: OnErrorCallback;
   private onCanPlayAudioChanged: OnCanPlayAudioChanged;
   private onAgentVideoChanged: OnAgentVideoChanged;
+  private onWebcamChanged: OnWebcamChanged;
   private _agentState: SDKAgentState = "warmup";
   private _remainingSeconds: number | null = null;
   private divElement: HTMLDivElement;
@@ -52,6 +58,7 @@ export class RealtimeSessionEngine {
     onUserVolumeChanged,
     onAgentStateChanged,
     onAgentVideoChanged,
+    onWebcamChanged: onWebcamChanged,
     onRemainingSecondsChanged: onRemainingSecondsChanged,
     onError,
     onCanPlayAudioChanged,
@@ -96,6 +103,7 @@ export class RealtimeSessionEngine {
     this.onError = onError;
     this.onCanPlayAudioChanged = onCanPlayAudioChanged;
     this.onAgentVideoChanged = onAgentVideoChanged;
+    this.onWebcamChanged = onWebcamChanged;
 
     this.agentVolumeVisualizer = new TrackVolumeVisualizer({
       onTick: this.onAgentVolumeChanged.bind(this),
@@ -157,6 +165,40 @@ export class RealtimeSessionEngine {
     await this.livekitRoom.localParticipant.setMicrophoneEnabled(enabled);
   }
 
+  async setWebcamEnabled(enabled: WebcamState) {
+    if(enabled === "off") {
+      if (this._webcamTrack) {
+        await this._webcamTrack.stop();
+        this._webcamTrack = undefined;
+        this.resolveWebcam();
+      }
+      return;
+    } else if(enabled === "preview") {
+      if (this._webcamTrack) {
+        const webcamPublication = this.getWebcamTrackPublication();
+        if(webcamPublication?.track) {
+          await this.livekitRoom.localParticipant.unpublishTrack(webcamPublication.track);
+        }
+        this.resolveWebcam();
+      } else {
+        const vt = await createLocalVideoTrack({})
+        this._webcamTrack = vt;
+        this.resolveWebcam();
+      }
+    } else if (enabled === "on") {
+      if (this._webcamTrack) {
+        await this.livekitRoom.localParticipant.publishTrack(this._webcamTrack);
+        this.resolveWebcam();
+      } else {
+        const vt = await createLocalVideoTrack({})
+        this._webcamTrack = vt;
+        this.resolveWebcam();
+        await this.livekitRoom.localParticipant.publishTrack(this._webcamTrack);
+        this.resolveWebcam();
+      }
+    }
+  }
+
   async sendChatMessage({ text }: SDKSendChatMessageParams) {
     const te = new TextEncoder();
     const encoded = te.encode(JSON.stringify({ text }));
@@ -165,6 +207,25 @@ export class RealtimeSessionEngine {
     });
   }
 
+  public setWebcamTrackDestination({ element }: { element: HTMLVideoElement | string | undefined }) {
+    if (typeof element === "string") {
+      const el = document.getElementById(element);
+      if (!el) {
+        console.error("Element not found", element);
+        return;
+      }
+      if (!(el instanceof HTMLVideoElement)) {
+        console.error("Element is not a video element", el);
+        return;
+      }
+      element = el;
+    } else if (element && !(element instanceof HTMLVideoElement)) {
+      console.error("Element is not a video element", element);
+      return;
+    }
+    this._webcamTrackDestination = element;
+    this.resolveWebcam();
+  }
   public setVideoTrackDestination({ element }: { element: HTMLVideoElement | string | undefined }) {
     if (typeof element === "string") {
       const el = document.getElementById(element);
@@ -216,18 +277,6 @@ export class RealtimeSessionEngine {
     }
   }
 
-  destroy() {
-    document.body.removeChild(this.divElement);
-    try {
-      this.livekitRoom.removeAllListeners();
-      this.livekitRoom.disconnect(true);
-    } catch (e) {
-      console.error("Error destroying session", e);
-    }
-  }
-
-
-
   private resolveMicrophoneState() {
     if (!this.livekitRoom.localParticipant) {
       this.microphoneEnabledState = false;
@@ -242,6 +291,29 @@ export class RealtimeSessionEngine {
     }
 
     this.agentVideoTrack.attach(this._videoTrackDestination);
+  }
+
+  private resolveWebcam() {
+    let webcamStateChanged = false;
+    const pub = this.getWebcamTrackPublication();
+    if(pub && this._webcamState !== "on") {
+      this._webcamState = "on";
+      webcamStateChanged = true;
+    }
+
+    if(!pub && this._webcamState !== "preview") {
+      this._webcamState = this._webcamTrack ? "preview" : "off";
+      webcamStateChanged = true;
+    }
+
+    if(webcamStateChanged) {
+      this.onWebcamChanged(this._webcamState);
+    }
+
+    if(this._webcamTrack && this._webcamTrackDestination) {
+      this._webcamTrack.attach(this._webcamTrackDestination);
+    }
+
   }
 
   private onTrackUnmuted(
@@ -280,6 +352,8 @@ export class RealtimeSessionEngine {
         publication.audioTrack as LocalAudioTrack
       );
       this.resolveMicrophoneState();
+    } else if (publication.kind === Track.Kind.Video) {
+      this.resolveWebcam();
     }
   }
 
@@ -290,6 +364,8 @@ export class RealtimeSessionEngine {
     console.log("Local track unpublished", publication, participant);
     if (publication.kind === Track.Kind.Audio) {
       this.resolveMicrophoneState();
+    } else if (publication.kind === Track.Kind.Video) {
+      this.resolveWebcam();
     }
   }
 
@@ -323,7 +399,7 @@ export class RealtimeSessionEngine {
     console.log("Track subscribed", track, pub, participant);
     if (track.kind === "video") {
       this.agentVideoTrack = track as RemoteVideoTrack;
-      this.agentVideo = false;
+      this.agentVideo = true;
       this.resolveVideoTrackAttachment();
     } else if (track.kind === "audio") {
       if (this.agentParticipant) {
@@ -426,6 +502,26 @@ export class RealtimeSessionEngine {
       console.error("Error on participant metadata cb", e);
     }
   }
+
+  private getWebcamTrackPublication(): LocalTrackPublication | undefined {
+    for (const key in this.livekitRoom.localParticipant.videoTrackPublications) {
+      const publication = this.livekitRoom.localParticipant.videoTrackPublications.get(key);
+      if (publication?.kind === Track.Kind.Video) {
+        return publication;
+      }
+    }
+    return undefined;
+  }
+
+  destroy() {
+    document.body.removeChild(this.divElement);
+    try {
+      this.livekitRoom.removeAllListeners();
+      this.livekitRoom.disconnect(true);
+    } catch (e) {
+      console.error("Error destroying session", e);
+    }
+  }
 }
 
 type ConnectionStateChangedCallback = (state: SDKConnectionState) => void;
@@ -437,6 +533,8 @@ type OnRemainingSecondsChanged = (seconds: number) => void;
 type OnErrorCallback = (error: RealtimeSessionError) => void;
 type OnCanPlayAudioChanged = (allowed: boolean) => void;
 type OnAgentVideoChanged = (enabled: boolean) => void;
+type OnWebcamChanged = (enabled: WebcamState) => void;
+export type WebcamState = "off" | "preview" | "on";
 
 export class RealtimeSessionErrorConnect extends Error {
   constructor(message: string) {
@@ -458,6 +556,7 @@ export type SessionEngineParams = {
   onConnectionStateChanged: ConnectionStateChangedCallback;
   onMessagesChanged: OnTranscriptionsChangedCallback;
   onMicrophoneChanged: OnMicrophoneCallback;
+  onWebcamChanged: OnWebcamChanged;
   onAgentStateChanged: OnAgentStateChanged;
   onRemainingSecondsChanged: OnRemainingSecondsChanged;
   onAgentVolumeChanged: OnVolumeCallback;

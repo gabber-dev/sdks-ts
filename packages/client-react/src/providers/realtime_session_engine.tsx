@@ -8,6 +8,7 @@ import {
   SDKConnectOptions,
   SDKSendChatMessageParams,
   SDKSessionTranscription,
+  WebcamState,
 } from "gabber-client-core";
 import React from "react";
 
@@ -17,6 +18,7 @@ type RealtimeSessionEngineContextData = {
   messages: SDKSessionTranscription[];
   lastError: { message: string } | null;
   microphoneEnabled: boolean;
+  webcamState: WebcamState;
   agentVolumeBands: number[];
   agentVolume: number;
   userVolumeBands: number[];
@@ -26,6 +28,8 @@ type RealtimeSessionEngineContextData = {
   transcription: { text: string; final: boolean };
   canPlayAudio: boolean;
   agentVideoEnabled: boolean;
+  innerEngine: RealtimeSessionEngine;
+  setWebcamEnabled: (state: WebcamState) => Promise<void>;
   setMicrophoneEnabled: (enabled: boolean) => Promise<void>;
   sendChatMessage: (p: SDKSendChatMessageParams) => Promise<void>;
   startAudio: () => Promise<void>;
@@ -36,15 +40,17 @@ const RealtimeSessionEngineContext = createContext<RealtimeSessionEngineContextD
 type Props = {
   connectionOpts: SDKConnectOptions | null;
   videoTrackDestination?: HTMLVideoElement | string;
+  webcamTrackDestination?: HTMLVideoElement | string;
   children: React.ReactNode;
 };
 
-export function RealtimeSessionEngineProvider({ connectionOpts, children, videoTrackDestination }: Props) {
+export function RealtimeSessionEngineProvider({ connectionOpts, children, videoTrackDestination, webcamTrackDestination }: Props) {
   const [id, setId] = useState<string | null>(null);
   const [connectionState, setConnectionState] =
     useState<SDKConnectionState>("not_connected");
   const [messages, setMessages] = useState<SDKSessionTranscription[]>([]);
   const [microphoneEnabledState, setMicrophoneEnabledState] = useState(false);
+  const [webcamState, setWebcamState] = useState<WebcamState>("off");
   const [agentVideoEnabled, setAgentVideoEnabled] = useState(false);
   const [agentVolumeBands, setAgentVolumeBands] = useState<number[]>([]);
   const [agentVolume, setAgentVolume] = useState<number>(0);
@@ -78,6 +84,10 @@ export function RealtimeSessionEngineProvider({ connectionOpts, children, videoT
     sessionEngine.current.setVideoTrackDestination({element: videoTrackDestination});
   }, [videoTrackDestination]);
 
+  useEffect(() => {
+    sessionEngine.current.setWebcamTrackDestination({element: webcamTrackDestination});
+  }, [webcamTrackDestination]);
+
   const onConnectionStateChanged = useRef((sessionState: SDKConnectionState) => {
     setConnectionState(sessionState);
     setId(sessionEngine.current.id);
@@ -107,6 +117,10 @@ export function RealtimeSessionEngineProvider({ connectionOpts, children, videoT
 
   const onAgentStateChanged = useRef((as: SDKAgentState) => {
     setAgentState(as);
+  });
+
+  const onWebcamChanged = useRef((enabled: WebcamState) => {
+    setWebcamState(enabled);
   });
 
   const onRemainingSecondsChanged = useRef((seconds: number | null) => {
@@ -140,6 +154,7 @@ export function RealtimeSessionEngineProvider({ connectionOpts, children, videoT
         onMicrophoneChanged: onMicrophoneChanged.current,
         onCanPlayAudioChanged: onCanPlayAudio.current,
         onAgentVideoChanged: onAgentVideoChanged.current,
+        onWebcamChanged: onWebcamChanged.current,
       });
     })()
   );
@@ -150,6 +165,14 @@ export function RealtimeSessionEngineProvider({ connectionOpts, children, videoT
       return;
     }
     await sessionEngine.current.setMicrophoneEnabled(enabled);
+  });
+
+  const setWebcamEnabled = useRef(async (state: WebcamState) => {
+    if (!sessionEngine.current) {
+      console.error("Trying to set webcam when there is no session");
+      return;
+    }
+    await sessionEngine.current.setWebcamEnabled(state);
   });
 
   const sendChatMessage = useRef(async (p: SDKSendChatMessageParams) => {
@@ -202,6 +225,9 @@ export function RealtimeSessionEngineProvider({ connectionOpts, children, videoT
         lastError,
         canPlayAudio,
         agentVideoEnabled,
+        webcamState,
+        innerEngine: sessionEngine.current,
+        setWebcamEnabled: setWebcamEnabled.current,
         sendChatMessage: sendChatMessage.current,
         setMicrophoneEnabled: setMicrophoneEnabled.current,
         startAudio: startAudio.current,
