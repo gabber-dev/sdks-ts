@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voice & Video Workflow Demo</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+  <!-- Status -->
+  <div class="section">
+    <h3>📊 Status</h3>
+    <div class="status-grid">
+      <div class="status-item">
+        <span>Workflow:</span>
+        <span id="workflow-status" class="status idle">idle</span>
+      </div>
+      <div class="status-item">
+        <span>Microphone:</span>
+        <span id="mic-status" class="status disconnected">off</span>
+      </div>
+      <div class="status-item">
+        <span>Camera:</span>
+        <span id="camera-status" class="status disconnected">off</span>
+      </div>
+      <div class="status-item">
+        <span>VAD Detection:</span>
+        <span id="vad-status">Waiting <span id="vad-indicator" class="vad-indicator"></span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Configuration -->
+  <div class="section">
+    <h3>⚙️ Configuration</h3>
+    <div class="form-grid">
+      <label for="api-base-url">API Base URL:</label>
+      <input type="text" id="api-base-url" value="http://localhost:4000" placeholder="http://localhost:4000">
+
+      <label for="api-key">API Key:</label>
+      <input type="text" id="api-key" placeholder="Your API key" value="3fb97c8e-f5cd-4b9e-8580-487cc2fecb49">
+
+      <label for="app-id">App ID:</label>
+      <input type="text" id="app-id" placeholder="workflow-app-id" value="e8f63898-a1fc-4c95-9f8c-bc785818c26b">
+    </div>
+    <div style="margin: 20px 0;">
+      <button id="start-workflow-btn" class="btn btn-success">🚀 Start Voice & Video Workflow</button>
+      <button id="stop-workflow-btn" class="btn btn-danger" disabled>⏹️ Stop Workflow</button>
+      <button id="mic-button" class="btn btn-primary" disabled>🎤 Microphone</button>
+      <button id="camera-button" class="btn btn-primary" disabled>📹 Camera</button>
+    </div>
+
+    <div style="margin-top: 10px;">
+      <p id="mic-instructions" style="margin: 0; color: #666; font-size: 14px;">Start the workflow to begin voice &
+        video
+        interaction</p>
+      <p id="camera-instructions" style="margin: 0; color: #666; font-size: 14px;">Camera controls will be available
+        after workflow starts</p>
+    </div>
+  </div>
+
+  <!-- Video Preview -->
+  <div class="section">
+    <h3>📹 Video Preview</h3>
+    <div style="margin-bottom: 15px;">
+      <video id="local-video" autoplay muted playsinline
+        style="width: 320px; height: 240px; background: #000; border-radius: 8px; display: none;"></video>
+      <p id="video-preview-status" style="margin: 10px 0; color: #666; font-size: 14px;">No video stream active</p>
+    </div>
+  </div>
+
+  <!-- Text Input -->
+  <div class="section">
+    <h3>💬 Text Input</h3>
+    <div style="margin-bottom: 15px;">
+      <div class="form-grid">
+        <input type="text" id="text-input" placeholder="Type your message here..." style="grid-column: span 2;">
+        <button id="send-text-btn" class="btn btn-primary" disabled>Send Message</button>
+      </div>
+      <p id="text-input-status" style="margin: 10px 0; color: #666; font-size: 14px;">Start the workflow to enable text
+        input</p>
+    </div>
+  </div>
+
+  <!-- Real-time Triggers & Events -->
+  <div class="section">
+    <h3>⚡ Trigger Events</h3>
+    <div id="trigger-log" class="trigger-log">
+      <!-- Trigger events will appear here -->
+    </div>
+    <button onclick="clearTriggerLog()" class="btn btn-secondary" style="margin-top: 10px;">Clear Events</button>
+  </div>
+
+
+
+  <!-- Workflow Nodes -->
+  <div class="section">
+    <h3>🔗 Workflow Nodes</h3>
+    <div id="workflow-nodes" class="workflow-nodes">
+      <p>Connect to workflow to see active nodes...</p>
+    </div>
+  </div>
+
+  <script type="module" src="index.js"></script>
+</body>
+
+</html>
