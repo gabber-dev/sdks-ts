@@ -1,0 +1,52 @@
+{
+  "name": "gabber-workflow-core",
+  "version": "0.1.0",
+  "description": "Core engine for Gabber workflow SDK (framework-agnostic)",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src --ext .ts"
+  },
+  "dependencies": {
+    "livekit-client": "^2.5.0",
+    "eventemitter3": "^5.0.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "@types/node": "^20.0.0",
+    "tsup": "^8.0.0"
+  },
+  "peerDependencies": {},
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gabber-dev/workflow-sdk.git",
+    "directory": "packages/client-core"
+  },
+  "keywords": [
+    "gabber",
+    "workflow",
+    "core",
+    "livekit",
+    "streaming"
+  ],
+  "author": "Gabber",
+  "license": "MIT"
+}
