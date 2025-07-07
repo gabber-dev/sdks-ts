@@ -43,14 +43,14 @@ export class AppEngine extends EventEmitter<AppEngineEvents> implements IAppEngi
   private config: AppEngineConfig = {
     apiBaseUrl: 'http://localhost:8080',
   };
-  private _humanNode: IWorkflowNode | null = null;
+  private _publisherNode: IWorkflowNode | null = null;
 
   /**
-   * Gets the human node if available.
+   * Gets the publisher node if available.
    * This is automatically set during node discovery.
    */
-  get humanNode(): IWorkflowNode | null {
-    return this._humanNode;
+  get publisherNode(): IWorkflowNode | null {
+    return this._publisherNode;
   }
 
   /**
@@ -361,8 +361,8 @@ export class AppEngine extends EventEmitter<AppEngineEvents> implements IAppEngi
           }
         }
 
-        // Find and set the human node from legacy discovery
-        this._humanNode = this.findHumanNode();
+        // Find and set the publisher node from legacy discovery
+        this._publisherNode = this.findPublisherNode();
       }
     } catch (error) {
       console.warn('Failed to parse room metadata:', error);
@@ -413,19 +413,19 @@ export class AppEngine extends EventEmitter<AppEngineEvents> implements IAppEngi
   }
 
   /**
-   * Finds the human node among discovered nodes.
+   * Finds the publisher node among discovered nodes.
    * @private
-   * @returns {IWorkflowNode | null} The human node if found, null otherwise
+   * @returns {IWorkflowNode | null} The publisher node if found, null otherwise
    */
-  private findHumanNode(): IWorkflowNode | null {
+  private findPublisherNode(): IWorkflowNode | null {
     for (const node of this.nodes.values()) {
       const nodeType = node.type.toLowerCase();
-      if (nodeType === 'human' || nodeType === 'publish') {
-        console.log(`🔍 Found human/publish node: ${node.id} (${node.type})`);
+      if (nodeType === 'publisher' || nodeType === 'publish') {
+        console.log(`🔍 Found publisher/publish node: ${node.id} (${node.type})`);
         return node;
       }
     }
-    console.log(`🔍 No human/publish node found among ${this.nodes.size} nodes`);
+    console.log(`🔍 No publisher/publish node found among ${this.nodes.size} nodes`);
     return null;
   }
 
@@ -555,11 +555,11 @@ export class AppEngine extends EventEmitter<AppEngineEvents> implements IAppEngi
         const nodeType = flowNode.type || 'unknown';
 
         // Add pads based on node type - this matches common workflow patterns
-        if (nodeType.toLowerCase() === 'human' || nodeType.toLowerCase() === 'publish') {
-          // Human/Publish input nodes publish audio/video using expected pad IDs
+        if (nodeType.toLowerCase() === 'publisher' || nodeType.toLowerCase() === 'publish') {
+          // Publisher/Publish input nodes publish audio/video using expected pad IDs
           await this.addSourcePad(node, 'audio_source', 'Audio Source', PadType.Audio);
           await this.addSourcePad(node, 'video_source', 'Video Source', PadType.Video);
-          console.log(`✅ Added human/publish pads: audio_source, video_source for node ${node.id}`);
+          console.log(`✅ Added publisher/publish pads: audio_source, video_source for node ${node.id}`);
         }
         else if (nodeType === 'output') {
           // Output nodes receive audio/video
@@ -825,18 +825,18 @@ export class AppEngine extends EventEmitter<AppEngineEvents> implements IAppEngi
         await this.createNodeFromBackendData(nodeData);
       }
 
-      // Find and set the human node after all nodes are created
-      this._humanNode = this.findHumanNode();
-      if (this._humanNode) {
-        console.log(`🔍 Human/Publish node found: ${this._humanNode.id} (${this._humanNode.type})`);
-        // Debug: Log the human node's pads
-        const audioPads = this._humanNode.getSourcePads().filter(pad => pad.dataType === 'audio');
-        const videoPads = this._humanNode.getSourcePads().filter(pad => pad.dataType === 'video');
-        console.log(`🔍 Human node has ${audioPads.length} audio pads and ${videoPads.length} video pads`);
+      // Find and set the publisher node after all nodes are created
+      this._publisherNode = this.findPublisherNode();
+      if (this._publisherNode) {
+        console.log(`🔍 Publisher/Publish node found: ${this._publisherNode.id} (${this._publisherNode.type})`);
+        // Debug: Log the publisher node's pads
+        const audioPads = this._publisherNode.getSourcePads().filter(pad => pad.dataType === 'audio');
+        const videoPads = this._publisherNode.getSourcePads().filter(pad => pad.dataType === 'video');
+        console.log(`🔍 Publisher node has ${audioPads.length} audio pads and ${videoPads.length} video pads`);
         audioPads.forEach(pad => console.log(`  - Audio pad: ${pad.id} (${pad.name})`));
         videoPads.forEach(pad => console.log(`  - Video pad: ${pad.id} (${pad.name})`));
       } else {
-        console.log('🔍 No Human/Publish node found');
+        console.log('🔍 No Publisher node found');
         // Debug: Log all node types to help diagnose the issue
         console.log('🔍 Available node types:', Array.from(this.nodes.values()).map(n => `${n.id} (${n.type})`));
       }
@@ -947,17 +947,17 @@ export class AppEngine extends EventEmitter<AppEngineEvents> implements IAppEngi
       return null;
     }
 
-    // Handle "human" identity - map to human/publish node from workflow
-    if (identity === 'human') {
-      // Find the first human/publish node in the workflow
+    // Handle "publisher" identity - map to publisher/publish node from workflow
+    if (identity === 'publisher') {
+      // Find the first publisher/publish node in the workflow
       for (const [nodeId, node] of this.nodes.entries()) {
         const nodeType = node.type.toLowerCase();
-        if (nodeType === 'human' || nodeType === 'publish') {
-          console.log(`🔍 Mapped "human" identity to human/publish node: ${nodeId} (${node.type})`);
+        if (nodeType === 'publisher' || nodeType === 'publish') {
+          console.log(`🔍 Mapped "publisher" identity to publisher node: ${nodeId} (${node.type})`);
           return nodeId;
         }
       }
-      console.log(`🔍 No human/publish node found for "human" identity`);
+      console.log(`🔍 No publisher node found for "publisher" identity`);
       return null;
     }
 

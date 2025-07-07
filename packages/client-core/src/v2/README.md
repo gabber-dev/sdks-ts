@@ -40,10 +40,10 @@ const { connectionDetails } = await response.json();
 await engine.connect(connectionDetails);
 
 // 4. Enable microphone input
-const humanNode = engine.humanNode;
-const humanAudioPad = humanNode.getSourcePad('audio_source');
-if (humanAudioPad) {
-  await humanAudioPad.setMicrophoneEnabled(true);
+const publisherNode = engine.publisherNode;
+const publisherAudioPad = publisherNode.getSourcePad('audio_source');
+if (publisherAudioPad) {
+  await publisherAudioPad.setMicrophoneEnabled(true);
 }
 
 // 5. Enable TTS audio output - the SDK will automatically manage audio playback
@@ -80,7 +80,7 @@ engine.configure({
 - `listNodes()` - Get all discovered nodes
 - `getConnectionState()` - Get current connection state
 - `getRunState()` - Get current run state ('idle', 'starting', 'running', 'stopping')
-- `humanNode` - Get the human node
+- `publisherNode` - Get the publisher node
 
 **Events:**
 - `'connection-state-changed'` - Emitted when connection state changes
@@ -158,9 +158,9 @@ await engine.connect(connectionDetails);
 ### Audio Track Control
 ```javascript
 // Example 1: Basic microphone control
-const humanNode = engine.humanNode;
-if (humanNode) {
-  const microphonePad = humanNode.getSourcePad('audio_source');
+const publisherNode = engine.publisherNode;
+if (publisherNode) {
+  const microphonePad = publisherNode.getSourcePad('audio_source');
   if (microphonePad) {
     // Enable microphone
     await microphonePad.setMicrophoneEnabled(true);
@@ -237,10 +237,10 @@ function setupNodes() {
   // Your node setup code here
 }
 
-const humanNode = engine.humanNode;
-if (humanNode) {
-  const audioPad = humanNode.getSourcePad('audio_source');
-  const videoPad = humanNode.getSourcePad('video_source');
+const publisherNode = engine.publisherNode;
+if (publisherNode) {
+  const audioPad = publisherNode.getSourcePad('audio_source');
+  const videoPad = publisherNode.getSourcePad('video_source');
 
   if (audioPad) {
     await audioPad.setMicrophoneEnabled(true);
@@ -350,7 +350,7 @@ pad.on('stream-received', (stream) => {
 ### Node Discovery vs Direct Access
 ```javascript
 // For production: Use convenient properties and known node IDs
-const humanNode = engine.humanNode;  // Automatically discovered
+const publisherNode = engine.publisherNode;  // Automatically discovered
 const vadNode = engine.getNode('vad-node-id');
 const llmNode = engine.getNode('llm-node-id');
 
