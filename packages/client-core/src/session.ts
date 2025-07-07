@@ -63,6 +63,7 @@ export class RealtimeSessionEngine {
     onError,
     onCanPlayAudioChanged,
   }: SessionEngineParams) {
+    
     this.livekitRoom = new Room();
     this.livekitRoom.on("connected", this.onRoomConnected.bind(this));
     this.livekitRoom.on("disconnected", this.onRoomDisconnected.bind(this));
@@ -91,8 +92,14 @@ export class RealtimeSessionEngine {
       this.onAudioPlaybackChangaed.bind(this)
     );
 
-    this.divElement = document.createElement("div");
-    document.body.appendChild(this.divElement);
+    
+    if (typeof document !== "undefined") {
+      this.divElement = document.createElement("div");
+      document.body.appendChild(this.divElement);
+    } else {
+      this.divElement = {} as HTMLDivElement; // Fallback for environments without DOM
+    }
+
     this.onConnectionStateChanged = onConnectionStateChanged;
     this.onMessagesChanged = onMessagesChanged;
     this.onMicrophoneChanged = onMicrophoneChanged;
@@ -208,6 +215,9 @@ export class RealtimeSessionEngine {
   }
 
   public setWebcamTrackDestination({ element }: { element: HTMLVideoElement | string | undefined }) {
+    if(typeof document === "undefined") {
+      return;
+    }
     if (typeof element === "string") {
       const el = document.getElementById(element);
       if (!el) {
@@ -227,6 +237,9 @@ export class RealtimeSessionEngine {
     this.resolveWebcam();
   }
   public setVideoTrackDestination({ element }: { element: HTMLVideoElement | string | undefined }) {
+    if(typeof document === "undefined") {
+      return;
+    }
     if (typeof element === "string") {
       const el = document.getElementById(element);
       if (!el) {
@@ -514,6 +527,9 @@ export class RealtimeSessionEngine {
   }
 
   destroy() {
+    if(typeof document === "undefined") {
+      return;
+    }
     document.body.removeChild(this.divElement);
     try {
       this.livekitRoom.removeAllListeners();
