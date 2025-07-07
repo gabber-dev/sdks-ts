@@ -12,6 +12,35 @@ var __export = (target, all) => {
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 
+// src/v2/types.ts
+var types_exports = {};
+__export(types_exports, {
+  PadType: () => PadType,
+  isSinkPad: () => isSinkPad,
+  isSourcePad: () => isSourcePad
+});
+function isSourcePad(padType) {
+  return padType.indexOf("Source") !== -1;
+}
+function isSinkPad(padType) {
+  return padType.indexOf("Sink") !== -1;
+}
+var PadType;
+var init_types = __esm({
+  "src/v2/types.ts"() {
+    PadType = {
+      Audio: "audio",
+      Video: "video",
+      Data: "data",
+      Trigger: "trigger",
+      Text: "text",
+      Boolean: "boolean",
+      Integer: "integer",
+      Number: "number"
+    };
+  }
+});
+
 // src/v2/StreamPad.ts
 var StreamPad_exports = {};
 __export(StreamPad_exports, {
@@ -20,6 +49,7 @@ __export(StreamPad_exports, {
 var StreamPad;
 var init_StreamPad = __esm({
   "src/v2/StreamPad.ts"() {
+    init_types();
     StreamPad = class extends EventEmitter {
       /**
        * Creates a new StreamPad instance.
@@ -41,7 +71,6 @@ var init_StreamPad = __esm({
         this.id = config.id;
         this.nodeId = config.nodeId;
         this.name = config.name;
-        this.direction = config.direction;
         this.dataType = config.dataType;
         this.backendType = config.backendType;
         this.category = config.category;
@@ -49,6 +78,20 @@ var init_StreamPad = __esm({
         this.nextPads = config.nextPads;
         this.previousPad = config.previousPad;
         this._value = config.value;
+      }
+      /**
+       * Checks if this is a source pad based on its backend type.
+       * @returns {boolean} True if this is a source pad
+       */
+      isSourcePad() {
+        return this.backendType ? isSourcePad(this.backendType) : false;
+      }
+      /**
+       * Checks if this is a sink pad based on its backend type.
+       * @returns {boolean} True if this is a sink pad
+       */
+      isSinkPad() {
+        return this.backendType ? isSinkPad(this.backendType) : false;
       }
       /**
        * Sets the HTML media element to output audio/video to.
@@ -67,7 +110,7 @@ var init_StreamPad = __esm({
         if (this.dataType === "video" && !(element instanceof HTMLVideoElement)) {
           throw new Error("Video pad requires HTMLVideoElement");
         }
-        if (this.direction !== "source") {
+        if (!this.isSourcePad()) {
           throw new Error("Can only set element on source pads");
         }
         if (this.autoManagedAudioElement) {
@@ -99,7 +142,7 @@ var init_StreamPad = __esm({
         if (this.dataType !== "audio") {
           throw new Error("Can only set enabled state on audio pads");
         }
-        if (this.direction !== "source") {
+        if (!this.isSourcePad()) {
           throw new Error("Can only set enabled state on source pads");
         }
         this.isEnabled = enabled;
@@ -107,7 +150,7 @@ var init_StreamPad = __esm({
           this._setElement(options.element);
         }
         let targetElement = this.outputElement;
-        if (!targetElement && this.direction === "source") {
+        if (!targetElement && this.isSourcePad()) {
           if (!this.autoManagedAudioElement) {
             this.autoManagedAudioElement = document.createElement("audio");
             this.autoManagedAudioElement.autoplay = true;
@@ -149,7 +192,7 @@ var init_StreamPad = __esm({
         if (this.dataType !== "audio") {
           throw new Error("Can only set microphone on audio pads");
         }
-        if (this.direction !== "source") {
+        if (!this.isSourcePad()) {
           throw new Error("Cannot set microphone on sink pad");
         }
         if (!this.livekitRoom) {
@@ -219,7 +262,7 @@ var init_StreamPad = __esm({
         if (this.dataType !== "video") {
           throw new Error("Can only set video on video pads");
         }
-        if (this.direction !== "source") {
+        if (!this.isSourcePad()) {
           throw new Error("Cannot set video on sink pad");
         }
         if (!this.livekitRoom) {
@@ -328,7 +371,7 @@ var init_StreamPad = __esm({
        * @param {MediaStream | null} stream - The media stream to set
        */
       setStream(stream) {
-        if (this.direction !== "source") {
+        if (!this.isSourcePad()) {
           throw new Error("Can only set stream on source pads");
         }
         this.currentStream = stream;
@@ -4180,7 +4223,9 @@ __export(v2_exports, {
   AppEngine: () => AppEngine,
   PadType: () => PadType,
   StreamPad: () => StreamPad,
-  WorkflowNode: () => WorkflowNode
+  WorkflowNode: () => WorkflowNode,
+  isSinkPad: () => isSinkPad,
+  isSourcePad: () => isSourcePad
 });
 
 // src/v2/WorkflowNode.ts
@@ -4215,14 +4260,14 @@ var WorkflowNode = class extends EventEmitter {
    * @returns {IStreamPad[]} Array of source pads
    */
   getSourcePads() {
-    return Array.from(this.pads.values()).filter((pad) => pad.direction === "source");
+    return Array.from(this.pads.values()).filter((pad) => pad.isSourcePad());
   }
   /**
    * Gets all sink (input) pads on this node.
    * @returns {IStreamPad[]} Array of sink pads
    */
   getSinkPads() {
-    return Array.from(this.pads.values()).filter((pad) => pad.direction === "sink");
+    return Array.from(this.pads.values()).filter((pad) => pad.isSinkPad());
   }
   /**
    * Gets input pads, optionally filtered by data type.
@@ -4249,7 +4294,7 @@ var WorkflowNode = class extends EventEmitter {
    */
   getSourcePad(padId) {
     const pad = this.pads.get(padId);
-    if (pad && pad.direction === "source") {
+    if (pad && pad.isSourcePad()) {
       return pad;
     }
     return null;
@@ -4261,7 +4306,7 @@ var WorkflowNode = class extends EventEmitter {
    */
   getSinkPad(padId) {
     const pad = this.pads.get(padId);
-    if (pad && pad.direction === "sink") {
+    if (pad && pad.isSinkPad()) {
       return pad;
     }
     return null;
@@ -4365,7 +4410,7 @@ var WorkflowNode = class extends EventEmitter {
   routeTrackToPads(track, publication, _participant) {
     const trackName = publication.trackName || "";
     for (const pad of this.pads.values()) {
-      if (pad.direction === "sink" && (pad.dataType === "audio" && track.kind === "audio" || pad.dataType === "video" && track.kind === "video")) {
+      if (pad.isSinkPad() && (pad.dataType === "audio" && track.kind === "audio" || pad.dataType === "video" && track.kind === "video")) {
         if (trackName.includes(pad.id) || trackName.includes(pad.name)) {
           pad.setStream(new MediaStream([track]));
         }
@@ -4382,7 +4427,7 @@ var WorkflowNode = class extends EventEmitter {
   routeTrackUnsubscriptionToPads(track, publication, _participant) {
     const trackName = publication.trackName || "";
     for (const pad of this.pads.values()) {
-      if (pad.direction === "sink" && (pad.dataType === "audio" && track.kind === "audio" || pad.dataType === "video" && track.kind === "video")) {
+      if (pad.isSinkPad() && (pad.dataType === "audio" && track.kind === "audio" || pad.dataType === "video" && track.kind === "video")) {
         if (trackName.includes(pad.id) || trackName.includes(pad.name)) {
           pad.setStream(null);
         }
@@ -4426,18 +4471,6 @@ var WorkflowNode = class extends EventEmitter {
   }
 };
 
-// src/v2/types.ts
-var PadType = {
-  Audio: "audio",
-  Video: "video",
-  Data: "data",
-  Trigger: "trigger",
-  Text: "text",
-  Boolean: "boolean",
-  Integer: "integer",
-  Number: "number"
-};
-
 // src/v2/AppEngine.ts
 var AppEngine = class extends EventEmitter {
   /**
@@ -4453,17 +4486,17 @@ var AppEngine = class extends EventEmitter {
     this.config = {
       apiBaseUrl: "http://localhost:8080"
     };
-    this._humanNode = null;
+    this._publisherNode = null;
     if (config) {
       this.configure(config);
     }
   }
   /**
-   * Gets the human node if available.
+   * Gets the publisher node if available.
    * This is automatically set during node discovery.
    */
-  get humanNode() {
-    return this._humanNode;
+  get publisherNode() {
+    return this._publisherNode;
   }
   /**
    * Configures the workflow engine with the provided options.
@@ -4480,84 +4513,10 @@ var AppEngine = class extends EventEmitter {
     return this.runState;
   }
   /**
-   * Sets the run state and emits a state change event.
-   * @private
-   * @param {RunState} state - New run state
-   */
-  setRunState(state) {
-    if (this.runState !== state) {
-      this.runState = state;
-      this.emit("run-state-changed", state);
-    }
-  }
-  /**
-   * Starts a new app run with the provided configuration.
-   * This creates a new workflow instance on the server.
-   *
-   * @param {AppRunConfig} config - Configuration for the app run
-   * @returns {Promise<ConnectionDetails>} Connection details for the new workflow
-   * @throws {Error} If the server request fails or if already running
-   */
-  async startAppRun(config) {
-    if (this.runState !== "idle") {
-      throw new Error(`Cannot start app run in ${this.runState} state`);
-    }
-    try {
-      this.setRunState("starting");
-      const requestBody = {
-        app: config.appId,
-        version: config.version,
-        inputs: config.inputs || {}
-      };
-      if (config.entryFlow) {
-        requestBody.entry_flow = config.entryFlow;
-      }
-      const headers = {
-        "Content-Type": "application/json"
-      };
-      if (this.config.apiKey) {
-        headers["x-api-key"] = this.config.apiKey;
-      }
-      if (this.config.bearerToken) {
-        headers["Authorization"] = `Bearer ${this.config.bearerToken}`;
-      }
-      const response = await fetch(`${this.config.apiBaseUrl}/v1/app/run`, {
-        method: "POST",
-        headers,
-        body: JSON.stringify(requestBody)
-      });
-      if (!response.ok) {
-        this.setRunState("idle");
-        const errorText = await response.text();
-        throw new Error(`Failed to start app run: ${response.status} ${response.statusText}. ${errorText}`);
-      }
-      const data = await response.json();
-      this.setRunState("running");
-      return {
-        token: data.connection_details.token,
-        url: data.connection_details.url
-      };
-    } catch (error) {
-      this.setRunState("idle");
-      throw new Error(`Failed to start app run: ${error}`);
-    }
-  }
-  /**
-   * Stops the current app run and cleans up resources.
-   */
-  async stopAppRun() {
-    if (this.runState === "idle") {
-      return;
-    }
-    this.setRunState("stopping");
-    await this.disconnect();
-    this.setRunState("idle");
-  }
-  /**
    * Connects to a workflow using the provided connection details.
    * This establishes the WebSocket connection and discovers workflow nodes.
    *
-   * @param {ConnectionDetails} connectionDetails - Connection details from startAppRun
+   * @param {ConnectionDetails} connectionDetails - Connection details for the workflow
    * @throws {Error} If already connected or if connection fails
    */
   async connect(connectionDetails) {
@@ -4681,44 +4640,7 @@ var AppEngine = class extends EventEmitter {
   async discoverNodes() {
     if (!this.livekitRoom) return;
     console.log("\u{1F50D} Starting node discovery - waiting for backend node information...");
-    try {
-      const roomInfo = this.livekitRoom.metadata;
-      if (roomInfo) {
-        const metadata = JSON.parse(roomInfo);
-        console.log("Room metadata:", metadata);
-        if (metadata.app && metadata.app.flows && metadata.app.flows[0]) {
-          const editLedger = metadata.app.flows[0].edit_ledger;
-          console.log("\u{1F50D} Edit ledger found:", editLedger?.length || 0, "edits");
-          if (editLedger && editLedger.length > 0) {
-            console.log("\u{1F50D} First few edits:", editLedger.slice(0, 3));
-          }
-        } else {
-          console.log("\u26A0\uFE0F No edit_ledger found in metadata structure");
-        }
-        if (metadata.app && metadata.app.flows) {
-          console.log(`Found app with ${metadata.app.flows.length} flows`);
-          for (const flow of metadata.app.flows) {
-            if (flow.nodes && Array.isArray(flow.nodes)) {
-              console.log(`Processing flow "${flow.id}" with ${flow.nodes.length} nodes`);
-              for (const flowNode of flow.nodes) {
-                await this.createNodeFromFlowDefinition(flowNode);
-              }
-            }
-          }
-        } else {
-          console.log("No app.flows found in metadata, trying legacy flow structure");
-          if (metadata.flow && metadata.flow.nodes) {
-            for (const flowNode of metadata.flow.nodes) {
-              await this.createNodeFromFlowDefinition(flowNode);
-            }
-          }
-        }
-        this._humanNode = this.findHumanNode();
-      }
-    } catch (error) {
-      console.warn("Failed to parse room metadata:", error);
-    }
-    console.log("\u{1F50D} Legacy node discovery complete, waiting for backend node information...");
+    console.log("\u{1F50D} Waiting for backend node information...");
     setTimeout(() => {
       if (this.nodes.size === 0) {
         console.warn("\u26A0\uFE0F No nodes discovered after 5 seconds. This could mean:");
@@ -4734,200 +4656,22 @@ var AppEngine = class extends EventEmitter {
         }
       }
     }, 5e3);
-    setTimeout(() => {
-      if (this.livekitRoom && this.nodes.size === 0) {
-        console.log("\u{1F50D} Attempting to request graph data from backend...");
-        const testRequest = {
-          req_id: "test-" + Date.now(),
-          route: "get_graph"
-        };
-        const encoder = new TextEncoder();
-        this.livekitRoom.localParticipant.publishData(
-          encoder.encode(JSON.stringify(testRequest)),
-          { topic: "graph" }
-        ).then(() => {
-          console.log("\u{1F4E4} Graph request sent to backend");
-        }).catch((error) => {
-          console.error("\u274C Failed to send graph request:", error);
-        });
-      }
-    }, 3e3);
   }
   /**
-   * Finds the human node among discovered nodes.
+   * Finds the publisher node among discovered nodes.
    * @private
-   * @returns {IWorkflowNode | null} The human node if found, null otherwise
+   * @returns {IWorkflowNode | null} The publisher node if found, null otherwise
    */
-  findHumanNode() {
+  findPublisherNode() {
     for (const node of this.nodes.values()) {
       const nodeType = node.type.toLowerCase();
-      if (nodeType === "human" || nodeType === "publish") {
-        console.log(`\u{1F50D} Found human/publish node: ${node.id} (${node.type})`);
+      if (nodeType === "publisher" || nodeType === "publish") {
+        console.log(`\u{1F50D} Found publisher/publish node: ${node.id} (${node.type})`);
         return node;
       }
     }
-    console.log(`\u{1F50D} No human/publish node found among ${this.nodes.size} nodes`);
+    console.log(`\u{1F50D} No publisher/publish node found among ${this.nodes.size} nodes`);
     return null;
-  }
-  /**
-   * Creates a workflow node from a flow definition.
-   * @private
-   * @param {any} flowNode - Flow node definition from metadata
-   */
-  async createNodeFromFlowDefinition(flowNode) {
-    try {
-      const nodeId = flowNode.uuid || flowNode.id;
-      const nodeType = flowNode.node_name || flowNode.type || "unknown";
-      console.log(`Creating node from flow definition:`, JSON.stringify(flowNode, null, 2));
-      console.log(`Node ID: ${nodeId}, Node Type: ${nodeType}`);
-      if (!nodeId) {
-        console.warn("Flow node missing ID, skipping:", flowNode);
-        return;
-      }
-      if (this.nodes.has(nodeId)) {
-        console.log(`Node ${nodeId} already exists, skipping`);
-        return;
-      }
-      const node = new WorkflowNode(nodeId, nodeType);
-      node.setLivekitRoom(this.livekitRoom);
-      await this.addNodePads(node, flowNode);
-      console.log(`\u2705 Successfully created node: ${nodeId} (${nodeType})`);
-      this.addNode(node);
-    } catch (error) {
-      console.error(`Failed to create node from flow definition:`, error);
-    }
-  }
-  /**
-   * Adds pads to a node based on its flow definition.
-   * @private
-   * @param {IWorkflowNode} node - Node to add pads to
-   * @param {any} flowNode - Flow node definition
-   */
-  async addNodePads(node, flowNode) {
-    try {
-      console.log(`\u{1F527} Adding pads for node type: ${flowNode.type}`);
-      console.log(`\u{1F50D} Full flow node data:`, JSON.stringify(flowNode.data, null, 2));
-      if (flowNode.data && flowNode.data.pad_data) {
-        console.log(`\u{1F4CB} Found pad_data definitions for node ${node.id}:`, flowNode.data.pad_data);
-        for (const [padName] of Object.entries(flowNode.data.pad_data)) {
-          try {
-            let direction;
-            let dataType;
-            let displayName;
-            if (padName.endsWith("_source")) {
-              direction = "source";
-              displayName = padName.replace("_source", "").replace(/_/g, " ");
-              if (padName.includes("audio")) {
-                dataType = PadType.Audio;
-              } else if (padName.includes("video")) {
-                dataType = PadType.Video;
-              } else if (padName.includes("text")) {
-                dataType = PadType.Data;
-              } else {
-                dataType = PadType.Data;
-              }
-            } else if (padName.endsWith("_sink")) {
-              direction = "sink";
-              displayName = padName.replace("_sink", "").replace(/_/g, " ");
-              if (padName.includes("audio")) {
-                dataType = PadType.Audio;
-              } else if (padName.includes("video")) {
-                dataType = PadType.Video;
-              } else if (padName.includes("text")) {
-                dataType = PadType.Data;
-              } else {
-                dataType = PadType.Data;
-              }
-            } else if (padName.endsWith("_trigger")) {
-              direction = "source";
-              dataType = PadType.Trigger;
-              displayName = padName.replace("_trigger", "").replace(/_/g, " ");
-            } else if (padName.endsWith("_ref")) {
-              direction = "sink";
-              dataType = PadType.Data;
-              displayName = padName.replace("_ref", "").replace(/_/g, " ");
-            } else {
-              continue;
-            }
-            displayName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
-            console.log(`  Adding pad: ${padName} \u2192 ${displayName} (${direction}, ${dataType})`);
-            if (direction === "source") {
-              await this.addSourcePad(node, padName, displayName, dataType);
-            } else {
-              await this.addSinkPad(node, padName, displayName, dataType);
-            }
-          } catch (error) {
-            console.warn(`\u26A0\uFE0F Failed to add pad ${padName} to node ${node.id}:`, error);
-          }
-        }
-      } else {
-        console.log(`\u2139\uFE0F No pad_data found, using type-based fallback for: ${flowNode.type}`);
-        const nodeType = flowNode.type || "unknown";
-        if (nodeType.toLowerCase() === "human" || nodeType.toLowerCase() === "publish") {
-          await this.addSourcePad(node, "audio_source", "Audio Source", PadType.Audio);
-          await this.addSourcePad(node, "video_source", "Video Source", PadType.Video);
-          console.log(`\u2705 Added human/publish pads: audio_source, video_source for node ${node.id}`);
-        } else if (nodeType === "output") {
-          await this.addSinkPad(node, "audio_in", "Audio Input", PadType.Audio);
-          await this.addSinkPad(node, "video_in", "Video Input", PadType.Video);
-        } else if (nodeType === "vad") {
-          await this.addSinkPad(node, "audio_in", "Audio Input", PadType.Audio);
-          await this.addSourcePad(node, "speech_started", "Speech Started", PadType.Trigger);
-          await this.addSourcePad(node, "speech_ended", "Speech Ended", PadType.Trigger);
-        } else if (nodeType.includes("llm") || nodeType === "omni_llm") {
-          await this.addSinkPad(node, "text_in", "Text Input", PadType.Data);
-          await this.addSourcePad(node, "text_out", "Text Output", PadType.Data);
-        } else if (nodeType === "tts") {
-          await this.addSinkPad(node, "text_in", "Text Input", PadType.Data);
-          await this.addSourcePad(node, "audio_out", "Audio Output", PadType.Audio);
-        } else {
-          console.log(`\u2139\uFE0F Adding default pads for unknown node type: ${nodeType}`);
-          await this.addSinkPad(node, "data_in", "Data Input", PadType.Data);
-          await this.addSourcePad(node, "data_out", "Data Output", PadType.Data);
-        }
-      }
-      console.log(`\u2705 Added ${node.getSourcePads().length} source pads and ${node.getSinkPads().length} sink pads to node ${node.id}`);
-    } catch (error) {
-      console.warn(`Failed to add pads to node ${node.id}:`, error);
-    }
-  }
-  /**
-   * Adds a source pad to a node.
-   * @private
-   * @param {IWorkflowNode} node - Node to add the pad to
-   * @param {string} id - Pad ID
-   * @param {string} name - Pad name
-   * @param {PadDataType} dataType - Type of data for the pad
-   */
-  async addSourcePad(node, id, name, dataType) {
-    const pad = new (await Promise.resolve().then(() => (init_StreamPad(), StreamPad_exports))).StreamPad({
-      id,
-      nodeId: node.id,
-      name,
-      direction: "source",
-      dataType
-    });
-    pad.setLivekitRoom(this.livekitRoom);
-    node.addPad(pad);
-  }
-  /**
-   * Adds a sink pad to a node.
-   * @private
-   * @param {IWorkflowNode} node - Node to add the pad to
-   * @param {string} id - Pad ID
-   * @param {string} name - Pad name
-   * @param {PadDataType} dataType - Type of data for the pad
-   */
-  async addSinkPad(node, id, name, dataType) {
-    const pad = new (await Promise.resolve().then(() => (init_StreamPad(), StreamPad_exports))).StreamPad({
-      id,
-      nodeId: node.id,
-      name,
-      direction: "sink",
-      dataType
-    });
-    pad.setLivekitRoom(this.livekitRoom);
-    node.addPad(pad);
   }
   /**
    * Handles a subscribed track from LiveKit.
@@ -5068,16 +4812,16 @@ var AppEngine = class extends EventEmitter {
       for (const nodeData of nodesData) {
         await this.createNodeFromBackendData(nodeData);
       }
-      this._humanNode = this.findHumanNode();
-      if (this._humanNode) {
-        console.log(`\u{1F50D} Human/Publish node found: ${this._humanNode.id} (${this._humanNode.type})`);
-        const audioPads = this._humanNode.getSourcePads().filter((pad) => pad.dataType === "audio");
-        const videoPads = this._humanNode.getSourcePads().filter((pad) => pad.dataType === "video");
-        console.log(`\u{1F50D} Human node has ${audioPads.length} audio pads and ${videoPads.length} video pads`);
+      this._publisherNode = this.findPublisherNode();
+      if (this._publisherNode) {
+        console.log(`\u{1F50D} Publisher/Publish node found: ${this._publisherNode.id} (${this._publisherNode.type})`);
+        const audioPads = this._publisherNode.getSourcePads().filter((pad) => pad.dataType === "audio");
+        const videoPads = this._publisherNode.getSourcePads().filter((pad) => pad.dataType === "video");
+        console.log(`\u{1F50D} Publisher node has ${audioPads.length} audio pads and ${videoPads.length} video pads`);
         audioPads.forEach((pad) => console.log(`  - Audio pad: ${pad.id} (${pad.name})`));
         videoPads.forEach((pad) => console.log(`  - Video pad: ${pad.id} (${pad.name})`));
       } else {
-        console.log("\u{1F50D} No Human/Publish node found");
+        console.log("\u{1F50D} No Publisher node found");
         console.log("\u{1F50D} Available node types:", Array.from(this.nodes.values()).map((n) => `${n.id} (${n.type})`));
       }
       console.log(`\u2705 Node discovery complete: ${this.nodes.size} nodes created`);
@@ -5122,11 +4866,12 @@ var AppEngine = class extends EventEmitter {
   async createPadFromBackendData(node, padData) {
     try {
       const padId = padData.id;
-      const padDirection = padData.direction;
       const padDataType = padData.data_type;
       const padBackendType = padData.type;
       const padDisplayName = padData.id.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
-      console.log(`  Adding pad from backend: ${padId} (${padDirection}, ${padDataType}, ${padBackendType})`);
+      const { isSourcePad: isSourcePad2, isSinkPad: isSinkPad2 } = await Promise.resolve().then(() => (init_types(), types_exports));
+      const padDirection = isSourcePad2(padBackendType) ? "source" : isSinkPad2(padBackendType) ? "sink" : "unknown";
+      console.log(`  Adding pad from backend: ${padId} (${padDirection} derived from ${padBackendType}, ${padDataType})`);
       let padCategory = "stateless";
       if (padBackendType === "PropertySourcePad" || padBackendType === "PropertySinkPad") {
         padCategory = "property";
@@ -5135,7 +4880,6 @@ var AppEngine = class extends EventEmitter {
         id: padId,
         nodeId: node.id,
         name: padDisplayName,
-        direction: padDirection,
         dataType: padDataType,
         backendType: padBackendType,
         category: padCategory,
@@ -5165,15 +4909,15 @@ var AppEngine = class extends EventEmitter {
       console.log(`\u{1F50D} No identity found`);
       return null;
     }
-    if (identity === "human") {
+    if (identity === "publisher") {
       for (const [nodeId, node] of this.nodes.entries()) {
         const nodeType = node.type.toLowerCase();
-        if (nodeType === "human" || nodeType === "publish") {
-          console.log(`\u{1F50D} Mapped "human" identity to human/publish node: ${nodeId} (${node.type})`);
+        if (nodeType === "publisher" || nodeType === "publish") {
+          console.log(`\u{1F50D} Mapped "publisher" identity to publisher node: ${nodeId} (${node.type})`);
           return nodeId;
         }
       }
-      console.log(`\u{1F50D} No human/publish node found for "human" identity`);
+      console.log(`\u{1F50D} No publisher node found for "publisher" identity`);
       return null;
     }
     if (identity.includes("node-")) {
@@ -5206,6 +4950,7 @@ var AppEngine = class extends EventEmitter {
 
 // src/v2/index.ts
 init_StreamPad();
+init_types();
 
 export { Api, BadRequestTypeEnum, ChatCompletionMessageToolCallChunkTypeEnum, ChatCompletionMessageToolCallTypeEnum, ChatCompletionNamedToolChoiceTypeEnum, ChatCompletionRequestAssistantMessageRoleEnum, ChatCompletionRequestMessageContentPartAudioInputAudioFormatEnum, ChatCompletionRequestMessageContentPartAudioTypeEnum, ChatCompletionRequestMessageContentPartTextTypeEnum, ChatCompletionRequestSystemMessageRoleEnum, ChatCompletionRequestToolMessageRoleEnum, ChatCompletionRequestUserMessageRoleEnum, ChatCompletionResponseGabberMessageDataTypeEnum, ChatCompletionResponseMessageRoleEnum, ChatCompletionStreamResponseChoiceFinishReasonEnum, ChatCompletionStreamResponseDeltaRoleEnum, ChatCompletionStreamResponseObjectEnum, ChatCompletionToolTypeEnum, ContextMessageContentTextTypeEnum, ContextMessageCreateParamsRoleEnum, ContextMessageRoleEnum, ContextMessageToolCallTypeEnum, CreatePersonaRequestGenderEnum, HistoryMessageRoleEnum, HumanDataType, PersonaGenderEnum, RealtimeSessionDTMFDigitDigitEnum, RealtimeSessionDataType, RealtimeSessionDataTypeEnum, RealtimeSessionEngine, RealtimeSessionErrorConnect, RealtimeSessionErrorUnknown, RealtimeSessionInitiateOutboundCallRequestPhoneTypeEnum, RealtimeSessionStateEnum, RealtimeSessionTimelineItemTypeEnum, SDKAgentState, SDKConnectionState, SessionStateEnum, SessionTimelineItemTypeEnum, TTSWebsocketRequestMessageType, TTSWebsocketResponseMessageAudioPayloadAudioFormatEnum, TTSWebsocketResponseMessageAudioPayloadEncodingEnum, TTSWebsocketResponseMessageType, ToolDefinitionCallSettingDestinationClientAppTypeEnum, ToolDefinitionCallSettingDestinationWebRequestTypeEnum, ToolDefinitionParameterTypeEnum, UpdatePersonaRequestGenderEnum, UsageType, WebhookMessageRealtimeSessionMessageCommittedTypeEnum, WebhookMessageRealtimeSessionStateChangedTypeEnum, WebhookMessageRealtimeSessionStateChangedpayloadSessionStateEnum, WebhookMessageRealtimeSessionTimeLimitExceededTypeEnum, WebhookMessageToolCallsFinishedTypeEnum, WebhookMessageToolCallsStartedTypeEnum, WebhookMessageUsageTrackedTypeEnum, v2_exports as v2 };
 //# sourceMappingURL=index.mjs.map

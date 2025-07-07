@@ -26,10 +26,10 @@ const gabberProxy = new GabberProxy({
   apiBaseUrl: process.env.GABBER_API_URL || 'http://localhost:4000'
 });
 
-// Create a new session
-app.post('/api/sessions', async (req, res) => {
+// Create a new app run
+app.post('/app/run', async (req, res) => {
   try {
-    console.log('📝 Creating new session with params:', req.body);
+    console.log('📝 Creating new app run with params:', req.body);
 
     const { appId, version, entryFlow, inputs } = req.body;
 
@@ -50,10 +50,10 @@ app.post('/api/sessions', async (req, res) => {
       inputs
     });
 
-    console.log('✅ Session created successfully:', { sessionId: session.sessionId });
+    console.log('✅ App run created successfully:', { sessionId: session.sessionId });
     res.json(session);
   } catch (error) {
-    console.error('❌ Error creating session:', error);
+    console.error('❌ Error creating app run:', error);
     res.status(500).json({
       error: error.message,
       details: error.stack
@@ -61,42 +61,42 @@ app.post('/api/sessions', async (req, res) => {
   }
 });
 
-// Get session details
-app.get('/api/sessions/:sessionId', (req, res) => {
+// Get app run details
+app.get('/app/run/:sessionId', (req, res) => {
   try {
-    console.log('📝 Getting session details for:', req.params.sessionId);
+    console.log('📝 Getting app run details for:', req.params.sessionId);
 
     const session = gabberProxy.getSession(req.params.sessionId);
     if (!session) {
-      console.warn('⚠️ Session not found:', req.params.sessionId);
-      res.status(404).json({ error: 'Session not found' });
+      console.warn('⚠️ App run not found:', req.params.sessionId);
+      res.status(404).json({ error: 'App run not found' });
       return;
     }
 
-    console.log('✅ Session details retrieved successfully');
+    console.log('✅ App run details retrieved successfully');
     res.json(session);
   } catch (error) {
-    console.error('❌ Error getting session:', error);
+    console.error('❌ Error getting app run:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// Delete a session
-app.delete('/api/sessions/:sessionId', (req, res) => {
+// Delete an app run
+app.delete('/app/run/:sessionId', (req, res) => {
   try {
-    console.log('🗑️ Deleting session:', req.params.sessionId);
+    console.log('🗑️ Deleting app run:', req.params.sessionId);
 
     const deleted = gabberProxy.deleteSession(req.params.sessionId);
     if (!deleted) {
-      console.warn('⚠️ Session not found for deletion:', req.params.sessionId);
-      res.status(404).json({ error: 'Session not found' });
+      console.warn('⚠️ App run not found for deletion:', req.params.sessionId);
+      res.status(404).json({ error: 'App run not found' });
       return;
     }
 
-    console.log('✅ Session deleted successfully');
+    console.log('✅ App run deleted successfully');
     res.status(204).send();
   } catch (error) {
-    console.error('❌ Error deleting session:', error);
+    console.error('❌ Error deleting app run:', error);
     res.status(500).json({ error: error.message });
   }
 });

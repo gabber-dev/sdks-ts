@@ -4,18 +4,14 @@ import type {
   IAppEngine,
   IWorkflowNode,
   AppEngineEvents,
-  AppRunConfig,
   ConnectionDetails,
   ConnectionState,
   AppEngineConfig,
-  CreateAppRunRequest,
-  CreateAppRunResponse,
   PadDataType,
   BackendPadType,
   RunState
 } from './types';
 import { WorkflowNode } from './WorkflowNode';
-import { PadType } from './types';
 
 /**
  * AppEngine is the main entry point for interacting with Gabber workflows.
@@ -80,97 +76,13 @@ export class AppEngine extends EventEmitter<AppEngineEvents> implements IAppEngi
     return this.runState;
   }
 
-  /**
-   * Sets the run state and emits a state change event.
-   * @private
-   * @param {RunState} state - New run state
-   */
-  private setRunState(state: RunState): void {
-    if (this.runState !== state) {
-      this.runState = state;
-      this.emit('run-state-changed', state);
-    }
-  }
 
-  /**
-   * Starts a new app run with the provided configuration.
-   * This creates a new workflow instance on the server.
-   *
-   * @param {AppRunConfig} config - Configuration for the app run
-   * @returns {Promise<ConnectionDetails>} Connection details for the new workflow
-   * @throws {Error} If the server request fails or if already running
-   */
-  async startAppRun(config: AppRunConfig): Promise<ConnectionDetails> {
-    if (this.runState !== 'idle') {
-      throw new Error(`Cannot start app run in ${this.runState} state`);
-    }
-
-    try {
-      this.setRunState('starting');
-      const requestBody: CreateAppRunRequest = {
-        app: config.appId,
-        version: config.version,
-        inputs: config.inputs || {},
-      };
-
-      if (config.entryFlow) {
-        requestBody.entry_flow = config.entryFlow;
-      }
-
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-      };
-
-      if (this.config.apiKey) {
-        headers['x-api-key'] = this.config.apiKey;
-      }
-      if (this.config.bearerToken) {
-        headers['Authorization'] = `Bearer ${this.config.bearerToken}`;
-      }
-
-      const response = await fetch(`${this.config.apiBaseUrl}/v1/app/run`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(requestBody),
-      });
-
-      if (!response.ok) {
-        this.setRunState('idle');
-        const errorText = await response.text();
-        throw new Error(`Failed to start app run: ${response.status} ${response.statusText}. ${errorText}`);
-      }
-
-      const data: CreateAppRunResponse = await response.json();
-      this.setRunState('running');
-
-      return {
-        token: data.connection_details.token,
-        url: data.connection_details.url,
-      };
-    } catch (error) {
-      this.setRunState('idle');
-      throw new Error(`Failed to start app run: ${error}`);
-    }
-  }
-
-  /**
-   * Stops the current app run and cleans up resources.
-   */
-  async stopAppRun(): Promise<void> {
-    if (this.runState === 'idle') {
-      return;
-    }
-
-    this.setRunState('stopping');
-    await this.disconnect();
-    this.setRunState('idle');
-  }
 
   /**
    * Connects to a workflow using the provided connection details.
    * This establishes the WebSocket connection and discovers workflow nodes.
    *
-   * @param {ConnectionDetails} connectionDetails - Connection details from startAppRun
+   * @param {ConnectionDetails} connectionDetails - Connection details for the workflow
    * @throws {Error} If already connected or if connection fails
    */
   async connect(connectionDetails: ConnectionDetails): Promise<void> {
@@ -320,57 +232,8 @@ export class AppEngine extends EventEmitter<AppEngineEvents> implements IAppEngi
 
     console.log('🔍 Starting node discovery - waiting for backend node information...');
 
-    try {
-      const roomInfo = this.livekitRoom.metadata;
-      if (roomInfo) {
-        const metadata = JSON.parse(roomInfo);
-        console.log('Room metadata:', metadata);
-
-        // Debug: Check for edit_ledger
-        if (metadata.app && metadata.app.flows && metadata.app.flows[0]) {
-          const editLedger = metadata.app.flows[0].edit_ledger;
-          console.log('🔍 Edit ledger found:', editLedger?.length || 0, 'edits');
-          if (editLedger && editLedger.length > 0) {
-            console.log('🔍 First few edits:', editLedger.slice(0, 3));
-          }
-        } else {
-          console.log('⚠️ No edit_ledger found in metadata structure');
-        }
-
-        // Create nodes based on app flows definition (legacy fallback)
-        if (metadata.app && metadata.app.flows) {
-          console.log(`Found app with ${metadata.app.flows.length} flows`);
-
-          for (const flow of metadata.app.flows) {
-            if (flow.nodes && Array.isArray(flow.nodes)) {
-              console.log(`Processing flow "${flow.id}" with ${flow.nodes.length} nodes`);
-
-              for (const flowNode of flow.nodes) {
-                await this.createNodeFromFlowDefinition(flowNode);
-              }
-            }
-          }
-        } else {
-          console.log('No app.flows found in metadata, trying legacy flow structure');
-
-          // Fallback to legacy structure if available
-          if (metadata.flow && metadata.flow.nodes) {
-            for (const flowNode of metadata.flow.nodes) {
-              await this.createNodeFromFlowDefinition(flowNode);
-            }
-          }
-        }
-
-        // Find and set the publisher node from legacy discovery
-        this._publisherNode = this.findPublisherNode();
-      }
-    } catch (error) {
-      console.warn('Failed to parse room metadata:', error);
-    }
-
-    // Note: Primary node discovery now happens via backend data packets
-    // This method handles legacy fallback and backup discovery
-    console.log('🔍 Legacy node discovery complete, waiting for backend node information...');
+    // Note: Node discovery happens via backend data packets
+    console.log('🔍 Waiting for backend node information...');
 
     // Set up a timeout to show warning if no backend data is received
     setTimeout(() => {
@@ -389,27 +252,6 @@ export class AppEngine extends EventEmitter<AppEngineEvents> implements IAppEngi
         }
       }
     }, 5000);
-
-    // Test: Try to request graph data using the existing "graph" topic
-    setTimeout(() => {
-      if (this.livekitRoom && this.nodes.size === 0) {
-        console.log('🔍 Attempting to request graph data from backend...');
-        const testRequest = {
-          req_id: 'test-' + Date.now(),
-          route: 'get_graph'
-        };
-
-        const encoder = new TextEncoder();
-        this.livekitRoom.localParticipant.publishData(
-          encoder.encode(JSON.stringify(testRequest)),
-          { topic: 'graph' }
-        ).then(() => {
-          console.log('📤 Graph request sent to backend');
-        }).catch((error) => {
-          console.error('❌ Failed to send graph request:', error);
-        });
-      }
-    }, 3000);
   }
 
   /**
@@ -427,213 +269,6 @@ export class AppEngine extends EventEmitter<AppEngineEvents> implements IAppEngi
     }
     console.log(`🔍 No publisher/publish node found among ${this.nodes.size} nodes`);
     return null;
-  }
-
-  /**
-   * Creates a workflow node from a flow definition.
-   * @private
-   * @param {any} flowNode - Flow node definition from metadata
-   */
-  private async createNodeFromFlowDefinition(flowNode: any): Promise<void> {
-    try {
-      // Handle both new and legacy node structures
-      const nodeId = flowNode.uuid || flowNode.id;
-      const nodeType = flowNode.node_name || flowNode.type || 'unknown';
-
-      console.log(`Creating node from flow definition:`, JSON.stringify(flowNode, null, 2));
-      console.log(`Node ID: ${nodeId}, Node Type: ${nodeType}`);
-
-      if (!nodeId) {
-        console.warn('Flow node missing ID, skipping:', flowNode);
-        return;
-      }
-
-      // Skip if node already exists
-      if (this.nodes.has(nodeId)) {
-        console.log(`Node ${nodeId} already exists, skipping`);
-        return;
-      }
-
-      // Create generic WorkflowNode for all types
-      const node = new WorkflowNode(nodeId, nodeType);
-
-      // Set up LiveKit room reference
-      (node as any).setLivekitRoom(this.livekitRoom);
-
-      // Add pads from flow definition
-      await this.addNodePads(node, flowNode);
-
-      console.log(`✅ Successfully created node: ${nodeId} (${nodeType})`);
-      this.addNode(node);
-    } catch (error) {
-      console.error(`Failed to create node from flow definition:`, error);
-    }
-  }
-
-
-
-  /**
-   * Adds pads to a node based on its flow definition.
-   * @private
-   * @param {IWorkflowNode} node - Node to add pads to
-   * @param {any} flowNode - Flow node definition
-   */
-  private async addNodePads(node: IWorkflowNode, flowNode: any): Promise<void> {
-    try {
-      console.log(`🔧 Adding pads for node type: ${flowNode.type}`);
-      console.log(`🔍 Full flow node data:`, JSON.stringify(flowNode.data, null, 2));
-
-      // Check for pad definitions in pad_data (the actual format used by the backend)
-      if (flowNode.data && flowNode.data.pad_data) {
-        console.log(`📋 Found pad_data definitions for node ${node.id}:`, flowNode.data.pad_data);
-
-        for (const [padName] of Object.entries(flowNode.data.pad_data)) {
-          try {
-            // Determine pad direction and type from naming convention
-            let direction: 'source' | 'sink';
-            let dataType: PadDataType;
-            let displayName: string;
-
-            if (padName.endsWith('_source')) {
-              direction = 'source';
-              displayName = padName.replace('_source', '').replace(/_/g, ' ');
-
-              if (padName.includes('audio')) {
-                dataType = PadType.Audio;
-              } else if (padName.includes('video')) {
-                dataType = PadType.Video;
-              } else if (padName.includes('text')) {
-                dataType = PadType.Data;
-              } else {
-                dataType = PadType.Data;
-              }
-            } else if (padName.endsWith('_sink')) {
-              direction = 'sink';
-              displayName = padName.replace('_sink', '').replace(/_/g, ' ');
-
-              if (padName.includes('audio')) {
-                dataType = PadType.Audio;
-              } else if (padName.includes('video')) {
-                dataType = PadType.Video;
-              } else if (padName.includes('text')) {
-                dataType = PadType.Data;
-              } else {
-                dataType = PadType.Data;
-              }
-            } else if (padName.endsWith('_trigger')) {
-              direction = 'source'; // triggers are typically outputs
-              dataType = PadType.Trigger;
-              displayName = padName.replace('_trigger', '').replace(/_/g, ' ');
-            } else if (padName.endsWith('_ref')) {
-              direction = 'sink'; // references are typically inputs
-              dataType = PadType.Data;
-              displayName = padName.replace('_ref', '').replace(/_/g, ' ');
-            } else {
-              // Skip configuration parameters (like vad_threshold, silence_duration_ms, etc.)
-              continue;
-            }
-
-            // Capitalize first letter of display name
-            displayName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
-
-            console.log(`  Adding pad: ${padName} → ${displayName} (${direction}, ${dataType})`);
-
-            if (direction === 'source') {
-              await this.addSourcePad(node, padName, displayName, dataType);
-            } else {
-              await this.addSinkPad(node, padName, displayName, dataType);
-            }
-          } catch (error) {
-            console.warn(`⚠️ Failed to add pad ${padName} to node ${node.id}:`, error);
-          }
-        }
-      }
-      // Fallback to type-based pad creation if no pad_data
-      else {
-        console.log(`ℹ️ No pad_data found, using type-based fallback for: ${flowNode.type}`);
-
-        const nodeType = flowNode.type || 'unknown';
-
-        // Add pads based on node type - this matches common workflow patterns
-        if (nodeType.toLowerCase() === 'publisher' || nodeType.toLowerCase() === 'publish') {
-          // Publisher/Publish input nodes publish audio/video using expected pad IDs
-          await this.addSourcePad(node, 'audio_source', 'Audio Source', PadType.Audio);
-          await this.addSourcePad(node, 'video_source', 'Video Source', PadType.Video);
-          console.log(`✅ Added publisher/publish pads: audio_source, video_source for node ${node.id}`);
-        }
-        else if (nodeType === 'output') {
-          // Output nodes receive audio/video
-          await this.addSinkPad(node, 'audio_in', 'Audio Input', PadType.Audio);
-          await this.addSinkPad(node, 'video_in', 'Video Input', PadType.Video);
-        }
-        else if (nodeType === 'vad') {
-          // VAD nodes receive audio and publish triggers
-          await this.addSinkPad(node, 'audio_in', 'Audio Input', PadType.Audio);
-          await this.addSourcePad(node, 'speech_started', 'Speech Started', PadType.Trigger);
-          await this.addSourcePad(node, 'speech_ended', 'Speech Ended', PadType.Trigger);
-        }
-        else if (nodeType.includes('llm') || nodeType === 'omni_llm') {
-          // LLM nodes handle data
-          await this.addSinkPad(node, 'text_in', 'Text Input', PadType.Data);
-          await this.addSourcePad(node, 'text_out', 'Text Output', PadType.Data);
-        }
-        else if (nodeType === 'tts') {
-          // TTS nodes receive text and publish audio
-          await this.addSinkPad(node, 'text_in', 'Text Input', PadType.Data);
-          await this.addSourcePad(node, 'audio_out', 'Audio Output', PadType.Audio);
-        }
-        else {
-          // Generic nodes - add basic support
-          console.log(`ℹ️ Adding default pads for unknown node type: ${nodeType}`);
-          await this.addSinkPad(node, 'data_in', 'Data Input', PadType.Data);
-          await this.addSourcePad(node, 'data_out', 'Data Output', PadType.Data);
-        }
-      }
-
-      console.log(`✅ Added ${node.getSourcePads().length} source pads and ${node.getSinkPads().length} sink pads to node ${node.id}`);
-    } catch (error) {
-      console.warn(`Failed to add pads to node ${node.id}:`, error);
-    }
-  }
-
-  /**
-   * Adds a source pad to a node.
-   * @private
-   * @param {IWorkflowNode} node - Node to add the pad to
-   * @param {string} id - Pad ID
-   * @param {string} name - Pad name
-   * @param {PadDataType} dataType - Type of data for the pad
-   */
-  private async addSourcePad(node: IWorkflowNode, id: string, name: string, dataType: PadDataType): Promise<void> {
-    const pad = new (await import('./StreamPad')).StreamPad({
-      id,
-      nodeId: node.id,
-      name,
-      direction: 'source',
-      dataType
-    });
-    pad.setLivekitRoom(this.livekitRoom);
-    (node as any).addPad(pad);
-  }
-
-  /**
-   * Adds a sink pad to a node.
-   * @private
-   * @param {IWorkflowNode} node - Node to add the pad to
-   * @param {string} id - Pad ID
-   * @param {string} name - Pad name
-   * @param {PadDataType} dataType - Type of data for the pad
-   */
-  private async addSinkPad(node: IWorkflowNode, id: string, name: string, dataType: PadDataType): Promise<void> {
-    const pad = new (await import('./StreamPad')).StreamPad({
-      id,
-      nodeId: node.id,
-      name,
-      direction: 'sink',
-      dataType
-    });
-    pad.setLivekitRoom(this.livekitRoom);
-    (node as any).addPad(pad);
   }
 
   /**
@@ -895,12 +530,15 @@ export class AppEngine extends EventEmitter<AppEngineEvents> implements IAppEngi
   private async createPadFromBackendData(node: IWorkflowNode, padData: any): Promise<void> {
     try {
       const padId = padData.id;
-      const padDirection = padData.direction;
       const padDataType = padData.data_type;
       const padBackendType = padData.type;
       const padDisplayName = padData.id.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
 
-      console.log(`  Adding pad from backend: ${padId} (${padDirection}, ${padDataType}, ${padBackendType})`);
+      // Import the utility functions to check pad types
+      const { isSourcePad, isSinkPad } = await import('./types');
+      const padDirection = isSourcePad(padBackendType) ? 'source' : (isSinkPad(padBackendType) ? 'sink' : 'unknown');
+
+      console.log(`  Adding pad from backend: ${padId} (${padDirection} derived from ${padBackendType}, ${padDataType})`);
 
       // Determine pad category from backend type
       let padCategory: 'stateless' | 'property' = 'stateless';
@@ -912,7 +550,6 @@ export class AppEngine extends EventEmitter<AppEngineEvents> implements IAppEngi
         id: padId,
         nodeId: node.id,
         name: padDisplayName,
-        direction: padDirection as 'source' | 'sink',
         dataType: padDataType as PadDataType,
         backendType: padBackendType as BackendPadType,
         category: padCategory,

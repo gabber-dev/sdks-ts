@@ -20,23 +20,15 @@ engine.configure({
   apiKey: 'your-api-key'  // Required for direct API calls
 });
 
-// 2. Start a workflow (direct API approach)
-const connectionDetails = await engine.startAppRun({
-  appId: 'your-workflow-app-id',
-  version: 1
-});
-
-// 3. Connect to the Gabber workflow
-await engine.connect(connectionDetails);
-
-// Alternative: Using a proxy server (recommended for web apps)
-// If you're using a proxy server to handle API keys securely:
-const response = await fetch('your-proxy-server/api/sessions', {
+// 2. Get connection details from your proxy server (recommended for web apps)
+const response = await fetch('your-proxy-server/app/run', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({ appId: 'your-workflow-app-id', version: 1 })
 });
 const { connectionDetails } = await response.json();
+
+// 3. Connect to the Gabber workflow
 await engine.connect(connectionDetails);
 
 // 4. Enable microphone input
@@ -70,9 +62,7 @@ engine.configure({
 ```
 
 **Workflow Management:**
-- `startAppRun(config)` - Start a workflow run
 - `connect(details)` - Connect to workflow session
-- `stopAppRun()` - Stop the current workflow run
 - `disconnect()` - Disconnect from session and clean up all resources
 
 **Node Access:**
@@ -141,7 +131,7 @@ const engine = new AppEngine();
 // No need to configure API keys when using proxy
 
 // Create session through proxy
-const response = await fetch(`${proxyServerUrl}/api/sessions`, {
+const response = await fetch(`${proxyServerUrl}/app/run`, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -226,12 +216,18 @@ engine.on('nodes-discovered', () => {
   setupNodes();
 });
 
-const details = await engine.startAppRun({
-  appId: 'voice-chat-workflow',
-  version: 1
+// Get connection details from proxy server
+const response = await fetch(`${proxyServerUrl}/app/run`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    appId: 'voice-chat-workflow',
+    version: 1
+  })
 });
+const { connectionDetails } = await response.json();
 
-await engine.connect(details);
+await engine.connect(connectionDetails);
 
 function setupNodes() {
   // Your node setup code here
@@ -371,10 +367,17 @@ allNodes.forEach(node => {
 
 ```javascript
 try {
-  const details = await engine.startAppRun(config);
-  await engine.connect(details);
+  // Get connection details from proxy server
+  const response = await fetch(`${proxyServerUrl}/app/run`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(config)
+  });
+  const { connectionDetails } = await response.json();
+
+  await engine.connect(connectionDetails);
 } catch (error) {
-  console.error('Failed to start workflow:', error.message);
+  console.error('Failed to connect to workflow:', error.message);
 }
 
 engine.on('error', (error) => {

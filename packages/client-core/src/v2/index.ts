@@ -34,12 +34,11 @@ export type {
   ConnectionState,
   /** Type identifier for workflow nodes */
   NodeType,
-  /** Direction of data flow for pads */
-  PadDirection,
+
   /** Type of data that can flow through a pad */
   PadDataType,
   /** Configuration for creating a new pad */
   PadConfig
 } from './types';
 
-export { PadType } from './types';
+export { PadType, isSourcePad, isSinkPad } from './types';

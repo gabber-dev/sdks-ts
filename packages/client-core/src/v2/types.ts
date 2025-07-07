@@ -74,9 +74,6 @@ export type RunState = 'idle' | 'starting' | 'running' | 'stopping';
 /** Type identifier for workflow nodes */
 export type NodeType = string;
 
-/** Direction of data flow for pads */
-export type PadDirection = 'source' | 'sink';
-
 /** Type of data that can flow through a pad */
 export type PadDataType = 'audio' | 'video' | 'data' | 'trigger' | 'text' | 'boolean' | 'integer' | 'number';
 
@@ -128,8 +125,6 @@ export interface PadConfig {
   nodeId: string;
   /** Display name of the pad */
   name: string;
-  /** Direction of data flow */
-  direction: PadDirection;
   /** Type of data that flows through the pad */
   dataType: PadDataType;
   /** Backend pad type */
@@ -188,10 +183,6 @@ export interface StreamPadEvents {
 export interface IAppEngine extends EventEmitter<AppEngineEvents> {
   /** Configure the workflow engine */
   configure(config: AppEngineConfig): void;
-  /** Start a new app run */
-  startAppRun(config: AppRunConfig): Promise<ConnectionDetails>;
-  /** Stop the current app run */
-  stopAppRun(): Promise<void>;
   /** Connect to a workflow using connection details */
   connect(connectionDetails: ConnectionDetails): Promise<void>;
   /** Disconnect from the current workflow and clean up all resources */
@@ -242,7 +233,6 @@ export interface IStreamPad extends EventEmitter<StreamPadEvents> {
   readonly id: string;
   readonly nodeId: string;
   readonly name: string;
-  readonly direction: PadDirection;
   readonly dataType: PadDataType;
   readonly backendType?: BackendPadType | undefined;
   readonly category?: PadCategory | undefined;
@@ -258,6 +248,10 @@ export interface IStreamPad extends EventEmitter<StreamPadEvents> {
   getConnectionState(): boolean;
   isPublishing(): boolean;
   isSubscribed(): boolean;
+
+  // Pad type methods
+  isSourcePad(): boolean;
+  isSinkPad(): boolean;
 
   // Property pad methods
   getValue(): any;
@@ -278,3 +272,21 @@ export const PadType = {
   Integer: 'integer' as const,
   Number: 'number' as const,
 };
+
+/**
+ * Checks if a pad is a source pad based on its backend type.
+ * @param {string} padType - The backend pad type (e.g., 'StatelessSourcePad', 'PropertySourcePad')
+ * @returns {boolean} True if this is a source pad
+ */
+export function isSourcePad(padType: string): boolean {
+  return padType.indexOf('Source') !== -1;
+}
+
+/**
+ * Checks if a pad is a sink pad based on its backend type.
+ * @param {string} padType - The backend pad type (e.g., 'StatelessSinkPad', 'PropertySinkPad')
+ * @returns {boolean} True if this is a sink pad
+ */
+export function isSinkPad(padType: string): boolean {
+  return padType.indexOf('Sink') !== -1;
+}

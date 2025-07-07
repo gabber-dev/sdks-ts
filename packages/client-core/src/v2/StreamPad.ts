@@ -2,7 +2,6 @@ import { EventEmitter } from 'eventemitter3';
 import type {
   IStreamPad,
   StreamPadEvents,
-  PadDirection,
   PadDataType,
   PadConfig,
   AudioOptions,
@@ -12,6 +11,7 @@ import type {
   PadDataTypeDefinition,
   PadReference
 } from './types';
+import { isSourcePad, isSinkPad } from './types';
 
 /**
  * StreamPad represents a connection point on a workflow node that can send or receive data.
@@ -23,7 +23,6 @@ export class StreamPad extends EventEmitter<StreamPadEvents> implements IStreamP
   readonly id: string;
   readonly nodeId: string;
   readonly name: string;
-  readonly direction: PadDirection;
   readonly dataType: PadDataType;
   readonly backendType?: BackendPadType | undefined;
   readonly category?: PadCategory | undefined;
@@ -52,7 +51,6 @@ export class StreamPad extends EventEmitter<StreamPadEvents> implements IStreamP
     this.id = config.id;
     this.nodeId = config.nodeId;
     this.name = config.name;
-    this.direction = config.direction;
     this.dataType = config.dataType;
     this.backendType = config.backendType;
     this.category = config.category;
@@ -60,6 +58,22 @@ export class StreamPad extends EventEmitter<StreamPadEvents> implements IStreamP
     this.nextPads = config.nextPads;
     this.previousPad = config.previousPad;
     this._value = config.value;
+  }
+
+  /**
+   * Checks if this is a source pad based on its backend type.
+   * @returns {boolean} True if this is a source pad
+   */
+  isSourcePad(): boolean {
+    return this.backendType ? isSourcePad(this.backendType) : false;
+  }
+
+  /**
+   * Checks if this is a sink pad based on its backend type.
+   * @returns {boolean} True if this is a sink pad
+   */
+  isSinkPad(): boolean {
+    return this.backendType ? isSinkPad(this.backendType) : false;
   }
 
   /**
@@ -81,7 +95,7 @@ export class StreamPad extends EventEmitter<StreamPadEvents> implements IStreamP
       throw new Error('Video pad requires HTMLVideoElement');
     }
 
-    if (this.direction !== 'source') {
+    if (!this.isSourcePad()) {
       throw new Error('Can only set element on source pads');
     }
 
@@ -120,7 +134,7 @@ export class StreamPad extends EventEmitter<StreamPadEvents> implements IStreamP
       throw new Error('Can only set enabled state on audio pads');
     }
 
-    if (this.direction !== 'source') {
+    if (!this.isSourcePad()) {
       throw new Error('Can only set enabled state on source pads');
     }
 
@@ -135,7 +149,7 @@ export class StreamPad extends EventEmitter<StreamPadEvents> implements IStreamP
     let targetElement = this.outputElement;
 
     // If no element is provided or set, create and manage one automatically
-    if (!targetElement && this.direction === 'source') {
+    if (!targetElement && this.isSourcePad()) {
       if (!this.autoManagedAudioElement) {
         this.autoManagedAudioElement = document.createElement('audio');
         this.autoManagedAudioElement.autoplay = true;
@@ -184,7 +198,7 @@ export class StreamPad extends EventEmitter<StreamPadEvents> implements IStreamP
       throw new Error('Can only set microphone on audio pads');
     }
 
-    if (this.direction !== 'source') {
+    if (!this.isSourcePad()) {
       throw new Error('Cannot set microphone on sink pad');
     }
 
@@ -266,7 +280,7 @@ export class StreamPad extends EventEmitter<StreamPadEvents> implements IStreamP
       throw new Error('Can only set video on video pads');
     }
 
-    if (this.direction !== 'source') {
+    if (!this.isSourcePad()) {
       throw new Error('Cannot set video on sink pad');
     }
 
@@ -392,7 +406,7 @@ export class StreamPad extends EventEmitter<StreamPadEvents> implements IStreamP
    * @param {MediaStream | null} stream - The media stream to set
    */
   setStream(stream: MediaStream | null): void {
-    if (this.direction !== 'source') {
+    if (!this.isSourcePad()) {
       throw new Error('Can only set stream on source pads');
     }
 

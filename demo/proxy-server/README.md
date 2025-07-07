@@ -37,9 +37,9 @@ npm run dev
 
 ## API Endpoints
 
-### Create Session
-- **POST** `/api/sessions`
-- Creates a new workflow session
+### Create App Run
+- **POST** `/app/run`
+- Creates a new workflow app run
 - Request body:
 ```json
 {
@@ -60,9 +60,9 @@ npm run dev
 }
 ```
 
-### Get Session
-- **GET** `/api/sessions/:sessionId`
-- Retrieves connection details for an existing session
+### Get App Run
+- **GET** `/app/run/:sessionId`
+- Retrieves connection details for an existing app run
 - Response:
 ```json
 {
@@ -73,9 +73,9 @@ npm run dev
 }
 ```
 
-### Delete Session
-- **DELETE** `/api/sessions/:sessionId`
-- Deletes a session and its associated resources
+### Delete App Run
+- **DELETE** `/app/run/:sessionId`
+- Deletes an app run and its associated resources
 - Response: 204 No Content
 
 ## Using with the SDK
@@ -85,8 +85,8 @@ Update your frontend code to use the proxy server instead of direct API access:
 ```javascript
 const engine = new AppEngine();
 
-// Create a session through the proxy
-const response = await fetch('http://localhost:3000/api/sessions', {
+// Create an app run through the proxy
+const response = await fetch('http://localhost:3000/app/run', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -100,8 +100,8 @@ const { sessionId, connectionDetails } = await response.json();
 // Connect using the returned details
 await engine.connect(connectionDetails);
 
-// When done, clean up the session
-await fetch(`http://localhost:3000/api/sessions/${sessionId}`, {
+// When done, clean up the app run
+await fetch(`http://localhost:3000/app/run/${sessionId}`, {
   method: 'DELETE'
 });
 ```

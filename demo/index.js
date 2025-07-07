@@ -1,7 +1,7 @@
 import { v2 } from './gabber-client-core.mjs';
 const { AppEngine } = v2;
 const NODE_IDS = {
-  human: '3d5b2db6-a72a-4164-a7ce-82aee3048ab0',
+  publisher: '3d5b2db6-a72a-4164-a7ce-82aee3048ab0',
   vad: 'd974a0ea-daee-4d07-b8cb-2ebd626ee98f',
   output: 'bb8fa49e-2dec-41f2-94c9-a8cda2c7ec70',
   omni_llm: 'fecb90d0-8faa-409c-9adf-f2236ee56430',
@@ -16,11 +16,11 @@ class SimpleVoiceDemo {
     this.llmNode = null;
     this.outputNode = null;
     this.ttsNode = null;
-    this.humanNode = null;
+    this.publisherNode = null;
     this.llmContextEventsNode = null;
 
-    this.humanAudioPad = null;
-    this.humanVideoPad = null;
+    this.publisherAudioPad = null;
+    this.publisherVideoPad = null;
     this.ttsAudioPad = null;
     this.outputAudioPad = null;
     this.isAudioMonitorEnabled = true;
@@ -97,7 +97,7 @@ class SimpleVoiceDemo {
       console.log(`🚀 Starting voice workflow: ${appId}`);
 
       // Get connection details from proxy server
-      const response = await fetch(`${proxyBaseUrl}/api/sessions`, {
+      const response = await fetch(`${proxyBaseUrl}/app/run`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -154,8 +154,8 @@ class SimpleVoiceDemo {
 
     console.log('🔍 Setting up nodes after discovery');
 
-    // Use direct property access for human node
-    this.humanNode = this.engine.humanNode;
+    // Use direct property access for publisher node
+    this.publisherNode = this.engine.publisherNode;
 
     // Get other nodes by ID
     this.vadNode = this.engine.getNode(NODE_IDS.vad);
@@ -167,18 +167,18 @@ class SimpleVoiceDemo {
     // Setup individual node handlers
     this.setupNodeHandlers();
 
-    // Setup human node UI and controls if available
-    if (this.humanNode) {
-      this.setupHumanEvents();
+    // Setup publisher node UI and controls if available
+    if (this.publisherNode) {
+      this.setupPublisherEvents();
 
       // Enable controls based on available pads
-      const audioSourcePad = this.humanNode.getSourcePad('audio_source');
+      const audioSourcePad = this.publisherNode.getSourcePad('audio_source');
       if (audioSourcePad) {
         document.getElementById('mic-button').disabled = false;
         document.getElementById('mic-instructions').textContent = 'Click the microphone to start/stop recording';
       }
 
-      const videoSourcePad = this.humanNode.getSourcePad('video_source');
+      const videoSourcePad = this.publisherNode.getSourcePad('video_source');
       if (videoSourcePad) {
         document.getElementById('camera-button').disabled = false;
         document.getElementById('camera-instructions').textContent = 'Click the camera to start/stop video';
@@ -217,12 +217,12 @@ class SimpleVoiceDemo {
     }
 
     // Enable controls based on available pads
-    if (this.humanAudioPad) {
+    if (this.publisherAudioPad) {
       document.getElementById('mic-button').disabled = false;
       document.getElementById('mic-instructions').textContent = 'Click the microphone to start/stop recording';
     }
 
-    if (this.humanVideoPad) {
+    if (this.publisherVideoPad) {
       document.getElementById('camera-button').disabled = false;
       document.getElementById('camera-instructions').textContent = 'Click the camera to start/stop video';
     }
@@ -351,37 +351,37 @@ class SimpleVoiceDemo {
     });
   }
 
-  setupHumanEvents() {
-    if (!this.humanNode) {
-      console.warn('⚠️ Human node not found for setup');
+  setupPublisherEvents() {
+    if (!this.publisherNode) {
+      console.warn('⚠️ Publisher node not found for setup');
       return;
     }
 
-    this.setupHumanAudioPad();
-    this.setupHumanVideoPad();
+    this.setupPublisherAudioPad();
+    this.setupPublisherVideoPad();
   }
 
-  setupHumanAudioPad() {
-    this.humanAudioPad = this.humanNode.getSourcePad('audio_source');
-    if (this.humanAudioPad) {
-      this.humanAudioPad.on('connection-changed', (connected) => {
-        this.addTriggerEvent('Human', `Audio Publishing ${connected ? 'Started' : 'Stopped'}`, { padId: this.humanAudioPad.id });
+  setupPublisherAudioPad() {
+    this.publisherAudioPad = this.publisherNode.getSourcePad('audio_source');
+    if (this.publisherAudioPad) {
+      this.publisherAudioPad.on('connection-changed', (connected) => {
+        this.addTriggerEvent('Publisher', `Audio Publishing ${connected ? 'Started' : 'Stopped'}`, { padId: this.publisherAudioPad.id });
       });
 
-      this.humanAudioPad.on('stream-received', (stream) => {
-        this.addTriggerEvent('Human', 'Audio Stream Received', { padId: this.humanAudioPad.id });
+      this.publisherAudioPad.on('stream-received', (stream) => {
+        this.addTriggerEvent('Publisher', 'Audio Stream Received', { padId: this.publisherAudioPad.id });
       });
     }
   }
 
-  setupHumanVideoPad() {
-    this.humanVideoPad = this.humanNode.getSourcePad('video_source');
-    if (this.humanVideoPad) {
-      this.humanVideoPad.on('connection-changed', (connected) => {
-        this.addTriggerEvent('Human', `Video Publishing ${connected ? 'Started' : 'Stopped'}`, { padId: this.humanVideoPad.id });
+  setupPublisherVideoPad() {
+    this.publisherVideoPad = this.publisherNode.getSourcePad('video_source');
+    if (this.publisherVideoPad) {
+      this.publisherVideoPad.on('connection-changed', (connected) => {
+        this.addTriggerEvent('Publisher', `Video Publishing ${connected ? 'Started' : 'Stopped'}`, { padId: this.publisherVideoPad.id });
       });
 
-      this.humanVideoPad.on('stream-received', (stream) => {
+      this.publisherVideoPad.on('stream-received', (stream) => {
         this.showVideoPreview(stream);
       });
     }
@@ -424,21 +424,21 @@ class SimpleVoiceDemo {
   }
 
   async toggleMicrophone() {
-    // Rely on the humanNode property
-    if (!this.humanNode) {
-      this.addTriggerEvent('Human', 'Error: Microphone unavailable - No human node found');
-      console.error('❌ No human node found for microphone toggle');
+    // Rely on the publisherNode property
+    if (!this.publisherNode) {
+      this.addTriggerEvent('Publisher', 'Error: Microphone unavailable - No publisher node found');
+      console.error('❌ No publisher node found for microphone toggle');
       return;
     }
 
-    console.log('🔍 Human node found:', this.humanNode.id, this.humanNode.type);
-    console.log('🔍 Human node source pads:', this.humanNode.getSourcePads().map(pad => `${pad.id} (${pad.dataType})`));
+    console.log('🔍 Publisher node found:', this.publisherNode.id, this.publisherNode.type);
+    console.log('🔍 Publisher node source pads:', this.publisherNode.getSourcePads().map(pad => `${pad.id} (${pad.dataType})`));
 
-    const audioSourcePad = this.humanNode.getSourcePad('audio_source');
+    const audioSourcePad = this.publisherNode.getSourcePad('audio_source');
     if (!audioSourcePad) {
       // Try alternative pad names
-      const allAudioPads = this.humanNode.getSourcePads().filter(pad => pad.dataType === 'audio');
-      console.log('🔍 All audio pads on human node:', allAudioPads.map(pad => `${pad.id} (${pad.name})`));
+      const allAudioPads = this.publisherNode.getSourcePads().filter(pad => pad.dataType === 'audio');
+      console.log('🔍 All audio pads on publisher node:', allAudioPads.map(pad => `${pad.id} (${pad.name})`));
 
       if (allAudioPads.length > 0) {
         const firstAudioPad = allAudioPads[0];
@@ -462,11 +462,11 @@ class SimpleVoiceDemo {
           }
         } catch (error) {
           console.error('❌ Failed to toggle microphone on first audio pad:', error);
-          this.addTriggerEvent('Human', 'Error: Failed to toggle microphone', { error: error.message });
+          this.addTriggerEvent('Publisher', 'Error: Failed to toggle microphone', { error: error.message });
         }
       } else {
-        console.error('❌ No audio pads found on human node');
-        this.addTriggerEvent('Human', 'Error: Microphone unavailable - No audio pad found');
+        console.error('❌ No audio pads found on publisher node');
+        this.addTriggerEvent('Publisher', 'Error: Microphone unavailable - No audio pad found');
       }
       return;
     }
@@ -492,26 +492,26 @@ class SimpleVoiceDemo {
       }
     } catch (error) {
       console.error('❌ Failed to toggle microphone:', error);
-      this.addTriggerEvent('Human', 'Error: Failed to toggle microphone', { error: error.message });
+      this.addTriggerEvent('Publisher', 'Error: Failed to toggle microphone', { error: error.message });
     }
   }
 
   async toggleCamera() {
-    // Rely on the humanNode property
-    if (!this.humanNode) {
-      this.addTriggerEvent('Human', 'Error: Camera unavailable - No human node found');
-      console.error('❌ No human node found for camera toggle');
+    // Rely on the publisherNode property
+    if (!this.publisherNode) {
+      this.addTriggerEvent('Publisher', 'Error: Camera unavailable - No publisher node found');
+      console.error('❌ No publisher node found for camera toggle');
       return;
     }
 
-    console.log('🔍 Human node found for camera:', this.humanNode.id, this.humanNode.type);
-    console.log('🔍 Human node video pads:', this.humanNode.getSourcePads().filter(pad => pad.dataType === 'video').map(pad => `${pad.id} (${pad.name})`));
+    console.log('🔍 Publisher node found for camera:', this.publisherNode.id, this.publisherNode.type);
+    console.log('🔍 Publisher node video pads:', this.publisherNode.getSourcePads().filter(pad => pad.dataType === 'video').map(pad => `${pad.id} (${pad.name})`));
 
-    const videoSourcePad = this.humanNode.getSourcePad('video_source');
+    const videoSourcePad = this.publisherNode.getSourcePad('video_source');
     if (!videoSourcePad) {
       // Try alternative pad names
-      const allVideoPads = this.humanNode.getSourcePads().filter(pad => pad.dataType === 'video');
-      console.log('🔍 All video pads on human node:', allVideoPads.map(pad => `${pad.id} (${pad.name})`));
+      const allVideoPads = this.publisherNode.getSourcePads().filter(pad => pad.dataType === 'video');
+      console.log('🔍 All video pads on publisher node:', allVideoPads.map(pad => `${pad.id} (${pad.name})`));
 
       if (allVideoPads.length > 0) {
         const firstVideoPad = allVideoPads[0];
@@ -536,11 +536,11 @@ class SimpleVoiceDemo {
           }
         } catch (error) {
           console.error('❌ Failed to toggle camera on first video pad:', error);
-          this.addTriggerEvent('Human', 'Error: Failed to toggle camera', { error: error.message });
+          this.addTriggerEvent('Publisher', 'Error: Failed to toggle camera', { error: error.message });
         }
       } else {
-        console.error('❌ No video pads found on human node');
-        this.addTriggerEvent('Human', 'Error: Camera unavailable - No video pad found');
+        console.error('❌ No video pads found on publisher node');
+        this.addTriggerEvent('Publisher', 'Error: Camera unavailable - No video pad found');
       }
       return;
     }
@@ -567,7 +567,7 @@ class SimpleVoiceDemo {
       }
     } catch (error) {
       console.error('❌ Failed to toggle camera:', error);
-      this.addTriggerEvent('Human', 'Error: Failed to toggle camera', { error: error.message });
+      this.addTriggerEvent('Publisher', 'Error: Failed to toggle camera', { error: error.message });
     }
   }
 
@@ -964,12 +964,12 @@ class SimpleVoiceDemo {
     this.llmNode = null;
     this.outputNode = null;
     this.ttsNode = null;
-    this.humanNode = null;
+    this.publisherNode = null;
     this.llmContextEventsNode = null;
 
     // Reset pad references
-    this.humanAudioPad = null;
-    this.humanVideoPad = null;
+    this.publisherAudioPad = null;
+    this.publisherVideoPad = null;
     this.ttsAudioPad = null;
     this.outputAudioPad = null;
 

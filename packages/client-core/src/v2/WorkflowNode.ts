@@ -49,7 +49,7 @@ export class WorkflowNode extends EventEmitter<WorkflowNodeEvents> implements IW
    * @returns {IStreamPad[]} Array of source pads
    */
   getSourcePads(): IStreamPad[] {
-    return Array.from(this.pads.values()).filter(pad => pad.direction === 'source');
+    return Array.from(this.pads.values()).filter(pad => (pad as any).isSourcePad());
   }
 
   /**
@@ -57,7 +57,7 @@ export class WorkflowNode extends EventEmitter<WorkflowNodeEvents> implements IW
    * @returns {IStreamPad[]} Array of sink pads
    */
   getSinkPads(): IStreamPad[] {
-    return Array.from(this.pads.values()).filter(pad => pad.direction === 'sink');
+    return Array.from(this.pads.values()).filter(pad => (pad as any).isSinkPad());
   }
 
   /**
@@ -87,7 +87,7 @@ export class WorkflowNode extends EventEmitter<WorkflowNodeEvents> implements IW
    */
   getSourcePad<T extends PadDataType>(padId: string): (IStreamPad & { dataType: T }) | null {
     const pad = this.pads.get(padId);
-    if (pad && pad.direction === 'source') {
+    if (pad && pad.isSourcePad()) {
       return pad as unknown as IStreamPad & { dataType: T };
     }
     return null;
@@ -100,7 +100,7 @@ export class WorkflowNode extends EventEmitter<WorkflowNodeEvents> implements IW
    */
   getSinkPad<T extends PadDataType>(padId: string): (IStreamPad & { dataType: T }) | null {
     const pad = this.pads.get(padId);
-    if (pad && pad.direction === 'sink') {
+    if (pad && pad.isSinkPad()) {
       return pad as unknown as IStreamPad & { dataType: T };
     }
     return null;
@@ -217,7 +217,7 @@ export class WorkflowNode extends EventEmitter<WorkflowNodeEvents> implements IW
     const trackName = publication.trackName || '';
 
     for (const pad of this.pads.values()) {
-      if (pad.direction === 'sink' &&
+      if (pad.isSinkPad() &&
         (pad.dataType === 'audio' && track.kind === 'audio' ||
           pad.dataType === 'video' && track.kind === 'video')) {
 
@@ -239,7 +239,7 @@ export class WorkflowNode extends EventEmitter<WorkflowNodeEvents> implements IW
     const trackName = publication.trackName || '';
 
     for (const pad of this.pads.values()) {
-      if (pad.direction === 'sink' &&
+      if (pad.isSinkPad() &&
         (pad.dataType === 'audio' && track.kind === 'audio' ||
           pad.dataType === 'video' && track.kind === 'video')) {
 
