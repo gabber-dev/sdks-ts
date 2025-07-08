@@ -2,6 +2,30 @@
 
 A TypeScript/JavaScript SDK for building interactive workflow frontends that connect to Gabber backend services through LiveKit.
 
+## Important: Node ID Patterns
+
+✅ **Node IDs follow a predictable pattern: `{type}_{index}`** (lowercase)
+
+```javascript
+// ✅ Recommended: Use predictable node IDs
+const vadNode = engine.getNode('vad_0');        // First VAD node
+const llmNode = engine.getNode('llm_0');        // First LLM node
+const ttsNode = engine.getNode('tts_0');        // First TTS node
+const outputNode = engine.getNode('output_0');  // First output node
+
+// ✅ Fallback: Dynamic discovery by type (if IDs differ)
+const allNodes = engine.listNodes();
+const vadNodeFallback = allNodes.find(node => node.type.toLowerCase().includes('vad'));
+```
+
+⚠️ **Avoid hardcoded UUIDs** - they're unique per workflow run:
+```javascript
+// ❌ Don't do this - UUIDs change between runs
+const ttsNode = engine.getNode('216b59bd-0f46-484f-b463-da208219b806');
+```
+
+
+
 ## Installation
 
 ```bash
@@ -39,7 +63,7 @@ if (publisherAudioPad) {
 }
 
 // 5. Enable TTS audio output - the SDK will automatically manage audio playback
-const ttsNode = engine.getNode('tts-node-id');
+const ttsNode = engine.getNode('tts_0');
 if (ttsNode) {
   const ttsAudioPad = ttsNode.getSourcePad('audio_source');
   if (ttsAudioPad) {
@@ -161,7 +185,7 @@ if (publisherNode) {
 }
 
 // Example 2: TTS audio output
-const ttsNode = engine.getNode('tts-node-id');
+const ttsNode = engine.getNode('tts_0');
 if (ttsNode) {
   const ttsAudioPad = ttsNode.getSourcePad('audio_source');
   if (ttsAudioPad) {
@@ -171,7 +195,7 @@ if (ttsNode) {
 }
 
 // Example 3: Using custom audio elements (optional)
-const outputNode = engine.getNode('output-node-id');
+const outputNode = engine.getNode('output_0');
 if (outputNode) {
   const outputAudioPad = outputNode.getSourcePad('audio_source');
   if (outputAudioPad) {
@@ -248,7 +272,7 @@ if (publisherNode) {
 }
 
 // Listen for VAD events
-const vadNode = engine.getNode('vad-node-id');
+const vadNode = engine.getNode('vad_0');
 if (vadNode) {
   const triggerPad = vadNode.getSourcePad('speech_started_trigger');
   triggerPad?.on('trigger-received', (data) => {
@@ -257,7 +281,7 @@ if (vadNode) {
 }
 
 // Set up audio output with monitoring control
-const outputNode = engine.getNode('output-node-id');
+const outputNode = engine.getNode('output_0');
 if (outputNode) {
   const outputAudioPad = outputNode.getSourcePad('audio_source');
   if (outputAudioPad) {
@@ -283,7 +307,7 @@ if (outputNode) {
 Property pads allow you to get and set values on workflow nodes:
 
 ```javascript
-const llmNode = engine.getNode('llm-node-id');
+const llmNode = engine.getNode('llm_0');
 if (llmNode) {
   const temperaturePad = llmNode.getSinkPad('temperature');
   if (temperaturePad && temperaturePad.isPropertyPad()) {
@@ -343,15 +367,43 @@ pad.on('stream-received', (stream) => {
 });
 ```
 
-### Node Discovery vs Direct Access
+### Node Discovery Best Practices
+
+#### ✅ Primary Approach: Predictable Node IDs
 ```javascript
-// For production: Use convenient properties and known node IDs
+// ✅ Recommended: Use predictable node IDs (pattern: {type}_{index})
 const publisherNode = engine.publisherNode;  // Automatically discovered
-const vadNode = engine.getNode('vad-node-id');
-const llmNode = engine.getNode('llm-node-id');
+const vadNode = engine.getNode('vad_0');        // First VAD node
+const llmNode = engine.getNode('llm_0');        // First LLM node
+const ttsNode = engine.getNode('tts_0');        // First TTS node
+const outputNode = engine.getNode('output_0');  // First output node
+
+// For multiple nodes of same type
+const secondLlmNode = engine.getNode('llm_1');  // Second LLM node (if exists)
+```
+
+#### ✅ Fallback Approach: Dynamic Discovery by Type
+```javascript
+// If predictable IDs don't work, fall back to type-based discovery
+const allNodes = engine.listNodes();
+
+function findNodeByType(typePatterns) {
+  for (const node of allNodes) {
+    const nodeType = node.type.toLowerCase();
+    for (const pattern of typePatterns) {
+      if (nodeType.includes(pattern.toLowerCase()) || nodeType === pattern.toLowerCase()) {
+        return node;
+      }
+    }
+  }
+  return null;
+}
+
+// Robust approach with fallbacks
+const vadNode = engine.getNode('vad_0') || findNodeByType(['vad', 'voice_activity_detection']);
+const llmNode = engine.getNode('llm_0') || findNodeByType(['llm', 'omni_llm', 'language_model']);
 
 // For debugging: List all available nodes
-const allNodes = engine.listNodes();
 console.log('Available nodes:');
 allNodes.forEach(node => {
   const audioPads = node.getInputPads('audio').length + node.getOutputPads('audio').length;
@@ -400,8 +452,13 @@ The SDK is built with TypeScript and provides full type definitions:
 import { AppEngine, type IWorkflowNode, type IStreamPad } from 'gabber-workflow-core';
 
 const engine: AppEngine = new AppEngine();
-const node: IWorkflowNode | null = engine.getNode('node-id');
-const audioPad: IStreamPad | null = node?.getSourcePad('audio_source');
+
+// Type-safe node discovery using predictable IDs
+const ttsNode: IWorkflowNode | null = engine.getNode('tts_0');
+const vadNode: IWorkflowNode | null = engine.getNode('vad_0');
+const llmNode: IWorkflowNode | null = engine.getNode('llm_0');
+
+const audioPad: IStreamPad | null = ttsNode?.getSourcePad('audio_source') || null;
 if (audioPad) {
   // Type-safe pad operations
   await audioPad.setMicrophoneEnabled(true);
@@ -413,9 +470,10 @@ if (audioPad) {
 See the `demo/` folder for a complete interactive example showcasing:
 - Real-time workflow connection using proxy server approach
 - Audio/video streaming with microphone and camera controls
-- Event-driven interaction with workflow nodes
+- Event-driven interaction with workflow nodes using predictable node IDs
 - Visual node discovery and debugging
 - Proper event handling for run state and connection state changes
+- Fallback to dynamic node discovery when needed
 
 The demo demonstrates the recommended proxy server approach for web applications, where API keys are handled securely on the backend rather than exposed in client-side code.
 

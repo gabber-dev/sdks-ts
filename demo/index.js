@@ -1,13 +1,5 @@
 import { v2 } from './gabber-client-core.mjs';
 const { AppEngine } = v2;
-const NODE_IDS = {
-  publisher: '3d5b2db6-a72a-4164-a7ce-82aee3048ab0',
-  vad: 'd974a0ea-daee-4d07-b8cb-2ebd626ee98f',
-  output: 'bb8fa49e-2dec-41f2-94c9-a8cda2c7ec70',
-  omni_llm: 'fecb90d0-8faa-409c-9adf-f2236ee56430',
-  tts: '216b59bd-0f46-484f-b463-da208219b806',
-  llm_context_events: '5a6b9958-424a-4c25-9f5b-b662f126b327'
-};
 
 class SimpleVoiceDemo {
   constructor() {
@@ -157,12 +149,31 @@ class SimpleVoiceDemo {
     // Use direct property access for publisher node
     this.publisherNode = this.engine.publisherNode;
 
-    // Get other nodes by ID
-    this.vadNode = this.engine.getNode(NODE_IDS.vad);
-    this.llmNode = this.engine.getNode(NODE_IDS.omni_llm);
-    this.outputNode = this.engine.getNode(NODE_IDS.output);
-    this.ttsNode = this.engine.getNode(NODE_IDS.tts);
-    this.llmContextEventsNode = this.engine.getNode(NODE_IDS.llm_context_events);
+    // Get nodes by their predictable IDs: {type}_{index}
+    this.vadNode = this.engine.getNode('vad_0');
+    this.llmNode = this.engine.getNode('llm_0') || this.engine.getNode('omni_llm_0');
+    this.outputNode = this.engine.getNode('output_0');
+    this.ttsNode = this.engine.getNode('tts_0');
+    this.llmContextEventsNode = this.engine.getNode('llmcontext_0') || this.engine.getNode('llm_context_0');
+
+    // Log what we found for debugging
+    console.log('🔍 Discovered nodes:');
+    console.log('  Publisher:', this.publisherNode?.id, this.publisherNode?.type);
+    console.log('  VAD:', this.vadNode?.id, this.vadNode?.type);
+    console.log('  LLM:', this.llmNode?.id, this.llmNode?.type);
+    console.log('  Output:', this.outputNode?.id, this.outputNode?.type);
+    console.log('  TTS:', this.ttsNode?.id, this.ttsNode?.type);
+    console.log('  LLM Context Events:', this.llmContextEventsNode?.id, this.llmContextEventsNode?.type);
+
+    // Fallback: if predictable IDs don't work, use dynamic discovery
+    if (!this.vadNode || !this.llmNode || !this.ttsNode) {
+      console.log('🔍 Some nodes not found with predictable IDs, falling back to type discovery');
+      this.vadNode = this.vadNode || this.findNodeByType(['vad', 'voice_activity_detection']);
+      this.llmNode = this.llmNode || this.findNodeByType(['llm', 'omni_llm', 'language_model']);
+      this.outputNode = this.outputNode || this.findNodeByType(['output', 'audio_output']);
+      this.ttsNode = this.ttsNode || this.findNodeByType(['tts', 'text_to_speech']);
+      this.llmContextEventsNode = this.llmContextEventsNode || this.findNodeByType(['llm_context_events', 'context_events']);
+    }
 
     // Setup individual node handlers
     this.setupNodeHandlers();
@@ -191,6 +202,31 @@ class SimpleVoiceDemo {
     allNodesForUI.forEach(node => {
       this.addNodeToUI(node);
     });
+  }
+
+  /**
+   * Find a node by checking if its type matches any of the provided type patterns
+   * @param {string[]} typePatterns - Array of type patterns to match (case-insensitive)
+   * @returns {IWorkflowNode | null} The first matching node or null
+   */
+  findNodeByType(typePatterns) {
+    const allNodes = this.engine.listNodes();
+
+    for (const node of allNodes) {
+      const nodeType = node.type.toLowerCase();
+
+      // Check if any of the type patterns match
+      for (const pattern of typePatterns) {
+        if (nodeType.includes(pattern.toLowerCase()) || nodeType === pattern.toLowerCase()) {
+          console.log(`🔍 Found ${pattern} node: ${node.id} (${node.type})`);
+          return node;
+        }
+      }
+    }
+
+    console.log(`🔍 No node found for types: [${typePatterns.join(', ')}]`);
+    console.log(`🔍 Available node types:`, allNodes.map(n => `${n.id} (${n.type})`));
+    return null;
   }
 
   setupNodeHandlers() {

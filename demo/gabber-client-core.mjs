@@ -3923,8 +3923,12 @@ var RealtimeSessionEngine = class {
       "audioPlaybackChanged",
       this.onAudioPlaybackChangaed.bind(this)
     );
-    this.divElement = document.createElement("div");
-    document.body.appendChild(this.divElement);
+    if (typeof document !== "undefined") {
+      this.divElement = document.createElement("div");
+      document.body.appendChild(this.divElement);
+    } else {
+      this.divElement = {};
+    }
     this.onConnectionStateChanged = onConnectionStateChanged;
     this.onMessagesChanged = onMessagesChanged;
     this.onMicrophoneChanged = onMicrophoneChanged;
@@ -4029,6 +4033,9 @@ var RealtimeSessionEngine = class {
     });
   }
   setWebcamTrackDestination({ element }) {
+    if (typeof document === "undefined") {
+      return;
+    }
     if (typeof element === "string") {
       const el = document.getElementById(element);
       if (!el) {
@@ -4048,6 +4055,9 @@ var RealtimeSessionEngine = class {
     this.resolveWebcam();
   }
   setVideoTrackDestination({ element }) {
+    if (typeof document === "undefined") {
+      return;
+    }
     if (typeof element === "string") {
       const el = document.getElementById(element);
       if (!el) {
@@ -4266,6 +4276,9 @@ var RealtimeSessionEngine = class {
     return undefined;
   }
   destroy() {
+    if (typeof document === "undefined") {
+      return;
+    }
     document.body.removeChild(this.divElement);
     try {
       this.livekitRoom.removeAllListeners();
