@@ -38,7 +38,25 @@ export type {
   /** Type of data that can flow through a pad */
   PadDataType,
   /** Configuration for creating a new pad */
-  PadConfig
+  PadConfig,
+
+  /** Base pad data type definition */
+  PadDataTypeDefinition,
+  /** Specific type definitions */
+  StringDataType,
+  IntegerDataType,
+  FloatDataType,
+  BooleanDataType,
+  AudioDataType,
+  VideoDataType,
+  TriggerDataType,
+  AudioClipDataType,
+  VideoClipDataType,
+  AVClipDataType,
+  ContextMessageDataType,
+  ContextMessageRoleDataType,
+  ListDataType,
+  SpecificDataType
 } from './types';
 
-export { PadType, isSourcePad, isSinkPad } from './types';
+export { PadType, isSourcePad, isSinkPad, deriveDataType } from './types';

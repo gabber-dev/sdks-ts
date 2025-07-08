@@ -426,3 +426,29 @@ cd demo
 ```
 
 Then open http://localhost:8080 in your browser.
+
+### Type System and Pad Types
+
+The SDK now uses a sophisticated type system that matches the backend:
+
+```javascript
+// Check if a pad is "fully typed" (has exactly one allowed type)
+const temperaturePad = llmNode.getSinkPad('temperature');
+if (temperaturePad.isFullyTyped()) {
+  const singleType = temperaturePad.getSingleAllowedType();
+  console.log('Fully typed pad with type:', singleType.type); // e.g., "float"
+
+  // For fully typed pads, you can safely use type-specific operations
+  if (singleType.type === 'float') {
+    temperaturePad.setValue(0.8);
+  }
+}
+
+// Access allowed types
+const audioPad = publisherNode.getSourcePad('audio_source');
+console.log('Allowed types:', audioPad.allowedTypes);
+// e.g., [{ type: 'audio' }]
+
+// The dataType is now derived from allowedTypes
+console.log('Derived data type:', audioPad.dataType); // "audio"
+```

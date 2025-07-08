@@ -7,7 +7,6 @@ import type {
   ConnectionDetails,
   ConnectionState,
   AppEngineConfig,
-  PadDataType,
   BackendPadType,
   RunState
 } from './types';
@@ -530,7 +529,6 @@ export class AppEngine extends EventEmitter<AppEngineEvents> implements IAppEngi
   private async createPadFromBackendData(node: IWorkflowNode, padData: any): Promise<void> {
     try {
       const padId = padData.id;
-      const padDataType = padData.data_type;
       const padBackendType = padData.type;
       const padDisplayName = padData.id.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
 
@@ -538,7 +536,7 @@ export class AppEngine extends EventEmitter<AppEngineEvents> implements IAppEngi
       const { isSourcePad, isSinkPad } = await import('./types');
       const padDirection = isSourcePad(padBackendType) ? 'source' : (isSinkPad(padBackendType) ? 'sink' : 'unknown');
 
-      console.log(`  Adding pad from backend: ${padId} (${padDirection} derived from ${padBackendType}, ${padDataType})`);
+      console.log(`  Adding pad from backend: ${padId} (${padDirection} derived from ${padBackendType})`);
 
       // Determine pad category from backend type
       let padCategory: 'stateless' | 'property' = 'stateless';
@@ -550,7 +548,6 @@ export class AppEngine extends EventEmitter<AppEngineEvents> implements IAppEngi
         id: padId,
         nodeId: node.id,
         name: padDisplayName,
-        dataType: padDataType as PadDataType,
         backendType: padBackendType as BackendPadType,
         category: padCategory,
         value: padData.value,
@@ -562,7 +559,7 @@ export class AppEngine extends EventEmitter<AppEngineEvents> implements IAppEngi
       pad.setLivekitRoom(this.livekitRoom);
       (node as any).addPad(pad);
 
-      console.log(`    ✅ Added pad: ${padId} → ${padDisplayName} (${padCategory})`);
+      console.log(`    ✅ Added pad: ${padId} → ${padDisplayName} (${padCategory}) with data type: ${pad.dataType}`);
     } catch (error) {
       console.warn(`⚠️ Failed to create pad ${padData.id} for node ${node.id}:`, error);
     }

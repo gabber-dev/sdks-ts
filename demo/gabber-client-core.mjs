@@ -16,6 +16,7 @@ var __export = (target, all) => {
 var types_exports = {};
 __export(types_exports, {
   PadType: () => PadType,
+  deriveDataType: () => deriveDataType,
   isSinkPad: () => isSinkPad,
   isSourcePad: () => isSourcePad
 });
@@ -24,6 +25,51 @@ function isSourcePad(padType) {
 }
 function isSinkPad(padType) {
   return padType.indexOf("Sink") !== -1;
+}
+function deriveDataType(allowedTypes, padId) {
+  if (padId) {
+    const padIdLower = padId.toLowerCase();
+    if (padIdLower.includes("audio")) {
+      return "audio";
+    } else if (padIdLower.includes("video")) {
+      return "video";
+    } else if (padId.endsWith("_trigger")) {
+      return "trigger";
+    }
+  }
+  if (allowedTypes && allowedTypes.length > 0) {
+    const firstType = allowedTypes[0];
+    const typeName = firstType.type;
+    switch (typeName) {
+      case "audio_clip":
+      case "audio_frame":
+      case "audio":
+        return "audio";
+      case "video_clip":
+      case "video_frame":
+      case "video":
+        return "video";
+      case "string":
+      case "text":
+        return "text";
+      case "bool":
+      case "boolean":
+        return "boolean";
+      case "int":
+      case "integer":
+        return "integer";
+      case "float":
+      case "number":
+        return "number";
+      case "trigger":
+        return "trigger";
+      case "context_message":
+        return "data";
+      default:
+        return "data";
+    }
+  }
+  return "data";
 }
 var PadType;
 var init_types = __esm({
@@ -71,13 +117,19 @@ var init_StreamPad = __esm({
         this.id = config.id;
         this.nodeId = config.nodeId;
         this.name = config.name;
-        this.dataType = config.dataType;
         this.backendType = config.backendType;
         this.category = config.category;
         this.allowedTypes = config.allowedTypes;
         this.nextPads = config.nextPads;
         this.previousPad = config.previousPad;
         this._value = config.value;
+      }
+      /**
+       * Gets the derived data type from allowed types.
+       * This is computed dynamically based on the pad's allowed types.
+       */
+      get dataType() {
+        return deriveDataType(this.allowedTypes, this.id);
       }
       /**
        * Checks if this is a source pad based on its backend type.
@@ -92,6 +144,25 @@ var init_StreamPad = __esm({
        */
       isSinkPad() {
         return this.backendType ? isSinkPad(this.backendType) : false;
+      }
+      /**
+       * Gets the single allowed type if this pad is fully typed.
+       * Following the React Flow UI pattern.
+       * @returns {PadDataTypeDefinition | null} The single allowed type, or null if not fully typed
+       */
+      getSingleAllowedType() {
+        if (!this.allowedTypes || this.allowedTypes.length !== 1) {
+          return null;
+        }
+        return this.allowedTypes[0];
+      }
+      /**
+       * Checks if this pad is fully typed (has exactly one allowed type).
+       * Following the React Flow UI pattern.
+       * @returns {boolean} True if this pad has exactly one allowed type
+       */
+      isFullyTyped() {
+        return this.getSingleAllowedType() !== null;
       }
       /**
        * Sets the HTML media element to output audio/video to.
@@ -4224,6 +4295,7 @@ __export(v2_exports, {
   PadType: () => PadType,
   StreamPad: () => StreamPad,
   WorkflowNode: () => WorkflowNode,
+  deriveDataType: () => deriveDataType,
   isSinkPad: () => isSinkPad,
   isSourcePad: () => isSourcePad
 });
@@ -4866,12 +4938,11 @@ var AppEngine = class extends EventEmitter {
   async createPadFromBackendData(node, padData) {
     try {
       const padId = padData.id;
-      const padDataType = padData.data_type;
       const padBackendType = padData.type;
       const padDisplayName = padData.id.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
       const { isSourcePad: isSourcePad2, isSinkPad: isSinkPad2 } = await Promise.resolve().then(() => (init_types(), types_exports));
       const padDirection = isSourcePad2(padBackendType) ? "source" : isSinkPad2(padBackendType) ? "sink" : "unknown";
-      console.log(`  Adding pad from backend: ${padId} (${padDirection} derived from ${padBackendType}, ${padDataType})`);
+      console.log(`  Adding pad from backend: ${padId} (${padDirection} derived from ${padBackendType})`);
       let padCategory = "stateless";
       if (padBackendType === "PropertySourcePad" || padBackendType === "PropertySinkPad") {
         padCategory = "property";
@@ -4880,7 +4951,6 @@ var AppEngine = class extends EventEmitter {
         id: padId,
         nodeId: node.id,
         name: padDisplayName,
-        dataType: padDataType,
         backendType: padBackendType,
         category: padCategory,
         value: padData.value,
@@ -4890,7 +4960,7 @@ var AppEngine = class extends EventEmitter {
       });
       pad.setLivekitRoom(this.livekitRoom);
       node.addPad(pad);
-      console.log(`    \u2705 Added pad: ${padId} \u2192 ${padDisplayName} (${padCategory})`);
+      console.log(`    \u2705 Added pad: ${padId} \u2192 ${padDisplayName} (${padCategory}) with data type: ${pad.dataType}`);
     } catch (error) {
       console.warn(`\u26A0\uFE0F Failed to create pad ${padData.id} for node ${node.id}:`, error);
     }

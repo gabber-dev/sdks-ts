@@ -11,7 +11,7 @@ import type {
   PadDataTypeDefinition,
   PadReference
 } from './types';
-import { isSourcePad, isSinkPad } from './types';
+import { isSourcePad, isSinkPad, deriveDataType } from './types';
 
 /**
  * StreamPad represents a connection point on a workflow node that can send or receive data.
@@ -23,7 +23,6 @@ export class StreamPad extends EventEmitter<StreamPadEvents> implements IStreamP
   readonly id: string;
   readonly nodeId: string;
   readonly name: string;
-  readonly dataType: PadDataType;
   readonly backendType?: BackendPadType | undefined;
   readonly category?: PadCategory | undefined;
   readonly allowedTypes?: PadDataTypeDefinition[] | undefined;
@@ -51,13 +50,20 @@ export class StreamPad extends EventEmitter<StreamPadEvents> implements IStreamP
     this.id = config.id;
     this.nodeId = config.nodeId;
     this.name = config.name;
-    this.dataType = config.dataType;
     this.backendType = config.backendType;
     this.category = config.category;
     this.allowedTypes = config.allowedTypes;
     this.nextPads = config.nextPads;
     this.previousPad = config.previousPad;
     this._value = config.value;
+  }
+
+  /**
+   * Gets the derived data type from allowed types.
+   * This is computed dynamically based on the pad's allowed types.
+   */
+  get dataType(): PadDataType {
+    return deriveDataType(this.allowedTypes, this.id);
   }
 
   /**
@@ -74,6 +80,27 @@ export class StreamPad extends EventEmitter<StreamPadEvents> implements IStreamP
    */
   isSinkPad(): boolean {
     return this.backendType ? isSinkPad(this.backendType) : false;
+  }
+
+  /**
+   * Gets the single allowed type if this pad is fully typed.
+   * Following the React Flow UI pattern.
+   * @returns {PadDataTypeDefinition | null} The single allowed type, or null if not fully typed
+   */
+  getSingleAllowedType(): PadDataTypeDefinition | null {
+    if (!this.allowedTypes || this.allowedTypes.length !== 1) {
+      return null;
+    }
+    return this.allowedTypes[0];
+  }
+
+  /**
+   * Checks if this pad is fully typed (has exactly one allowed type).
+   * Following the React Flow UI pattern.
+   * @returns {boolean} True if this pad has exactly one allowed type
+   */
+  isFullyTyped(): boolean {
+    return this.getSingleAllowedType() !== null;
   }
 
   /**

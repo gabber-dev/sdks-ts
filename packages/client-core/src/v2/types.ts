@@ -74,7 +74,135 @@ export type RunState = 'idle' | 'starting' | 'running' | 'stopping';
 /** Type identifier for workflow nodes */
 export type NodeType = string;
 
-/** Type of data that can flow through a pad */
+/**
+ * Base class for pad data type definitions matching the backend system.
+ * Each specific type has a literal 'type' field that identifies it.
+ */
+export interface PadDataTypeDefinition {
+  /** The type identifier */
+  type: string;
+  /** Additional properties specific to each type */
+  [key: string]: any;
+}
+
+/**
+ * String data type definition
+ */
+export interface StringDataType extends PadDataTypeDefinition {
+  type: 'string';
+  max_length?: number;
+  min_length?: number;
+}
+
+/**
+ * Integer data type definition
+ */
+export interface IntegerDataType extends PadDataTypeDefinition {
+  type: 'integer';
+  maximum?: number;
+  minimum?: number;
+}
+
+/**
+ * Float/Number data type definition
+ */
+export interface FloatDataType extends PadDataTypeDefinition {
+  type: 'float';
+  maximum?: number;
+  minimum?: number;
+}
+
+/**
+ * Boolean data type definition
+ */
+export interface BooleanDataType extends PadDataTypeDefinition {
+  type: 'boolean';
+}
+
+/**
+ * Audio data type definition
+ */
+export interface AudioDataType extends PadDataTypeDefinition {
+  type: 'audio';
+}
+
+/**
+ * Video data type definition
+ */
+export interface VideoDataType extends PadDataTypeDefinition {
+  type: 'video';
+}
+
+/**
+ * Trigger data type definition
+ */
+export interface TriggerDataType extends PadDataTypeDefinition {
+  type: 'trigger';
+}
+
+/**
+ * Audio clip data type definition
+ */
+export interface AudioClipDataType extends PadDataTypeDefinition {
+  type: 'audio_clip';
+}
+
+/**
+ * Video clip data type definition
+ */
+export interface VideoClipDataType extends PadDataTypeDefinition {
+  type: 'video_clip';
+}
+
+/**
+ * AV clip data type definition
+ */
+export interface AVClipDataType extends PadDataTypeDefinition {
+  type: 'av_clip';
+}
+
+/**
+ * Context message data type definition
+ */
+export interface ContextMessageDataType extends PadDataTypeDefinition {
+  type: 'context_message';
+}
+
+/**
+ * Context message role data type definition
+ */
+export interface ContextMessageRoleDataType extends PadDataTypeDefinition {
+  type: 'context_message_role';
+}
+
+/**
+ * List data type definition
+ */
+export interface ListDataType extends PadDataTypeDefinition {
+  type: 'list';
+  max_length?: number;
+  item_type_constraints?: PadDataTypeDefinition[];
+}
+
+/**
+ * Union type of all specific data type definitions
+ */
+export type SpecificDataType =
+  | StringDataType
+  | IntegerDataType
+  | FloatDataType
+  | BooleanDataType
+  | AudioDataType
+  | VideoDataType
+  | TriggerDataType
+  | AudioClipDataType
+  | VideoClipDataType
+  | AVClipDataType
+  | ContextMessageDataType
+  | ContextMessageRoleDataType
+  | ListDataType;
+
+/** Type of data that can flow through a pad - derived from allowed types */
 export type PadDataType = 'audio' | 'video' | 'data' | 'trigger' | 'text' | 'boolean' | 'integer' | 'number';
 
 /** Backend pad type names */
@@ -82,14 +210,6 @@ export type BackendPadType = 'StatelessSourcePad' | 'StatelessSinkPad' | 'Proper
 
 /** Category of pad functionality */
 export type PadCategory = 'stateless' | 'property';
-
-/**
- * Pad data type definition from backend
- */
-export interface PadDataTypeDefinition {
-  type: string;
-  [key: string]: any;
-}
 
 /**
  * Pad reference for connections
@@ -125,15 +245,13 @@ export interface PadConfig {
   nodeId: string;
   /** Display name of the pad */
   name: string;
-  /** Type of data that flows through the pad */
-  dataType: PadDataType;
   /** Backend pad type */
   backendType?: BackendPadType;
   /** Category of pad functionality */
   category?: PadCategory;
   /** Current value (for property pads) */
   value?: any;
-  /** Allowed data types */
+  /** Allowed data types - this is the source of truth for the pad's type capabilities */
   allowedTypes?: PadDataTypeDefinition[];
   /** Connected pads (for source pads) */
   nextPads?: PadReference[];
@@ -233,13 +351,15 @@ export interface IStreamPad extends EventEmitter<StreamPadEvents> {
   readonly id: string;
   readonly nodeId: string;
   readonly name: string;
-  readonly dataType: PadDataType;
   readonly backendType?: BackendPadType | undefined;
   readonly category?: PadCategory | undefined;
   readonly value?: any;
   readonly allowedTypes?: PadDataTypeDefinition[] | undefined;
   readonly nextPads?: PadReference[] | undefined;
   readonly previousPad?: PadReference | null | undefined;
+
+  /** Get the derived data type from allowed types */
+  readonly dataType: PadDataType;
 
   setMicrophoneEnabled(enabled: boolean, options?: AudioOptions): Promise<void>;
   setVideoEnabled(enabled: boolean, options?: VideoOptions): Promise<void>;
@@ -252,6 +372,10 @@ export interface IStreamPad extends EventEmitter<StreamPadEvents> {
   // Pad type methods
   isSourcePad(): boolean;
   isSinkPad(): boolean;
+
+  // Type utilities (following React Flow UI pattern)
+  getSingleAllowedType(): PadDataTypeDefinition | null;
+  isFullyTyped(): boolean;
 
   // Property pad methods
   getValue(): any;
@@ -289,4 +413,62 @@ export function isSourcePad(padType: string): boolean {
  */
 export function isSinkPad(padType: string): boolean {
   return padType.indexOf('Sink') !== -1;
+}
+
+/**
+ * Derives a simple data type from allowed types, matching the backend logic.
+ * @param {PadDataTypeDefinition[] | undefined} allowedTypes - The allowed types for the pad
+ * @param {string} padId - The pad ID for fallback detection
+ * @returns {PadDataType} The derived data type
+ */
+export function deriveDataType(allowedTypes?: PadDataTypeDefinition[], padId?: string): PadDataType {
+  // First, check pad ID for explicit audio/video naming (fallback)
+  if (padId) {
+    const padIdLower = padId.toLowerCase();
+    if (padIdLower.includes('audio')) {
+      return 'audio';
+    } else if (padIdLower.includes('video')) {
+      return 'video';
+    } else if (padId.endsWith('_trigger')) {
+      return 'trigger';
+    }
+  }
+
+  // If pad has allowed_types, use them to determine the primary data type
+  if (allowedTypes && allowedTypes.length > 0) {
+    const firstType = allowedTypes[0];
+    const typeName = firstType.type;
+
+    switch (typeName) {
+      case 'audio_clip':
+      case 'audio_frame':
+      case 'audio':
+        return 'audio';
+      case 'video_clip':
+      case 'video_frame':
+      case 'video':
+        return 'video';
+      case 'string':
+      case 'text':
+        return 'text';
+      case 'bool':
+      case 'boolean':
+        return 'boolean';
+      case 'int':
+      case 'integer':
+        return 'integer';
+      case 'float':
+      case 'number':
+        return 'number';
+      case 'trigger':
+        return 'trigger';
+      case 'context_message':
+        return 'data';
+      default:
+        return 'data';
+    }
+  }
+
+  // Default fallback
+  return 'data';
 }
