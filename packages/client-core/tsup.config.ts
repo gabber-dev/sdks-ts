@@ -9,4 +9,6 @@ export default defineConfig({
   clean: true,
   globalName: "Gabber",
   target: 'esnext',
+  external: ["eventemitter3", "axios", "livekit-client"], // Keep dependencies external for import maps
+  treeshake: true, // Remove unused code
 });
