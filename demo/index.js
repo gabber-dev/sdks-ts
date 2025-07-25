@@ -64,7 +64,7 @@ class SimpleVoiceDemo {
   }
 
   async startWorkflow() {
-    const proxyBaseUrl = document.getElementById('api-base-url').value || 'http://localhost:3002';
+    const proxyBaseUrl = document.getElementById('api-base-url').value || 'http://localhost:3003';
     const appId = document.getElementById('app-id').value;
 
     if (!appId) {

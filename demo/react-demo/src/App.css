@@ -1,0 +1,495 @@
+/* App Layout */
+.app {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.app-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.app-header h1 {
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.app-header p {
+  color: #666;
+  font-size: 16px;
+}
+
+.app-main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Section Styling */
+.section {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.section h3 {
+  margin-top: 0;
+  color: #333;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 10px;
+}
+
+/* Form Elements */
+.form-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 15px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.form-grid label {
+  font-weight: 500;
+  color: #333;
+}
+
+.form-grid input {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.form-grid input:disabled {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+/* Workflow Controls */
+.workflow-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.workflow-status-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.workflow-status-display .status {
+  margin-left: 4px;
+  font-size: 14px;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+/* Button Styles */
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: #007bff;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.btn-success {
+  background: #28a745;
+  color: white;
+}
+
+.btn-success:hover:not(:disabled) {
+  background: #1e7e34;
+}
+
+.btn-danger {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #c82333;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #545b62;
+}
+
+/* Status Grid */
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.status-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border-left: 4px solid #dee2e6;
+}
+
+.status-item span:first-child {
+  font-weight: 500;
+  color: #495057;
+}
+
+/* Status Indicators */
+.status {
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.status.connected,
+.status.running {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status.connecting,
+.status.starting {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status.disconnected,
+.status.idle,
+.status.stopping {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* VAD Indicator */
+.vad-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #28a745;
+  margin-left: 5px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Trigger Events */
+.trigger-log {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 10px;
+  background: #f8f9fa;
+}
+
+.trigger-event {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.trigger-event:last-child {
+  margin-bottom: 0;
+}
+
+.trigger-event-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.trigger-event-time {
+  font-size: 12px;
+  color: #6c757d;
+  font-family: monospace;
+}
+
+.trigger-event-source {
+  background: #007bff;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.trigger-event-message {
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.trigger-event-data {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 3px;
+  padding: 8px;
+  margin-top: 5px;
+}
+
+.trigger-event-data pre {
+  margin: 0;
+  font-size: 12px;
+  color: #495057;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Workflow Nodes */
+.workflow-nodes {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.workflow-node {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 15px;
+  background: #f8f9fa;
+}
+
+.workflow-node-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.workflow-node-title {
+  margin: 0;
+  color: #333;
+  font-size: 18px;
+}
+
+.workflow-node-id {
+  font-size: 14px;
+  color: #6c757d;
+  font-weight: normal;
+}
+
+.workflow-node-stats {
+  display: flex;
+  gap: 15px;
+}
+
+.pad-count {
+  font-size: 14px;
+  color: #495057;
+  background: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+}
+
+.workflow-node-pads {
+  margin-bottom: 15px;
+}
+
+.workflow-node-pads:last-child {
+  margin-bottom: 0;
+}
+
+.workflow-node-pads h5 {
+  margin: 0 0 10px 0;
+  color: #495057;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pads-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 10px;
+}
+
+/* Workflow Pads */
+.workflow-pad {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 12px;
+  transition: all 0.2s ease;
+}
+
+.workflow-pad:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.workflow-pad-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.workflow-pad-icon {
+  font-size: 16px;
+}
+
+.workflow-pad-name {
+  font-weight: 500;
+  color: #333;
+  flex: 1;
+}
+
+.workflow-pad-type {
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.workflow-pad-status {
+  font-size: 14px;
+}
+
+.workflow-pad-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.workflow-pad-details span {
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.workflow-pad-id {
+  font-family: monospace;
+}
+
+.workflow-pad-property {
+  background: #f8f9fa;
+  padding: 4px 6px;
+  border-radius: 3px;
+  font-family: monospace;
+}
+
+.workflow-pad-status-indicators {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.status-indicator {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.status-indicator.connected {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-indicator.publishing {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.status-indicator.subscribed {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-indicator.property {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .app {
+    padding: 10px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .workflow-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .status-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .workflow-node-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .pads-list {
+    grid-template-columns: 1fr;
+  }
+}

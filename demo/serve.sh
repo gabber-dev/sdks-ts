@@ -2,7 +2,7 @@
 
 echo "🚀 Starting Gabber Client Core v2 Demo..."
 echo "📝 Demo URL: http://localhost:3001"
-echo "🔧 Proxy Server URL: http://localhost:3002"
+echo "🔧 Proxy Server URL: http://localhost:3003"
 echo ""
 
 # Build the client-core package
@@ -25,7 +25,7 @@ if [ ! -f .env ]; then
     cat > .env << EOF
 GABBER_API_KEY=your_api_key_here
 GABBER_API_URL=http://localhost:4000
-PORT=3002
+PORT=3003
 EOF
     echo "⚠️  Please edit .env with your actual API key before continuing"
     echo "⚠️  You can find your API key in your Gabber dashboard"
@@ -34,7 +34,7 @@ fi
 
 # Update the port in the proxy server environment if not already set
 if ! grep -q "^PORT=" .env; then
-    echo "PORT=3002" >> .env
+    echo "PORT=3003" >> .env
 fi
 
 # Start proxy server in background
@@ -61,7 +61,7 @@ trap cleanup SIGINT SIGTERM
 
 echo "✨ All servers started!"
 echo "📝 Demo UI: http://localhost:3001"
-echo "🔧 Proxy Server: http://localhost:3002"
+echo "🔧 Proxy Server: http://localhost:3003"
 echo "Press Ctrl+C to stop all servers"
 
 # Wait for both background processes

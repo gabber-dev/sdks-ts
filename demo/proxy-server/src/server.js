@@ -118,7 +118,7 @@ app.use((err, req, res, next) => {
 });
 
 // Start the server
-const port = process.env.PORT || 3002;
+const port = process.env.PORT || 3003;
 app.listen(port, () => {
   console.log(`
 🚀 Proxy server running on port ${port}
