@@ -4685,20 +4685,31 @@ var AppEngine = class extends EventEmitter {
       if (this.livekitRoom) {
         console.log("\u{1F50D} Initial remote participants in room:", this.livekitRoom.remoteParticipants.size);
         this.livekitRoom.remoteParticipants.forEach((participant) => {
-          console.log(`  - Remote participant: ${participant.identity}`);
+          console.log(`  - Remote participant: ${participant.identity} (SID: ${participant.sid})`);
         });
         setTimeout(() => {
           if (this.livekitRoom) {
             console.log("\u{1F50D} Remote participants after 2s:", this.livekitRoom.remoteParticipants.size);
             this.livekitRoom.remoteParticipants.forEach((participant) => {
-              console.log(`  - Remote participant: ${participant.identity}`);
+              console.log(`  - Remote participant: ${participant.identity} (SID: ${participant.sid})`);
             });
+            if (this.livekitRoom.remoteParticipants.size === 0) {
+              console.warn("\u26A0\uFE0F No remote participants joined after 2 seconds - agent may not be connecting");
+            }
           }
         }, 2e3);
+        setTimeout(() => {
+          if (this.livekitRoom) {
+            console.log("\u{1F50D} Remote participants after 10s:", this.livekitRoom.remoteParticipants.size);
+            this.livekitRoom.remoteParticipants.forEach((participant) => {
+              console.log(`  - Remote participant: ${participant.identity} (SID: ${participant.sid})`);
+            });
+          }
+        }, 1e4);
       }
     });
     this.livekitRoom.on("disconnected", (reason) => {
-      console.log("Gabber workflow disconnected:", reason);
+      console.log("\u{1F534} Gabber workflow disconnected from LiveKit:", reason);
       this.setConnectionState("disconnected");
     });
     this.livekitRoom.on("trackSubscribed", (track, publication, participant) => {
@@ -4724,8 +4735,8 @@ var AppEngine = class extends EventEmitter {
    */
   async discoverNodes() {
     if (!this.livekitRoom) return;
-    console.log("\u{1F50D} Starting node discovery - waiting for backend node information...");
-    console.log("\u{1F50D} Waiting for backend node information...");
+    console.log("\u{1F50D} Starting node discovery - requesting graph data from backend...");
+    await this.requestGraphData();
     setTimeout(() => {
       if (this.nodes.size === 0) {
         console.warn("\u26A0\uFE0F No nodes discovered after 5 seconds. This could mean:");
@@ -4733,14 +4744,56 @@ var AppEngine = class extends EventEmitter {
         console.warn("  2. Backend is not sending node discovery data");
         console.warn("  3. Edit ledger is empty (no workflow nodes defined)");
         console.warn("  4. Timing issue with data packet delivery");
+        console.warn("  5. Backend missing _send_node_discovery() call in Graph.run()");
         if (this.livekitRoom) {
           console.warn("\u{1F50D} Current remote participants:", this.livekitRoom.remoteParticipants.size);
           this.livekitRoom.remoteParticipants.forEach((participant) => {
             console.warn(`  - ${participant.identity}`);
           });
         }
+        this.emit("error", new Error("Node discovery timeout - no nodes received from backend"));
       }
     }, 5e3);
+  }
+  /**
+   * Requests graph data from the backend via LiveKit data channel.
+   * @private
+   */
+  async requestGraphData() {
+    if (!this.livekitRoom) return;
+    try {
+      const reqId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const request = {
+        topic: "graph",
+        route: "get_graph",
+        req_id: reqId
+      };
+      console.log("\u{1F4E4} Requesting graph data from backend:", request);
+      const encoder = new TextEncoder();
+      const encodedData = encoder.encode(JSON.stringify(request));
+      await this.livekitRoom.localParticipant.publishData(
+        encodedData,
+        { topic: "graph" }
+      );
+      console.log("\u2705 Graph data request sent to backend");
+      const requestTimeoutMs = 1e4;
+      setTimeout(() => {
+        console.warn(`\u23F0 Graph request timeout after ${requestTimeoutMs}ms - no response received for req_id: ${reqId}`);
+        console.warn("  This could mean:");
+        console.warn("  1. Backend agent is not connected to the LiveKit room");
+        console.warn('  2. Backend agent is not listening for "graph" topic messages');
+        console.warn("  3. Backend graph_handler function is not working");
+        console.warn("  4. Backend is connected but edit ledger is empty");
+        console.warn("  5. Backend agent crashed or failed to start");
+      }, requestTimeoutMs);
+    } catch (error) {
+      console.error("\u274C Failed to request graph data:", error);
+      console.error("\u274C Error details:", {
+        name: error instanceof Error ? error.name : "Unknown",
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
+    }
   }
   /**
    * Finds the publisher node among discovered nodes.
@@ -4850,10 +4903,35 @@ var AppEngine = class extends EventEmitter {
     console.log("\u{1F50D} Data packet received from participant:", participant?.identity, "payload size:", payload.length);
     try {
       const decoder = new TextDecoder();
-      const message = JSON.parse(decoder.decode(payload));
-      console.log("\u{1F4E8} Received data message:", message);
+      const rawText = decoder.decode(payload);
+      const message = JSON.parse(rawText);
+      if (message.req_id && message.data) {
+        try {
+          const graphData = JSON.parse(message.data);
+          if (graphData.nodes && Array.isArray(graphData.nodes)) {
+            graphData.nodes.forEach((node, index) => {
+              console.log(`  ${index + 1}. ${node.id || "NO_ID"} (${node.type || "NO_TYPE"}) - ${node.pads?.length || 0} pads`);
+            });
+            console.log("\u{1F4CA} Full edit graph nodes data:", JSON.stringify(graphData.nodes, null, 2));
+            this.handleGraphResponse(graphData.nodes);
+            return;
+          } else {
+            console.error("\u274C Graph response missing nodes array or nodes is not an array");
+            console.log("\u{1F4CA} Graph data keys:", Object.keys(graphData));
+            console.log("\u{1F4CA} Full graph data:", JSON.stringify(graphData, null, 2));
+          }
+        } catch (parseError) {
+          console.error("\u274C Failed to parse graph data:", parseError);
+          console.log("\u{1F4C4} Raw unparseable data:", message.data);
+        }
+      }
       if (message.type === "node_discovery") {
         console.log("\u{1F50D} Received node discovery from backend:", message);
+        if (!message.nodes || !Array.isArray(message.nodes)) {
+          console.error("\u274C Invalid node discovery message: missing or invalid nodes array");
+          return;
+        }
+        console.log(`\u{1F50D} Node discovery contains ${message.nodes.length} nodes`);
         this.handleNodeDiscovery(message.nodes);
         return;
       }
@@ -4916,6 +4994,36 @@ var AppEngine = class extends EventEmitter {
     }
   }
   /**
+   * Handles graph response from backend (original edit ledger approach).
+   * @private
+   * @param {any[]} nodesData - Array of node data from backend
+   */
+  async handleGraphResponse(nodesData) {
+    console.log(`\u{1F4CA} Processing graph response for ${nodesData.length} nodes from edit ledger`);
+    console.log("\u{1F50D} Node types from edit ledger:", nodesData.map((n) => `${n.id} (${n.type})`));
+    try {
+      for (const nodeData of nodesData) {
+        await this.createNodeFromEditorData(nodeData);
+      }
+      this._publisherNode = this.findPublisherNode();
+      if (this._publisherNode) {
+        console.log(`\u{1F50D} Publisher/Publish node found: ${this._publisherNode.id} (${this._publisherNode.type})`);
+        const audioPads = this._publisherNode.getSourcePads().filter((pad) => pad.dataType === "audio");
+        const videoPads = this._publisherNode.getSourcePads().filter((pad) => pad.dataType === "video");
+        console.log(`\u{1F50D} Publisher node has ${audioPads.length} audio pads and ${videoPads.length} video pads`);
+        audioPads.forEach((pad) => console.log(`  - Audio pad: ${pad.id} (${pad.name})`));
+        videoPads.forEach((pad) => console.log(`  - Video pad: ${pad.id} (${pad.name})`));
+      } else {
+        console.log("\u{1F50D} No Publisher node found");
+        console.log("\u{1F50D} Available node types:", Array.from(this.nodes.values()).map((n) => `${n.id} (${n.type})`));
+      }
+      console.log(`\u2705 Graph response processing complete: ${this.nodes.size} nodes created`);
+      this.emit("nodes-discovered");
+    } catch (error) {
+      console.error("Failed to process graph response:", error);
+    }
+  }
+  /**
    * Creates a workflow node from backend data.
    * @private
    * @param {any} nodeData - Node data from backend
@@ -4956,6 +5064,69 @@ var AppEngine = class extends EventEmitter {
       const { isSourcePad: isSourcePad2, isSinkPad: isSinkPad2 } = await Promise.resolve().then(() => (init_types(), types_exports));
       const padDirection = isSourcePad2(padBackendType) ? "source" : isSinkPad2(padBackendType) ? "sink" : "unknown";
       console.log(`  Adding pad from backend: ${padId} (${padDirection} derived from ${padBackendType})`);
+      let padCategory = "stateless";
+      if (padBackendType === "PropertySourcePad" || padBackendType === "PropertySinkPad") {
+        padCategory = "property";
+      }
+      const pad = new (await Promise.resolve().then(() => (init_StreamPad(), StreamPad_exports))).StreamPad({
+        id: padId,
+        nodeId: node.id,
+        name: padDisplayName,
+        backendType: padBackendType,
+        category: padCategory,
+        value: padData.value,
+        allowedTypes: padData.allowed_types || [],
+        nextPads: padData.next_pads || [],
+        previousPad: padData.previous_pad || null
+      });
+      pad.setLivekitRoom(this.livekitRoom);
+      node.addPad(pad);
+      console.log(`    \u2705 Added pad: ${padId} \u2192 ${padDisplayName} (${padCategory}) with data type: ${pad.dataType}`);
+    } catch (error) {
+      console.warn(`\u26A0\uFE0F Failed to create pad ${padData.id} for node ${node.id}:`, error);
+    }
+  }
+  /**
+   * Creates a workflow node from editor data (edit ledger format).
+   * @private
+   * @param {any} nodeData - Node data from editor
+   */
+  async createNodeFromEditorData(nodeData) {
+    try {
+      const nodeId = nodeData.id;
+      const nodeType = nodeData.type;
+      console.log(`\u{1F527} Creating node from editor data: ${nodeId} (${nodeType})`);
+      if (this.nodes.has(nodeId)) {
+        console.log(`Node ${nodeId} already exists, skipping`);
+        return;
+      }
+      const node = new WorkflowNode(nodeId, nodeType);
+      node.setLivekitRoom(this.livekitRoom);
+      if (nodeData.pads && Array.isArray(nodeData.pads)) {
+        for (const padData of nodeData.pads) {
+          await this.createPadFromEditorData(node, padData);
+        }
+      }
+      console.log(`\u2705 Successfully created node: ${nodeId} (${nodeType}) with ${nodeData.pads?.length || 0} pads`);
+      this.addNode(node);
+    } catch (error) {
+      console.error(`Failed to create node from editor data:`, error);
+    }
+  }
+  /**
+   * Creates a pad from editor data and adds it to the node.
+   * @private
+   * @param {IWorkflowNode} node - Node to add the pad to
+   * @param {any} padData - Pad data from editor
+   */
+  async createPadFromEditorData(node, padData) {
+    try {
+      const padId = padData.id;
+      const padBackendType = padData.type;
+      const padDisplayName = padData.id.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+      const { isSourcePad: isSourcePad2, isSinkPad: isSinkPad2 } = await Promise.resolve().then(() => (init_types(), types_exports));
+      const padDirection = isSourcePad2(padBackendType) ? "source" : isSinkPad2(padBackendType) ? "sink" : "unknown";
+      console.log(`  Adding pad from editor: ${padId} (${padDirection} derived from ${padBackendType})`);
       let padCategory = "stateless";
       if (padBackendType === "PropertySourcePad" || padBackendType === "PropertySinkPad") {
         padCategory = "property";
