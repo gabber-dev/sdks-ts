@@ -49,6 +49,7 @@ export class RealtimeSessionEngine {
   private _remainingSeconds: number | null = null;
   private divElement: HTMLDivElement;
   public id: string | null = null;
+  private _initialAudioOutputDeviceId: string | undefined = undefined;
 
   constructor({
     onConnectionStateChanged: onConnectionStateChanged,
@@ -121,6 +122,8 @@ export class RealtimeSessionEngine {
       onTick: this.onUserVolumeChanged.bind(this),
       bands: 10,
     });
+
+    this._initialAudioOutputDeviceId = undefined;
   }
 
   async connect(opts: SDKConnectOptions) {
@@ -236,6 +239,7 @@ export class RealtimeSessionEngine {
     this._webcamTrackDestination = element;
     this.resolveWebcam();
   }
+
   public setVideoTrackDestination({ element }: { element: HTMLVideoElement | string | undefined }) {
     if(typeof document === "undefined") {
       return;
@@ -257,6 +261,20 @@ export class RealtimeSessionEngine {
     }
     this._videoTrackDestination = element;
     this.resolveVideoTrackAttachment();
+  }
+
+  public setAudioOutputDeviceId(deviceId: string | null) {
+    this._initialAudioOutputDeviceId = deviceId || undefined;
+    const audioElements = this.divElement.getElementsByTagName("audio");
+
+    for (let i = 0; i < audioElements.length; i++) {
+      const el = audioElements[i];
+      if (typeof el.setSinkId === "function") {
+        el.setSinkId(deviceId || "").catch((e) => {
+          console.error("Error setting audio output device", e);
+        });
+      }
+    }
   }
 
   private set agentState(value: SDKAgentState) {
@@ -420,7 +438,13 @@ export class RealtimeSessionEngine {
         return;
       }
       this.agentAudioTrack?.detach();
-      this.divElement.appendChild(track.attach());
+      const audioEl = track.attach();
+      if (this._initialAudioOutputDeviceId && typeof audioEl.setSinkId === "function") {
+        audioEl.setSinkId(this._initialAudioOutputDeviceId).catch((e) => {
+          console.error("Error setting audio output device", e);
+        });
+      }
+      this.divElement.appendChild(audioEl);
       this.agentParticipant = participant;
       this.agentAudioTrack = track as RemoteAudioTrack;
       this.agentVolumeVisualizer.setTrack(track as RemoteAudioTrack);
@@ -569,6 +593,7 @@ export class RealtimeSessionErrorUnknown extends Error {
 export type RealtimeSessionError = RealtimeSessionErrorConnect | RealtimeSessionErrorUnknown;
 
 export type SessionEngineParams = {
+  initialAudioOutputDeviceId?: string;
   onConnectionStateChanged: ConnectionStateChangedCallback;
   onMessagesChanged: OnTranscriptionsChangedCallback;
   onMicrophoneChanged: OnMicrophoneCallback;
