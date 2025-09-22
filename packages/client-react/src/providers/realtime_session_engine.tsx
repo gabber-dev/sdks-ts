@@ -29,6 +29,7 @@ type RealtimeSessionEngineContextData = {
   canPlayAudio: boolean;
   agentVideoEnabled: boolean;
   innerEngine: RealtimeSessionEngine;
+  setAudioOutputDeviceId: (deviceId: string | null) => void;
   setWebcamEnabled: (state: WebcamState) => Promise<void>;
   setMicrophoneEnabled: (enabled: boolean) => Promise<void>;
   sendChatMessage: (p: SDKSendChatMessageParams) => Promise<void>;
@@ -41,10 +42,11 @@ type Props = {
   connectionOpts: SDKConnectOptions | null;
   videoTrackDestination?: HTMLVideoElement | string;
   webcamTrackDestination?: HTMLVideoElement | string;
+  initialAudioOutputDeviceId?: string;
   children: React.ReactNode;
 };
 
-export function RealtimeSessionEngineProvider({ connectionOpts, children, videoTrackDestination, webcamTrackDestination }: Props) {
+export function RealtimeSessionEngineProvider({ connectionOpts, children, videoTrackDestination, webcamTrackDestination, initialAudioOutputDeviceId }: Props) {
   const [id, setId] = useState<string | null>(null);
   const [connectionState, setConnectionState] =
     useState<SDKConnectionState>("not_connected");
@@ -144,6 +146,7 @@ export function RealtimeSessionEngineProvider({ connectionOpts, children, videoT
       }
       createOnce.current = true;
       return new RealtimeSessionEngine({
+        initialAudioOutputDeviceId,
         onError: onError.current,
         onAgentStateChanged: onAgentStateChanged.current,
         onRemainingSecondsChanged: onRemainingSecondsChanged.current,
@@ -185,6 +188,14 @@ export function RealtimeSessionEngineProvider({ connectionOpts, children, videoT
 
   const startAudio = useRef(async () => {
     await sessionEngine.current.startAudio();
+  });
+
+  const setAudioOutputDeviceId = useRef((deviceId: string | null) => {
+    if (!sessionEngine.current) {
+      console.error("Trying to set audio output device when there is no session");
+      return;
+    }
+    sessionEngine.current.setAudioOutputDeviceId(deviceId);
   });
 
   useEffect(() => {
@@ -231,6 +242,7 @@ export function RealtimeSessionEngineProvider({ connectionOpts, children, videoT
         sendChatMessage: sendChatMessage.current,
         setMicrophoneEnabled: setMicrophoneEnabled.current,
         startAudio: startAudio.current,
+        setAudioOutputDeviceId: setAudioOutputDeviceId.current,
       }}
     >
       {children}
